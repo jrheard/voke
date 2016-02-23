@@ -332,3 +332,32 @@ http://t-machine.org/index.php/2013/05/30/designing-bomberman-with-an-entity-sys
 ******* good shit
 "…if data should be in two components, but you can’t decide which: create a third component for it"
 ok let's move all this stuff over to a new repo so i can start taking detailed game notes
+
+ok per that post
+
+behaviors:
+move a player/monster/bullet in the direction is velocity indicates
+player/monster runs into a wall, can't go farther in that direction
+player/monster fires a bullet up/down/left/right
+move a bullet along its vector
+bullet collides with a player/monster, disappears, decrements health
+monster/player collide, decrement player health
+kill a player/monster
+monster decides to aggro or leash
+player/monster decides to change direction
+player/monster decides to want to attack in a particular direction
+
+data:
+player/monster/bullet/wall boundingbox
+player/monster/bullet dx/dy velocity
+player/monster/bullet top speed / acceleration
+player intended move direction (8 options)
+player intended fire direction (8 options)
+monster intended move direction (360 degrees)
+monster intended fire direction (360 degrees)
+player/monster health
+player armor
+player xp
+player/monster level
+player items (whole can of worms here)
+player/monster bullet effects
