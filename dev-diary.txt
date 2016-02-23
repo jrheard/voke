@@ -1,0 +1,334 @@
+2/20/16
+
+http://www.mattgreer.org/articles/a-game-made-with-reagent/ talks about using css animations; TODO
+
+https://rafalcieslak.svbtle.com/9-tips-for-clojurescript-beginners has a few good links
+mentions checkout dependencies
+
+======
+
+2/21/16
+
+https://developer.mozilla.org/en-US/docs/Games/Techniques/Efficient_animation_for_web_games
+****** this article appears to be super good
+has tips on how to avoid drawing things multiple times per frame (which would be a waste)
+mentions https://github.com/BernieSumption/animator.js which is super old
+cf http://blog.berniesumption.com/software/animator/
+" For a modern library that exposes CSS animations through a similar API, I recommend jQuery.Transit."
+so maybe the mdn article above is real out of date?
+
+https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
+
+anyway tbh i think i should probably be using canvas instead of svg for a bullet-hell shooter/rpg
+i think reagent+svg/divs/whatever makes tons of sense for turn-based games like cljstone
+but for a boi clone, it really seems like square peg round hole
+
+css/svg/etc animation links for later if i end up wanting them:
+https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations
+https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Transitions/Using_CSS_transitions
+
+anyway overall it looks like css transformations/animations are useful for situations where, like,
+you've got a particular UI that you want to animate - but i don't think they're at all relevant for
+a game in a web browser, it just doesn't make any sense
+
+re: reagent and canvas (already expected these two wouldn't work together):
+https://www.reddit.com/r/Clojure/comments/3cq5hg/can_reagent_components_work_with_html_canvas/
+"No, and I've tried: https://github.com/gzmask/embodier-gcode-webgl"
+
+
+canvas resources:
+https://github.com/rm-hull/monet [seems abandoned; TODO read anyway, might have good ideas]
+
+core.async and keyboard events: https://github.com/bdrillard/async-key-events
+
+had trouble getting access to goog.events.KeyCodes, was given
+http://clojurescriptmadeeasy.com/blog/when-do-i-use-require-vs-import.html in slack
+
+TODO what the hell is an entity component system
+https://github.com/markmandel/brute
+https://github.com/muhuk/clecs
+https://github.com/weavejester/ittyon
+
+TODO what is http://wercker.com/
+
+http://hueypetersen.com/posts/2016/02/13/om-next-from-a-relay-graphql-perspective/
+incomprehensible om.next/relay/redux/graphql post
+
+https://eklitzke.org/effectively-using-bash-profile evan notes on .bash_profile vs .bashrc
+
+http://hueypetersen.com/posts/2013/08/02/the-state-machines-of-core-async/ core.async implementation
+http://hueypetersen.com/posts/2013/07/10/code-read-of-core-async-timeouts/ also good post on timeout!
+
+http://hueypetersen.com/posts/2013/06/17/angular_is_slow/ - unrelated, but good quote:
+"Your model is not your view model. It can be for simple cases, but as soon as you start feeling
+friction you want to let the view model evolve instead of changing your domain models to suit the view."
+****** gold stuff
+
+ok so what is https://github.com/pedestal/pedestal
+i remember this being announced at clojure/west a while back but don't know anything about it
+lol "Our primary focus for the near future is Pedestal documentation, sample applications and
+improving general ease of use."
+so i think i can be forgiven for closing this tab and checking back later
+https://github.com/pedestal/pedestal/tree/master/guides/documentation for the record
+
+edmund says to use https://github.com/edmund-huber/sssgen for my blog
+i'm sure he's not biased
+
+https://en.wikipedia.org/wiki/Entity_component_system - see "game example" section
+really good info
+one of the main touted advantages is "composability instead of inheritance" - so is ECS still relevant in cljs?
+the description of components sounds a lot like clj/s protocols
+
+https://stackoverflow.com/questions/1901251/component-based-game-engine-design
+the guy in that answer says use FRP instead of ECS
+
+https://web.archive.org/web/20140719094839/http://www.altdev.co/2011/10/08/a-handful-of-components/
+********* good shit
+"The health component is probably the component that I re-use the most. Not just a health value that goes up
+and down it also keeps track of invulnerability, regeneration and poison. It also looks after the entities
+damage modifies with the following types currently supported Fire, Ice, Melee, Projectile, Magic and Crushing"
+
+notes before i forget
+
+what does game state end up looking like? do we end up adopting some ecs concepts and going with like
+
+state: {:entities [Entity]}
+Entity: {:id s/Int
+         :components [Component]}
+
+having an id helps for generating ^keys
+what do rooms look like? are they some sort of, like, container components?
+or do we have an :entities list and a :rooms list? the player's only in one room at a time if that's relevant
+
+=======
+
+2/22/16
+
+https://www.youtube.com/watch?v=9sc8Pyc51uU
+******* great talk on graphql / relay
+
+https://github.com/devknoll/graphql-resources graphql links
+
+https://www.youtube.com/watch?v=UoZyyo2Bwr8 talk on hoplon/javelin
+difficult to tell how to reason about it with regard to reagent
+he trashtalks the virtual dom for a while but i don't think all his criticisms apply
+not a super big fan of the tone of this talk in general, the tech looks useful but not much different from reagent
+
+reading https://github.com/evancz/elm-architecture-tutorial/
+
+TODO for boi what will movement look like? does a player have a :bounding-box {x y width height} and a
+:movement-state [:down :right]? that could work.
+
+at some point i want to read the react dom-diffing code but i have 600 other tabs to process first
+
+ok time for http://elm-lang.org/guide/reactivity
+"Note: It is usually best to use signals as little as possible. When it comes to writing nice modular code,
+you should primarily use normal functions and values. If you find yourself stuck with a signal of signals,
+ask yourself “how can I model this explicitly with functions and values?”"
+
+https://www.reddit.com/r/elm/comments/3s6lhb/learning_elm_vs_haskell_as_an_intro_to_functional/ elm vs haskell
+
+reading http://elm-lang.org/blog/blazing-fast-html
+"Virtual DOM sounds pretty slow, right? Create a whole new scene on every frame? This technique is actually
+widely used in the game industry and performs shockingly well for DOM updates when you use two relatively
+simple techniques: diffing and laziness." *******
+
+"game industry" phrase links to https://en.wikipedia.org/wiki/Scene_graph
+
+https://pchiusano.github.io/2014-07-02/css-is-unnecessary.html advocates using a lang like elm instead of css
+"A little reflection on the history of software reveals abstraction as the primary means by which humans
+make increasingly complex software possible and comprehensible."
+
+https://news.ycombinator.com/item?id=9797973 om rant thread
+
+
+************
+okokok here's what i want to build
+bullet-hell, twin-stick, top-down, boi-style combat/gameplay (except tear height, fuck that)
+boi-style items
+diablo-style levels (randomly generated floors rather than rooms; hallways, forests, whatever)
+simple RoR-style leveling (don't care about skill trees / talents, just want to avoid staying at base damage
+  forever like you often do in BoI)
+
+updated state sketch
+state: {:entities [Entity]
+        :mode (s/enum :menu :loading :normal :etc)}
+Entity: {:id s/Int
+         :type (s/enum :player :bullet :monster :wall :etc)
+         :components [Component]}
+
+************
+
+elm architecture notes:
+https://gist.github.com/evancz/2b2ba366cae1887fe621
+talks about advantages of having a centralized home of application state - single source of truth
+
+
+what does main game loop look like?
+*****
+`
+update-movement-state ; let monsters decide to aggro, leash, change their direction, etc
+update-movement-speeds ; update dx, dy
+update-positions ; update x, y (should we combine this with update-movement-speeds? unclear)
+update-status-effects ; poison, invincibility, etc
+calculate-collisions
+update-health (? or does calculate-collisions do this? what does calculate-collisions do? add to a queue of
+  unresolved collisions? something else?)
+perform-attacks (player and monsters can have an :attacking state, with an :attacks-per-second or something)
+`
+******
+what else?
+can these things be done in parallel? how?
+i guess you could have each use pmap instead of map, that could work pretty well actually
+
+what does poisoning look like? a PoisonComponent and a poison-system?
+maybe StatusEffects and an apply-status-effects system
+i kinda like that a lot actually
+
+bullets can't collide with other bullets
+so there's an Owned component maybe
+
+interesting notes on virtual dom / diffing: https://gist.github.com/Raynos/8414846
+http://calendar.perfplanet.com/2013/diff/
+good notes on setState effects, dirtiness setting, etc
+
+http://t-machine.org/index.php/2012/03/16/entity-systems-what-makes-good-components-good-entities/
+lots of example entities, components, systems
+
+"Ideally, you add a new component when you have a new “dimension” to the game objects. For instance,
+if you’re adding a physics System, you may not need to add any new Components – it might be that all
+you need is Location (containing x,y,x position and dx,dy,dz velocity) and RenderState (containing
+screen-pixels x,y) – and that you already have those components."
+
+***** note re xyz position, dxdydz velocity ******
+
+note warnings re: "Many systems per component" being a warning sign
+the two versions of badness listed:
+
+You have – say – 8 variables in the struct where you should instead have two structs (components),
+one with 5 variables, the other with 3.
+You have – say – 4 variables in the struct, but different systems are using those variables to mean
+different things. It works OK for now, but it’s very fragile – as soon as the different meanings
+diverge even a little, your code is going to start breaking
+
+goood shit in this article man
+
+in the comments:
+"In regard to components a good idea at times is to stuff as much data into a single component that
+covers the complete purpose. This cuts down referencing multiple components over and over and there
+is definitely a speed up in a tight loop. A good example of this is physics where in my efforts I
+provide a default “KinematicsParams” component that has velocity, position, rotation, angular velocity,
+angular rotation, etc. etc. all stuffed into one data component. The reason being is that instead of
+referencing a single component for each parameter it’s much easier / quicker to reference one."
+
+"Q: What are the thoughts about having components that dont have any data, but instead exists to label
+a entity in a way. A: I’m all for it."
+
+http://t-machine.org/wp-content/uploads/Aliqua-progress-2015-BUUG-v3.pdf describes entity systems
+
+via http://entity-systems.wikidot.com/ -
+Entity - A container into which components can be added,
+  ****usually hierarchical (any Entity can have sub-Entities).****
+
+"Whereas in an inheritance-based design, an enemy may have a complex inheritance chain such as
+Damageable <- Actor <- GroundBasedActor <- Enemy <- ZombieEnemy, in a C/ES-based design you might
+have a Health component, a GroundBasedMovement component and a ZombieAi component added to
+an entity named ZombieEnemy."
+
+"Rendering and updating may take place either by traversing the entire entity tree (slow), by
+having entities register themselves to the respective services (service locator hell) or in a
+hybrid approach where the renderer/clock system remember which components they found in the tree
+while entities merely provide a change notification if components are added to them or removed
+from them, allowing the renderer/clock system to re-check that part of the tree (complex).
+This aspect of the design is however not part of the C/ES pattern."
+
+http://t-machine.org/index.php/2007/11/11/entity-systems-are-the-future-of-mmog-development-part-2/
+definition of entities/components
+"For every discernible “thing” in your game-world, you have one Entity. Entities have no data and no methods."
+
+all this stuff is very clojure-y - clear separation + composition of data and behavior
+"Typical Systems in a game would be: Rendering System, Animation System, Input System, etc.
+ The Rendering system wakes up every 16 milliseconds, renders every Entity that has the Renderable
+ Component, and then goes back to sleep."
+
+"But the vast majority of game development is orders of magnitude more complex than Chess.
+If you try – for instance – to write a computer game of Chess, that has AI … you certainly
+don’t have “a movement and position component”.
+Instead, you have: movement, position, potential positions this turn, potential positions on
+future turns, threat radius, threatened squares, tactical options, strategic options, available
+“plays” (famous chess strategies), enemy-histories-per-piece (what does your opponent tend
+to do with pawns?) … etc."
+
+http://t-machine.org/index.php/2007/12/22/entity-systems-are-the-future-of-mmog-development-part-3/
+"So, don’t be tempted into hierarchical encoding, and definitely don’t do ANY encoding in the entity names"
+“a System essentially provides the method-implementation for Components”.
+
+components - data
+systems - behavior
+entities - id'd collections of data
+
+"Mathematically-speaking, an Entity is a database Key, just as you’d see in any RDBMS.
+Likewise, from a purely abstracted point of view, the “set of component-instances that comprise
+Entity #7742” is, literally, a database Query.
+THIS is why I said at the start that, ideally, you do NOT want to store your component-instances
+as a list inside a struct/class representation of each Entity. Fundamentally, that set is NOT
+defined as a list (a list is a static thing, it’s members don’t change without you changing them),
+it’s defined as a query (whose members are always changing, whether you want them to or not),
+and using one where really you wanted the other tends to cause problems in the long term."
+
+hm - does all that still apply in clojure-land?
+yeah prob not he says this is mainly for giant server-side games, which makes sense but
+won't be super relevant for my tiny little client-side game
+
+http://cowboyprogramming.com/2007/01/05/evolve-your-heirachy/
+good article, not much different from the stuff above in t-machine
+does have stories about introducing this design architecture into a preexisting system, neat
+
+"Ideally, components should not know about each other. However, in a practical world, there
+are always going to be dependencies between specific components. Performance issues also
+dictate that components should be able to quickly access other components. Initially we had
+all component references going through the component manager, however when this started using
+up over 5% of our CPU time, we allowed the components to store pointers to one another, and
+call member functions in other components directly."
+hrm
+
+http://scottbilas.com/files/2002/gdc_san_jose/game_objects_slides.pdf
+"– Examples are trees, bushes, monsters, levers, waypoint markers, doors, heroes, inventory items
+ – Many are “pure logic”, never see them (triggers, elevator movers, camera sequences)"
+
+======
+
+2/23/16
+
+https://news.ycombinator.com/item?id=5116615 rant on ECS / clojure performance for games
+fuck this guy tho
+
+anyway i had a lot of ideas re: game this morning, jotting them down
+
+current favorite name: voke (as in invoke, evoke, voco)
+
+things i like about teleglitch:
+punishing difficulty
+setting/aesthetic (irrelevant, i'm not doing much art design here)
+general terror about what's around the next corner
+not so much into the crafting system, but was a fan of the health / armor system
+
+bullets should be rectangular and thinnish rather than squares
+
+if we end up making levels with hallways, i'm worried about the player cheesing the game by just
+  funnelling all enemies through a hallway and shooting at them
+i guess just don't have hallways?
+what about doorways though?
+i guess just have all doorways be way bigger than the player's/monsters' hitboxes, so monsters can always
+  chase through really quickly
+
+http://t-machine.org/index.php/2014/03/08/data-structures-for-entity-systems-contiguous-memory/
+super good article
+sort of unclear how to apply it to cljs tho
+
+TODO - are deftypes/etc more performant than maps in cljs?
+
+http://t-machine.org/index.php/2013/05/30/designing-bomberman-with-an-entity-system-which-components/
+******* good shit
+"…if data should be in two components, but you can’t decide which: create a third component for it"
+ok let's move all this stuff over to a new repo so i can start taking detailed game notes
