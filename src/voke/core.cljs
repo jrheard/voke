@@ -18,11 +18,11 @@
                       (s/maybe :human-controlled) {:indended-move-direction IntendedMoveDirection
                                                    :intended-fire-direction s/Any}})
 
-(def player {:id            1
-             :position      {:x 10
-                             :y 10}
-             :collision-box {:width 50 :height 50}
-             :render-info   {:shape :square}
+(def player {:id               1
+             :position         {:x 10
+                                :y 10}
+             :collision-box    {:width 50 :height 50}
+             :render-info      {:shape :square}
              :human-controlled {:intended-move-direction #{}}
              })
 
@@ -42,35 +42,34 @@
                  (-> entity :collision-box :width)
                  (-> entity :collision-box :height)))))
 
-(def move-keys #{KeyCodes.DOWN KeyCodes.LEFT KeyCodes.UP KeyCodes.RIGHT})
+(def move-key-mappings {KeyCodes.W :up
+                        KeyCodes.A :left
+                        KeyCodes.S :down
+                        KeyCodes.D :right})
+(def fire-key-mappings {KeyCodes.DOWN  :down
+                        KeyCodes.LEFT  :left
+                        KeyCodes.UP    :up
+                        KeyCodes.RIGHT :right})
+(def key-mappings (merge move-key-mappings fire-key-mappings))
 
 (defn listen-to-keyboard-inputs [event-chan]
   (events/removeAll (.-body js/document))
-  (events/listen
-    (.-body js/document)
-    (.-KEYDOWN events/EventType)
-    (fn [event]
-      (let [code (.-keyCode event)]
-        (when (contains? move-keys code)
-          (.preventDefault event)
-          (put! event-chan {:type      :move-key-down
-                            :direction ({KeyCodes.DOWN  :down
-                                         KeyCodes.UP    :up
-                                         KeyCodes.LEFT  :left
-                                         KeyCodes.RIGHT :right} code)})))))
-  ; TODO DRY
-  (events/listen
-    (.-body js/document)
-    (.-KEYUP events/EventType)
-    (fn [event]
-      (let [code (.-keyCode event)]
-        (when (contains? move-keys code)
-          (.preventDefault event)
-          (put! event-chan {:type      :move-key-up
-                            :direction ({KeyCodes.DOWN  :down
-                                         KeyCodes.UP    :up
-                                         KeyCodes.LEFT  :left
-                                         KeyCodes.RIGHT :right} code)}))))))
+
+  (doseq [[goog-event-type event-type-suffix] [[(.-KEYDOWN events/EventType) "down"]
+                                               [(.-KEYUP events/EventType) "up"]]]
+
+    (events/listen
+      (.-body js/document)
+      goog-event-type
+      (fn [event]
+        (let [code (.-keyCode event)]
+          (when (contains? key-mappings code)
+            (.preventDefault event)
+            (let [event-type (cond
+                               (contains? move-key-mappings code) (keyword (str "move-key-" event-type-suffix))
+                               (contains? fire-key-mappings code) (keyword (str "fire-key-" event-type-suffix)))]
+              (put! event-chan {:type      event-type
+                                :direction (key-mappings code)}))))))))
 
 (defn handle-events [state event-chan]
   (listen-to-keyboard-inputs event-chan)
