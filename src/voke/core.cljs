@@ -6,8 +6,8 @@
                    [schema.core :as sm])
   (:use [cljs.core.async :only [chan <! >! put! timeout]]))
 
-(sm/defschema MoveDirection (s/enum :up :right :down :left))
-(sm/defschema IntendedMoveDirection #{MoveDirection})
+(sm/defschema Direction (s/enum :up :right :down :left))
+(sm/defschema IntendedDirection #{Direction})
 
 (sm/defschema Entity {:id                         s/Int
                       (s/maybe :position)         {:x s/Num
@@ -15,16 +15,19 @@
                       (s/maybe :collision-box)    {:width  s/Int
                                                    :height s/Int}
                       (s/maybe :render-info)      {:shape (s/enum :square)}
-                      (s/maybe :human-controlled) {:indended-move-direction IntendedMoveDirection
-                                                   :intended-fire-direction s/Any}})
+                      (s/maybe :human-controlled) {:indended-move-direction IntendedDirection
+                                                   :intended-fire-direction IntendedDirection}})
 
 (def player {:id               1
              :position         {:x 10
                                 :y 10}
              :collision-box    {:width 50 :height 50}
              :render-info      {:shape :square}
-             :human-controlled {:intended-move-direction #{}}
+             :human-controlled {:intended-move-direction #{}
+                                :intended-fire-direction #{}}
              })
+
+(sm/defschema GameState {:entities [Entity]})
 
 ; TODO :mode? :active-level?
 (def game-state (atom {:entities [player]}))
@@ -71,6 +74,12 @@
               (put! event-chan {:type      event-type
                                 :direction (key-mappings code)}))))))))
 
+(sm/defn update-player [state :- GameState & args]
+  (apply update-in
+         state
+         (concat [:entities 0] (first args))
+         (rest args)))
+
 (defn handle-events [state event-chan]
   (listen-to-keyboard-inputs event-chan)
 
@@ -78,11 +87,11 @@
     (let [msg (<! event-chan)]
       (js/console.log (clj->js msg))
       (case (msg :type)
-        ; TODO function for getting the player
-        :move-key-down (swap! state update-in [:entities 0 :human-controlled :intended-move-direction] conj (msg :direction))
-        :move-key-up (swap! state update-in [:entities 0 :human-controlled :intended-move-direction] disj (msg :direction))
-        )
-      (js/console.log (clj->js (get-in @state [:entities 0 :human-controlled :intended-move-direction])))
+        :move-key-down (swap! state update-player [:human-controlled :intended-move-direction] conj (msg :direction))
+        :move-key-up (swap! state update-player [:human-controlled :intended-move-direction] disj (msg :direction))
+        :fire-key-down (swap! state update-player [:human-controlled :intended-fire-direction] conj (msg :direction))
+        :fire-key-up (swap! state update-player [:human-controlled :intended-fire-direction] disj (msg :direction)))
+      (js/console.log (clj->js (get-in @state [:entities 0 :human-controlled])))
       (recur))))
 
 (defn ^:export main []
