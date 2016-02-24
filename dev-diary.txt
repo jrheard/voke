@@ -666,3 +666,82 @@ and so you have this like event graph / dependency graph between the systems
 and so you have a few that are running every tick, and most of them always running and just listening
 for events constantly
 and the rendering system runs every tick too
+
+
+unrelated
+status effects:
+poison
+freeze
+knockback
+slow
+stun (same as freeze?)
+
+okok so we're almost ready to get started but first i want to make sure my ideas about events + ECS
+aren't completely insane, so i have a bunch of google tabs open about that
+
+https://github.com/MovingBlocks/Terasology/wiki/Entity-System-Architecture talks about events
+cool-looking project btw, voxel world thingy
+
+"ComponentSystems, or Systems for short, provide behavior to entities. They do this in two ways
+Processing entities with a desired set of components in response to engine method calls like
+initialise(), update(float delta) and render()
+Responding to entity events sent to entities with a desired set of components"
+
+yeah, that sounds kinda like what i have in mind, cool
+
+"The health system would respond to an entity with a Health component receiving a Damage event,
+in order to reduce an entity's health - and if the health reaches 0, send a Death event to the entity"
+
+in this design of theirs, *entities* receive events rather than systems receiving events. not sure if
+i agree with this, prob won't do that
+
+https://github.com/MovingBlocks/Terasology/wiki/Entity-System-Architecture#events-and-event-handlers good shit
+
+" Systems can then provide event handlers to pick up specific events that have been sent entities
+with a desired set of components. Expanding on the Damage event, you may have a System that handles
+damage events that occur on entities with health components, in order to reduce health. Or a System
+that handles damage events for entities with a location and physics component, to knock the entity
+away from the damage causer."
+
+i'm still not convinced that sending messages to entities is correct
+
+"Events also support cancellation - this allows a system to stop an event before it
+eaches systems with a lower priority - for instance if you add an invincibility component
+to make an entity temporarily immune to damage, you can add a system that will intercept
+the Damage event and cancel it before it can reach the health system."
+
+hrm hrm hrm
+
+https://www.gamedev.net/topic/643311-events-and-entity-component-systems/
+good first post, bad responses
+
+https://gamedev.stackexchange.com/questions/47476/tips-for-component-based-entity-system-message-handling
+"Although I haven't implemented a way to handle events (other than entity-related events),
+I left that up to the user" lol
+
+https://gamedev.stackexchange.com/questions/83767/communication-pattern-in-entity-component-system
+"There is no right answer to your question and a lot of it comes from personal taste and out of need."
+fair nuff
+
+http://unity-coding.slashgames.org/component-based-entity-systems-event-driven-systems-to-implement-the-logic/
+"As a system is very self-contained, events are the way to communicate with other systems and the world
+outside a system in general."
+yes yes fine ok
+
+http://forums.xkcd.com/viewtopic.php?f=11&t=81459
+"the major strength of component systems: you minimise communication overheads and you can easily "batch" updates."
+
+http://tarheadstudio.com/entity-component-system/
+"Have you considered an event system of some sort on top of this?"
+"Yes. The way we have solved it is rudimentary though: systems send messages, which is an object with
+some data, to a game manager, who propagate the message to every other system."
+
+ok so at this point i'm convinced that my design is good
+
+******
+so we're going to go with the style of entities/components that i talked about at the start of today's notes
+and there will be a bunch of systems that exist
+and some systems will run on every tick
+and other systems will just listen for events
+and there are some examples of those two kinds of systems in today's notes above
+rad
