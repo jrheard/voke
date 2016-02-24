@@ -758,3 +758,28 @@ TODO free sprites at http://www.widgetworx.com/spritelib/
 apparently http://www.physicsclassroom.com/ is good for physics
 
 http://www.compoundtheory.com/mini-game-dev-diary-1/ cool stuff
+
+http://www.pixijs.com/ claims to be super fast
+
+ok so i need to pick a rendering library
+first contenders i found are phaser, fabric, and pixi
+phaser appears to sit on top of pixi (but not any more i guess) and to be a full-fledged engine
+i think that is *not* what i want, and that i want pixi or fabric instead
+i just want a renderer, i don't want someone else's game engine
+
+https://github.com/alexkehayias/chocolatier (seen above) uses pixi, read through its source if i go with pixi
+
+http://sam-koblenski.blogspot.com/2015/08/a-barely-adequate-guide-to-javascript.html some guy who goes with pixi
+
+"Anyway, I tried a few different options when I was building the tool, Fabric.js, Famo.us,
+but nothing had close to the performance of PIXI."
+hrm
+pixi does have more stars/etc
+i guess i'll prob go with it
+
+https://groups.google.com/forum/#!topic/flashcodersny/rU0-3zD7QIo this guy says pixi over fabric
+
+stumbled over http://squirrel.pl/blog/2013/03/28/two-ways-to-access-properties-in-clojurescript/ yet again
+**** use only aset/aget when interacting with javascript libraries
+
+ok so i'll go with pixi for now and if it feels too heavyweight i'll switch to fabric

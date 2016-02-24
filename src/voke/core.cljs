@@ -9,41 +9,29 @@
 (sm/defschema Direction (s/enum :up :right :down :left))
 (sm/defschema IntendedDirection #{Direction})
 
-(sm/defschema Entity {:id                         s/Int
-                      (s/maybe :position)         {:x s/Num
-                                                   :y s/Num}
-                      (s/maybe :collision-box)    {:width  s/Int
-                                                   :height s/Int}
-                      (s/maybe :render-info)      {:shape (s/enum :square)}
-                      (s/maybe :human-controlled) {:indended-move-direction IntendedDirection
-                                                   :intended-fire-direction IntendedDirection}})
+(sm/defschema Entity {:id                                s/Int
+                      (s/maybe :position)                {:x s/Num
+                                                          :y s/Num}
+                      (s/maybe :collision-box)           {:width  s/Int
+                                                          :height s/Int}
+                      (s/maybe :render-info)             {:shape (s/enum :square)}
+                      (s/maybe :human-controlled)        s/Bool
+                      (s/maybe :indended-move-direction) IntendedDirection
+                      (s/maybe :intended-fire-direction) IntendedDirection})
 
-(def player {:id               1
-             :position         {:x 10
-                                :y 10}
-             :collision-box    {:width 50 :height 50}
-             :render-info      {:shape :square}
-             :human-controlled {:intended-move-direction #{}
-                                :intended-fire-direction #{}}
-             })
+(def player {:id                      1
+             :position                {:x 10
+                                       :y 10}
+             :collision-box           {:width 50 :height 50}
+             :render-info             {:shape :square}
+             :human-controlled        true
+             :intended-move-direction #{}
+             :intended-fire-direction #{}})
 
 (sm/defschema GameState {:entities [Entity]})
 
 ; TODO :mode? :active-level?
 (def game-state (atom {:entities [player]}))
-
-(sm/defn render-system
-  [entities :- [Entity]]
-  ; TODO  get a good canvas library via cljsjs, fabric or phaser seem to be top contenders, research
-  (let [canvas (js/document.getElementById "screen")
-        ctx (.getContext canvas "2d")]
-    (aset ctx "fillStyle" "rgb(50,50,50)")
-    (doseq [entity entities]
-      (.fillRect ctx
-                 (-> entity :position :x)
-                 (-> entity :position :y)
-                 (-> entity :collision-box :width)
-                 (-> entity :collision-box :height)))))
 
 (def move-key-mappings {KeyCodes.W :up
                         KeyCodes.A :left
@@ -87,16 +75,54 @@
     (let [msg (<! event-chan)]
       (js/console.log (clj->js msg))
       (case (msg :type)
-        :move-key-down (swap! state update-player [:human-controlled :intended-move-direction] conj (msg :direction))
-        :move-key-up (swap! state update-player [:human-controlled :intended-move-direction] disj (msg :direction))
-        :fire-key-down (swap! state update-player [:human-controlled :intended-fire-direction] conj (msg :direction))
-        :fire-key-up (swap! state update-player [:human-controlled :intended-fire-direction] disj (msg :direction)))
-      (js/console.log (clj->js (get-in @state [:entities 0 :human-controlled])))
+        :move-key-down (swap! state update-player [:intended-move-direction] conj (msg :direction))
+        :move-key-up (swap! state update-player [:intended-move-direction] disj (msg :direction))
+        :fire-key-down (swap! state update-player [:intended-fire-direction] conj (msg :direction))
+        :fire-key-up (swap! state update-player [:intended-fire-direction] disj (msg :direction)))
+      (js/console.log (clj->js (get-in @state [:entities 0])))
       (recur))))
 
+(sm/defn render-system
+  [entities :- [Entity]]
+  ; TODO  get a good canvas library via cljsjs, fabric or phaser seem to be top contenders, research
+  (let [canvas (js/document.getElementById "screen")
+        ctx (.getContext canvas "2d")]
+    (aset ctx "fillStyle" "rgb(50,50,50)")
+    (doseq [entity entities]
+      (.fillRect ctx
+                 (-> entity :position :x)
+                 (-> entity :position :y)
+                 (-> entity :collision-box :width)
+                 (-> entity :collision-box :height)))))
+
+(def direction-value-mappings {:up {:y -1}
+                               :down {:y 1}
+                               :left {:x -1}
+                               :right {:x 1}})
+
+(sm/defn move-system :- GameState
+  [state :- GameState]
+  (update-in state [:entities 0] (fn [entity]
+                                   (if-let [seq (entity :intended-move-direction)]
+                                     ; for each intended direction
+                                     ; look up its mapping
+                                     ; apply the delta to the relevant axis
+                                     entity
+                                     entity))))
+
+(sm/defn run-systems :- GameState
+  [state :- GameState]
+  (render-system (:entities state))
+  (-> state
+      move-system))
+
 (defn ^:export main []
-  (render-system (:entities @game-state))
   (let [event-chan (chan)]
     (handle-events game-state event-chan))
+
+  (js/window.requestAnimationFrame (fn process-frame [ts]
+                                     (swap! game-state run-systems)
+                                     (js/window.requestAnimationFrame process-frame)))
+
   )
 
