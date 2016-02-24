@@ -8,7 +8,10 @@
                  [org.clojure/clojurescript "1.7.170"]
                  [org.clojure/core.async "0.2.374"
                   :exclusions [org.clojure/tools.reader]]
-                 [figwheel-sidecar "0.5.0"]]
+                 [figwheel-sidecar "0.5.0"]
+                 [prismatic/schema "1.0.4"]
+                 [reagent "0.6.0-alpha"]
+                 ]
 
   :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]]
 

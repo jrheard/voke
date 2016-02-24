@@ -745,3 +745,16 @@ and some systems will run on every tick
 and other systems will just listen for events
 and there are some examples of those two kinds of systems in today's notes above
 rad
+
+https://github.com/tonsky/41-socks/blob/gh-pages/src/forty_one_socks.cljs
+
+http://www.compoundtheory.com/ prettiest blog ever
+http://www.compoundtheory.com/brute-entity-component-system-library-0-2-0-the-sequel/
+started side-effecty, went functional
+ok so anywyay i'm not going to use brute
+
+http://www.compoundtheory.com/writing-a-game-feels-like-im-going-around-in-circles/
+TODO free sprites at http://www.widgetworx.com/spritelib/
+apparently http://www.physicsclassroom.com/ is good for physics
+
+http://www.compoundtheory.com/mini-game-dev-diary-1/ cool stuff

@@ -1,19 +1,47 @@
 (ns voke.core
-  (:require ))
+  (:require [schema.core :as s]
+            [goog.events :as events])
+  (:import [goog.events KeyCodes])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]]
+                   [schema.core :as sm])
+  (:use [cljs.core.async :only [chan <! >! put! timeout]]))
 
-(enable-console-print!)
+(sm/defschema Entity {:id                      s/Int
+                      (s/maybe :position)      {:x s/Num
+                                                :y s/Num}
+                      (s/maybe :collision-box) {:width  s/Int
+                                                :height s/Int}
+                      (s/maybe :render-info)   {:shape (s/enum :square)}})
 
-(println "Edits to this text should show up in your developer console hi.")
-;; define your app data so that it doesn't get over-written on reload
+(def player {:id            1
+             :position      {:x 10
+                             :y 10}
+             :collision-box {:width 50 :height 50}
+             :render-info   {:shape :square}})
 
-(defonce app-state (atom {:text "Hello world!"}))
+; TODO :mode? :active-level?
+(def game-state (atom {:entities [player]}))
 
+(sm/defn render-system
+  [entities :- [Entity]]
+  (js/console.log (clj->js entities))
+  (let [canvas (js/document.getElementById "screen")
+        ctx (.getContext canvas "2d")]
+    (doseq [entity entities]
+      (aset ctx "fillStyle" "rgb(50,50,50)")
+      (.fillRect ctx
+                 (-> entity :position :x)
+                 (-> entity :position :y)
+                 (-> entity :collision-box :width)
+                 (-> entity :collision-box :height)
+                 ))
+    )
+  )
 
-(defn on-js-reload []
-  ;; optionally touch your app-state to force rerendering depending on
-  ;; your application
-  ;; (swap! app-state update-in [:__figwheel_counter] inc)
-)
+(defn ^:export main []
+  (render-system (:entities @game-state))
+  )
+
 
 
 (comment
