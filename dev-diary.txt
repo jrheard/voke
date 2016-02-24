@@ -328,8 +328,10 @@ sort of unclear how to apply it to cljs tho
 
 TODO - are deftypes/etc more performant than maps in cljs?
 
+*****************
 http://t-machine.org/index.php/2013/05/30/designing-bomberman-with-an-entity-system-which-components/
 ******* good shit
+****** fuckin gold
 "…if data should be in two components, but you can’t decide which: create a third component for it"
 ok let's move all this stuff over to a new repo so i can start taking detailed game notes
 
@@ -346,6 +348,8 @@ kill a player/monster
 monster decides to aggro or leash
 player/monster decides to change direction
 player/monster decides to want to attack in a particular direction
+player uses an active item
+player picks up an item
 
 data:
 player/monster/bullet/wall boundingbox
@@ -361,3 +365,128 @@ player xp
 player/monster level
 player items (whole can of worms here)
 player/monster bullet effects
+bullets in flight
+bullet owners
+player/monster attack state [range, frequency, time since last shot]
+item name and effect
+
+
+TODO how to take keyboard wasd/arrow input?
+
+TODO look into public domain sprites for players/monsters/bullets/whatever
+
+http://t-machine.org/index.php/2013/05/30/designing-bomberman-with-an-entity-system-which-components/comment-page-2/#comment-1274479
+really great question
+never gets an answer!
+
+http://t-machine.org/index.php/2013/05/30/designing-bomberman-with-an-entity-system-which-components/comment-page-2/#comment-1274784
+**********
+
+http://t-machine.org/index.php/2012/04/19/concepts-of-object-identity-in-game-programming/
+******* has notes on how systems can communicate with one another
+eg kill enemy, enemy drops loot
+
+*********
+http://shaun.boyblack.co.za/blog/2012/08/04/games-and-entity-systems/ other guy's list of components/etc
+******** GREAT post
+
+http://www.richardlord.net/blog/what-is-an-entity-framework
+ECS vs game loop
+not much new info after i've read all the stuff linked above, but overall a great standalone post
+"The collision system, which tests whether the player is colliding with other objects and
+resolves those collisions."
+
+"The systems are decoupled form each other. Each system knows only about itself and the data
+it operates on. It knows and cares nothing at all about the other systems and how they may
+have affected by or used the data before or after this system gets to work with it."
+hm, discourages systems from communicating
+
+but later...
+"In most games, ***some*** of the systems are entirely independent of each other, including being
+independent of the order in which they are applied. This makes it easy to run these systems in parallel."
+
+anyway i mean i've been reading a bunch of this stuff and it's all cool and helpful but i'm not sure
+how much of it applies in clojureland. in clojure you'd just be passing maps around to different functions
+anyway, you'd have a clear separation of code and data, which is what ECS is all about.
+so at the end of the day the main distinction is between, like, do i have game objects like this?
+
+{:id 123
+ :type :player
+ :position a-position
+ :velocity a-velocity
+ :intended-movement-state an-intended-movement-state
+ :firing-state a-firing-state
+ etc
+}
+
+or do i have objects like this:
+
+{:id 123
+ :components [player-controlled, a-position, a-velocity, an-indended-firing-state]
+}
+
+ECS is all about the second option i think, although it's sort of six-one-half-dozen-other, maybe doens't matter.
+might as well give it a shot
+
+TODO - what does player-controlled look like? does it contain both intended movement direction
+  and intended firing direction? what about active item usage, how does that work?
+
+http://gameprogrammingpatterns.com/component.html
+****** has a section on how components communicate with one another!!!!!!
+
+"sending messages" - sounds familiar
+
+so i guess the idea proposed here is that entities have a "send" function, and components have a
+"receive" function
+i mean that's all pretty OO
+in clj, it'd probably look more like
+
+(messaging/send an-entity-id a-message)
+
+that seems reasonable
+
+but what does it end up actually doing? like let's say we do
+(messaging/send 1234 {:type :player-direction-input
+                      :value :UP})
+
+where does the code live that handles that message?
+i guess you let components subscribe to specific types of messages and have some sort of "bus"
+(what does that term even mean?) that coordinates all this; i know core.async has facilities along these lines
+
+hm hm hm
+
+"Some domains are distinct but still closely related. Think animation and rendering, user input
+and AI, or physics and collision. If you have separate components for each half of those pairs,
+you may find it easiest to just let them know directly about their other half.
+
+Messaging is useful for “less important” communication. Its fire-and-forget nature is a good
+fit for things like having an audio component play a sound when a physics component sends a
+message that the object has collided with something."
+
+hm i'm not sure about the messaging/send stuff from above
+
+ok so what about if like for instance the physics component just adds a PendingAudio component
+and the audio system looks for PendingAudio components on each tick, plays them, and removes them
+
+and so the velocity component directly reads from the player-input component
+
+and the player-input component is... directly sent messages via the UI?
+hm how does it get its stuff
+
+i guess the game's business logic is a module that has a clearly defined API
+and only has a few specific public functions
+
+(accept-player-input a-message)
+(let-time-pass a-number-of-ticks)
+
+and so accept-player-input is a function that under the hood modifies components, and even then
+just like the direction the player is intending to move and fire
+
+and also i guess like (pause-game) etc
+
+so what does the game's state currently look like?
+
+{:entities [Entity]
+ :mode Mode ; for pausing, menus, game over, whatever
+ ; maybe a channel but probably not, it can be local to the root reagent component
+}
