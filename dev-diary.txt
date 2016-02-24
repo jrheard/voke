@@ -350,6 +350,7 @@ player/monster decides to change direction
 player/monster decides to want to attack in a particular direction
 player uses an active item
 player picks up an item
+camera moves to follow the player
 
 data:
 player/monster/bullet/wall boundingbox
@@ -369,6 +370,8 @@ bullets in flight
 bullet owners
 player/monster attack state [range, frequency, time since last shot]
 item name and effect
+camera
+background
 
 
 TODO how to take keyboard wasd/arrow input?
@@ -477,7 +480,7 @@ i guess the game's business logic is a module that has a clearly defined API
 and only has a few specific public functions
 
 (accept-player-input a-message)
-(let-time-pass a-number-of-ticks)
+(let-time-pass time-delta)
 
 and so accept-player-input is a function that under the hood modifies components, and even then
 just like the direction the player is intending to move and fire
@@ -488,5 +491,38 @@ so what does the game's state currently look like?
 
 {:entities [Entity]
  :mode Mode ; for pausing, menus, game over, whatever
+ :active-level an-entity-id ;?
  ; maybe a channel but probably not, it can be local to the root reagent component
 }
+
+https://gamedev.stackexchange.com/questions/31473/what-is-the-role-of-systems-in-a-component-based-entity-architecture/31491#31491
+not sure about the metaphor, but the main message is that systems can read from multiple components at once
+*** for perf, it suggests having each entity have a bitfield indicating which components it has; that could work
+
+https://github.com/ibdknox/ChromaShift/blob/master/cljs/game/levels/first.cljs
+**** level built in clj with an ECS
+"In ChromaShift's case the core structure and caches for the engine are actually written in
+JavaScript for performance reasons, while all of the game CES is written in ClojureScript."
+
+http://www.clojure-games.org/component-entity-system
+
+https://github.com/muhuk/clecs-examples/blob/master/clecs-example-roguelike/src/clecs_example_roguelike/entities.clj
+example entities/components
+
+i like https://github.com/muhuk/clecs/blob/master/src/clecs/system.clj -
+rather than having systems just be functions, he has them be maps
+so in addition to a function that takes a world and returns a new one, he has other metadata too like
+:name :rendering
+:reads #{:Inventory :Renderable}
+:writes #{:Inventory :Location}
+interesting! overkill or helpful/necessary?
+
+http://alexkehayias.tumblr.com/post/78711349238/entity-component-model-in-clojurescript
+ecs with protocols/records
+
+https://github.com/alexkehayias/chocolatier/ yet another system that talks a lot about:
+"Think about it less as a bunch of objects with their own state and methods and more like
+a database where you query for functionality, state, based on a certain aspect or entity."
+
+i've seen this talk of databases+queries like 10 times now in reference to ECS, not sure
+what i think about it
