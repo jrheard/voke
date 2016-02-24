@@ -595,3 +595,49 @@ dunno about this argument
 http://retroaktive.me/blog/keechma-design-decisions/
 
 https://github.com/tonsky/datascript - relevant for storing entities?
+
+======
+
+2/24/16
+
+ibdknox uses a js stats library in https://github.com/ibdknox/ChromaShift/blob/master/js/lib/stats.js
+see https://github.com/ibdknox/ChromaShift/blob/master/cljs/game/lib/dev.cljs
+
+he uses ! and ? as aliases for aset and aget, not sure if i like it but here we go
+https://github.com/ibdknox/ChromaShift/blob/master/cljs/game/lib/core.cljs
+
+physics in https://github.com/ibdknox/ChromaShift/blob/master/cljs/game/lib/physics.cljs
+note the Box2D library he seems to be using
+
+ok you know what i think my entities are just going to look like
+
+{:id 1234
+ :type :player
+ :position a-position-component
+ :bounding-box a-bounding-box-component
+ :etc etc}
+
+rather than
+
+{:id 1234
+ :components [a-position-component a-bounding-box-component etc}
+
+i think that the second style makes a lot of sense if you're outside of clojure and are used to OOP and
+trying to force yourself out of it, but i don't think it's required here. i also think that the second
+style is particularly good about discouraging components from communicating with one another, and also
+that it probably makes a lot of sense in eg an MMO where you have a jillion entities and a jillion components
+and you want to store their relationships in a RDBMS. but that's not us here. so i think i'll just use dicts.
+
+http://box2d-js.sourceforge.net/ here's that box2d library
+more relevant if you want gravity, etc; let's skip it imo
+
+still having a lot of trouble figuring out what position components should look like
+are they just an :x and a :y, or do they also have a :width and a :height?
+i know that ideally :width and :height would be for bounding boxes, but like what *doesn't* have a shape like that?
+i think in this game i'm going to have everything be rectangular, so nothing
+so you have a :position with an :x and a :y and a :width and a :height
+and you can also optionally have a CollisionBox with a :width and a :height
+things that don't have collision boxes: scenery, basically nothing else
+end of level has a collision box so you know when the player's walked into it
+items/pickups have collision boxes for same reason
+so i guess collision boxes have some sort of like :obstruction true/false field
