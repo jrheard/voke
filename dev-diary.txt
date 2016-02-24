@@ -364,7 +364,7 @@ player/monster health
 player armor
 player xp
 player/monster level
-player items (whole can of worms here)
+player inventory
 player/monster bullet effects
 bullets in flight
 bullet owners
@@ -526,3 +526,58 @@ a database where you query for functionality, state, based on a certain aspect o
 
 i've seen this talk of databases+queries like 10 times now in reference to ECS, not sure
 what i think about it
+
+chocolatier has notes about cross-component communication
+"A global pub-sub event queue is available for any component enabling cross component communication
+without coupling the state of any of the components. For example, suppose the render component
+needs to update the screen position of the player sprite. The render component needs information
+from the input component, but we don't want to couple the state of either components together.
+Instead of directly accessing the input component's state from the render component we subscribe
+to messages about player movement and update based on that. We can broadcast that information without
+any knowledge of who is listening to it and no one can change the component state from another component."
+
+not sure i 100% agree with the components he's come up with, but anyway here's another bit of precedent
+for messages / pubsub
+
+"Any component can subscribe to events by creating a component with a :subscriptions key in the options
+hashmap where each subscription is a vector of selectors:
+ (mk-component state :player1 [component-f {:subscriptions [[:e1] [:e2]]}])
+The subscribed component will receive the event in a hashmap in the :inbox key passed in as the
+third argument to the component function. Messages that are sent are available immediately to
+the subscriber which allows for events to be sent and received within the same frame and are
+therefore order dependent."
+
+interesting
+
+"ClojureScript presents challenges for optimization including garbage collection, persistent
+data structures, and functional paradigms that js engines may have difficulty optimizing."
+eep
+
+"Where appropriate, transient state should be used when operating on large collections and
+hashmaps for better performance. See chocolatier.macros in the clj source directory for
+helpers with transient state. "
+
+re: performance
+https://stackoverflow.com/questions/21721028/how-to-improve-clojurescript-performance
+"Now, if performance is really critical to what you're doing and persistence provides
+no benefit, you can just use arrays and objects from ClojureScript:"
+"By using records and native field access, you can cut the runtime for your
+original ClojureScript solution in half"
+
+http://numergent.com/2015-12/ClojureScript-performance-revisited.html
+******
+"As we can see it’s doing this with a regular vector, which we can easily turn into a
+transient one and persist it once we’re done."
+bought him 1 fps, 12->13
+lists other, more impactful techniques
+mentions `keep` as a one-pass map+filter
+
+http://davedellacosta.com/cljs-protocols notes on protocols
+
+http://www.bestinclass.dk/blog/brians-brain-optimized-clojurescript-html5
+
+https://swannodette.github.io/2013/06/10/porting-notchs-minecraft-demo-to-clojurescript/ nolen on perf
+
+okok that's enough reading for now
+tomorrow i should be able to start actually coding something
+and constantly be terrified that i'm violating all the principles i've read about or some shit
