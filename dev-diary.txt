@@ -353,7 +353,7 @@ player picks up an item
 camera moves to follow the player
 
 data:
-player/monster/bullet/wall boundingbox
+player/monster/bullet/wall collision-box
 player/monster/bullet dx/dy velocity
 player/monster/bullet top speed / acceleration
 player intended move direction (8 options)
@@ -581,3 +581,17 @@ https://swannodette.github.io/2013/06/10/porting-notchs-minecraft-demo-to-clojur
 okok that's enough reading for now
 tomorrow i should be able to start actually coding something
 and constantly be terrified that i'm violating all the principles i've read about or some shit
+
+TODO look into a good canvas js library that i can use via cljsjs
+
+https://web.archive.org/web/20140509212857/http://resatori.com/clojure-entity-component-system
+
+unrelated: http://yogthos.net/posts/2016-02-22-LuminusEmbracingHugSQL.html - yesql no longer developed?
+
+http://elbenshira.com/blog/the-end-of-dynamic-languages/
+http://yogthos.net/posts/2015-11-28-TheSkyIsNotFalling.html
+dunno about this argument
+
+http://retroaktive.me/blog/keechma-design-decisions/
+
+https://github.com/tonsky/datascript - relevant for storing entities?
