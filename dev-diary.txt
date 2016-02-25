@@ -805,3 +805,70 @@ begin work on a wrapper library for it
 and begin work on a pubsub event system so that the render system can subscribe to move events
 
 ignore the concept of collisions for now, forget they exist
+
+=========
+
+2/25/16
+
+here are my goals for today
+
+design and build a simple event system
+codify schemas for systems
+  they can have an :every-tick field whose value is a map like
+    {:reads #{:render-info :position}
+     :fn (fn [entity] entity) ; TODO should this take a single entity or a list of entities? prob the latter for perf?
+     }
+  they can also have an :event-handlers field whose value is a list of maps like
+    {:handles an-event-type
+    :fn (fn [event] something) ; TODO should this also take a system? what values should it return? does it just perform side effects?
+    }
+
+...and ideally i'd like to start wiring the rendering system up so that it listens to events
+that are emitted by the movement system (because pixi.js relies on mutability, so we'll
+like have all of these objects in flight that represent each entity, and so when each
+entity moves we have to mutate its corresponding object's x and y, etc),
+but i doubt that i'll get to that today.
+
+let's just mainly focus on designing an event system (likely using core.async) and codifying
+the schema for System.
+
+pixi links to look at later, haven't processed these yet:
+http://sam-koblenski.blogspot.com/2015/08/a-barely-adequate-guide-to-javascript.html
+http://www.mase.io/code/clojure/2015/02/07/pixi-cljs/
+https://github.com/alexkehayias/chocolatier/blob/5bc509f32f12411848c995f1e11ef917e87d6cbb/src/cljs/chocolatier/engine/components/renderable.cljs
+https://github.com/alexkehayias/chocolatier/search?utf8=%E2%9C%93&q=pixi
+https://github.com/alexkehayias/chocolatier/blob/dev/src/cljs/chocolatier/engine/systems/render.cljs
+https://github.com/alexkehayias/chocolatier
+https://github.com/pixijs/pixi.js
+https://pixijs.github.io/docs/
+http://www.goodboydigital.com/pixi-js-tutorial-getting-started/
+https://github.com/maseb/lab-pixi-cljs/blob/master/src/pixicljs/core.cljs
+https://github.com/maseb/lab-pixi-cljs/blob/master/src/pixi/core.cljs
+
+ok
+so what should our event system look like?
+
+core.async pubsub info
+https://github.com/clojure/core.async/wiki/Pub-Sub
+...hrm
+
+https://yobriefca.se/blog/2014/06/04/publish-and-subscribe-with-core-dot-asyncs-pub-and-sub/
+
+"While the pub/sub mechanism provided by core.async is higher level than working directly
+with chans and mults to achieve the same thing (in fact that is how the pub/sub operations
+are implemented internally) it should still be considered a set of lower level primitives
+compared to say a specific event bus notification with topic namespacing, wildcard broadcasting
+and other such specialised features."
+
+"I found the idea a bit easier to understand when I thought of the publication as a
+realised topic or set of topics."
+
+re: docstrings, here's the "would this work with multiple arities?" post i've been remembering lately
+https://www.reddit.com/r/Clojure/comments/3nko85/having_trouble_with_pubsub_with_coreasync_channels/
+
+https://clojure.github.io/core.async/#clojure.core.async/pub
+
+https://github.com/search?utf8=%E2%9C%93&q=core.async+pub+extension%3Aclj+extension%3Acljs&type=Code&ref=advsearch&l=&l=
+
+ok it looks like i'm *kinda* on my own here re: prior art
+here goes
