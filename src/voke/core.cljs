@@ -103,15 +103,16 @@
 
 (sm/defn move-system :- GameState
   [state :- GameState]
-  (update-in state [:entities 0] (fn [entity]
-                                   (loop [directions (entity :intended-move-direction)
-                                          entity entity]
-                                     (if (seq directions)
-                                       (let [direction (first directions)
-                                             [axis value] (first (direction-value-mappings direction))]
-                                         (recur (rest directions)
-                                                (update-in entity [:position axis] + (* 5 value))))
-                                       entity)))))
+  (update-in state [:entities] #(mapv (fn [entity]
+                                       (loop [directions (entity :intended-move-direction)
+                                              entity entity]
+                                         (if (seq directions)
+                                           (let [direction (first directions)
+                                                 [axis value] (first (direction-value-mappings direction))]
+                                             (recur (rest directions)
+                                                    (update-in entity [:position axis] + (* 5 value))))
+                                           entity)))
+                                     %)))
 
 (sm/defn run-systems :- GameState
   [state :- GameState]

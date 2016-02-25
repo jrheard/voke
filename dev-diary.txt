@@ -783,3 +783,25 @@ stumbled over http://squirrel.pl/blog/2013/03/28/two-ways-to-access-properties-i
 **** use only aset/aget when interacting with javascript libraries
 
 ok so i'll go with pixi for now and if it feels too heavyweight i'll switch to fabric
+
+http://www.mase.io/code/clojure/2015/02/07/pixi-cljs/
+https://github.com/maseb/lab-pixi-cljs/blob/master/src/pixicljs/core.cljs
+https://github.com/maseb/lab-pixi-cljs/blob/master/src/pixi/core.cljs
+
+TODO next task is going to be to spend some time with pixi, make a pixi.cljs that wraps it
+
+TODO i think the rendering system is going to have to subscribe to movement events
+like, successful-move events, ones emitted by the collision system
+whenever a successful move happens, the relevant entity's pixi object needs to be mutated to reflect the
+new position
+
+collisions:
+https://gamedev.stackexchange.com/questions/33731/collision-detection-and-response-in-an-entity-system
+
+*****
+ok so the goal for tomorrow is to work on the `pixi` branch
+learn a lot about pixi by reading and playing around with it
+begin work on a wrapper library for it
+and begin work on a pubsub event system so that the render system can subscribe to move events
+
+ignore the concept of collisions for now, forget they exist
