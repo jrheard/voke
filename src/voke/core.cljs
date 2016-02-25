@@ -79,7 +79,6 @@
         :move-key-up (swap! state update-player [:intended-move-direction] disj (msg :direction))
         :fire-key-down (swap! state update-player [:intended-fire-direction] conj (msg :direction))
         :fire-key-up (swap! state update-player [:intended-fire-direction] disj (msg :direction)))
-      (js/console.log (clj->js (get-in @state [:entities 0])))
       (recur))))
 
 (sm/defn render-system
@@ -87,6 +86,11 @@
   ; TODO  get a good canvas library via cljsjs, fabric or phaser seem to be top contenders, research
   (let [canvas (js/document.getElementById "screen")
         ctx (.getContext canvas "2d")]
+    (.clearRect ctx
+                0
+                0
+                (.-width canvas)
+                (.-height canvas))
     (aset ctx "fillStyle" "rgb(50,50,50)")
     (doseq [entity entities]
       (.fillRect ctx
@@ -95,20 +99,22 @@
                  (-> entity :collision-box :width)
                  (-> entity :collision-box :height)))))
 
-(def direction-value-mappings {:up {:y -1}
-                               :down {:y 1}
-                               :left {:x -1}
+(def direction-value-mappings {:up    {:y -1}
+                               :down  {:y 1}
+                               :left  {:x -1}
                                :right {:x 1}})
 
 (sm/defn move-system :- GameState
   [state :- GameState]
   (update-in state [:entities 0] (fn [entity]
-                                   (if-let [seq (entity :intended-move-direction)]
-                                     ; for each intended direction
-                                     ; look up its mapping
-                                     ; apply the delta to the relevant axis
-                                     entity
-                                     entity))))
+                                   (loop [directions (entity :intended-move-direction)
+                                          entity entity]
+                                     (if (seq directions)
+                                       (let [direction (first directions)
+                                             [axis value] (first (direction-value-mappings direction))]
+                                         (recur (rest directions)
+                                                (update-in entity [:position axis] + value)))
+                                       entity)))))
 
 (sm/defn run-systems :- GameState
   [state :- GameState]
@@ -116,13 +122,16 @@
   (-> state
       move-system))
 
+; useful in dev, so fighweel doesn't cause a jillion ticks of the system to happen at once
+(defonce animation-frame-request-id (atom nil))
+
 (defn ^:export main []
+  (js/window.cancelAnimationFrame @animation-frame-request-id)
+
   (let [event-chan (chan)]
     (handle-events game-state event-chan))
 
   (js/window.requestAnimationFrame (fn process-frame [ts]
                                      (swap! game-state run-systems)
-                                     (js/window.requestAnimationFrame process-frame)))
-
-  )
-
+                                     (reset! animation-frame-request-id
+                                             (js/window.requestAnimationFrame process-frame)))))
