@@ -20,8 +20,8 @@
                       (s/maybe :intended-fire-direction) IntendedDirection})
 
 (def player {:id                      1
-             :position                {:x 10
-                                       :y 10}
+             :position                {:x 500
+                                       :y 300}
              :collision-box           {:width 50 :height 50}
              :render-info             {:shape :square}
              :human-controlled        true
@@ -29,9 +29,6 @@
              :intended-fire-direction #{}})
 
 (sm/defschema GameState {:entities [Entity]})
-
-; TODO :mode? :active-level?
-(def game-state (atom {:entities [player]}))
 
 (def move-key-mappings {KeyCodes.W :up
                         KeyCodes.A :left
@@ -113,7 +110,7 @@
                                        (let [direction (first directions)
                                              [axis value] (first (direction-value-mappings direction))]
                                          (recur (rest directions)
-                                                (update-in entity [:position axis] + value)))
+                                                (update-in entity [:position axis] + (* 5 value))))
                                        entity)))))
 
 (sm/defn run-systems :- GameState
@@ -121,6 +118,9 @@
   (render-system (:entities state))
   (-> state
       move-system))
+
+; TODO :mode? :active-level?
+(defonce game-state (atom {:entities [player]}))
 
 ; useful in dev, so fighweel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))

@@ -1,2 +1,6 @@
-/* some style */
+canvas {
+border: solid 1px #666;
+margin: 0 auto;
+display: block;
+}
 
