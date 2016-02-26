@@ -1,17 +1,15 @@
 (defproject voke "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
+  :description "a roguelike"
   :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :license {:name "DO WHAT THE FUCK YOU WANT TO BUT IT'S NOT MY FAULT PUBLIC LICENSE"
+            :url "https://raw.githubusercontent.com/adversary-org/wtfnmf/c7b46d8114e3b3adcd9198e635b43f511c7c803d/COPYING.WTFNMFPL"}
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.170"]
                  [org.clojure/core.async "0.2.374"
                   :exclusions [org.clojure/tools.reader]]
                  [figwheel-sidecar "0.5.0"]
-                 [prismatic/schema "1.0.4"]
-                 [reagent "0.6.0-alpha"]
-                 ]
+                 [prismatic/schema "1.0.4"]]
 
   :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]]
 
