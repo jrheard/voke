@@ -19,18 +19,13 @@
           value)))
     fields))
 
-; TODO
-; turn each system map into a function
-; it should take in entities with all the relevant keys
-; and call its function on each matching entity [TODO or all the entities at once, can't decide]
-; yeah i want it to do all the entities at once
-; ok so i guess we first convert state's :entities into a map keyed by entity id
-; and then we make a new map and merge the two
-
 (sm/defn system-to-tick-fn [system :- System]
   (sm/fn [state :- GameState
           publish-chan]
     (let [tick-specification (system :every-tick)
+          ; TODO - if the system has no :reads key, *all* entities are relevant.
+          ; i feel like there was a case where this was important. maybe not. if there's not a case
+          ; like that then delete this and make :reads required in the schema again
           relevant-entities (filter #(has-relevant-fields? % (tick-specification :reads))
                                     (vals (state :entities)))
           processed-entities ((tick-specification :fn) relevant-entities publish-chan)]
@@ -38,25 +33,20 @@
       (update-in state
                  [:entities]
                  merge
-                 ; TODO reimplement next expression more simply
-                 (apply hash-map
-                        (flatten
-                          (for [entity processed-entities]
-                            [(entity :id) entity])))))))
+                 (into {}
+                       (map (juxt :id identity)
+                            processed-entities))))))
 
 
 (sm/defn make-system-runner []
   (let [{:keys [publish-chan publication]} (make-pub)]
     (subscribe-to-event publication :movement a-rendering-event-handler)
 
-    ; hm - how to express this situation? i have a dynamic list of things that i want to thread state through
-    ; maybe "apply comp"?
-    ; oh fuck it just do a loop/recur for now and figure out a prettier way later
     (fn [state]
+      ; feels like there must be a simpler way to express this loop statement, but i haven't found one
       (loop [state state
              tick-functions (map system-to-tick-fn [move-system render-system])]
         (if (seq tick-functions)
-
           (recur ((first tick-functions) state publish-chan)
                  (rest tick-functions))
           state)))))
