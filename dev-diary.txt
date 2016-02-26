@@ -965,3 +965,20 @@ something to the stage and moving it around and drawing it
 
 i'll need to read through all these goddang tabs to get super familiar with how pixi works
 and eventually i'll want to make a pretty api that sits on top of it
+
+ok, so what's the specific problem i'm having with rendering engine reloadability?
+i guess i mainly don't want my renderer and stage js objects to be blown away when the rendering ns is reloaded
+what other state will we have?
+likely a map from entity-id -> sprite (or some such object)
+everything else can be blown away
+
+so i guess we have two options
+we put a :rendering-engine k/v pair on the GameState map
+or we have a private rendering-engine atom that's kept inside the rendering system's ns
+
+the latter seems like the less testable approach to me, which is often a smell
+but i'm also not in love with having a :rendering-engine k/v pair on GameState, because that makes this
+mutable data essentially global
+
+yeah i think having a private rendering-engine atom in the rendering system's NS is fine
+if we want to we can always with-redefs it in tests
