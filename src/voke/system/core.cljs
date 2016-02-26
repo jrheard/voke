@@ -19,7 +19,10 @@
           value)))
     fields))
 
-(sm/defn system-to-tick-fn [system :- System]
+(sm/defn system-to-tick-fn
+  "Takes a System map, returns a function of [game-state publish-chan] -> game-state.
+  Basically takes a System map and turns it into something you can run every tick."
+  [system :- System]
   (sm/fn [state :- GameState
           publish-chan]
     (let [tick-specification (system :every-tick)
@@ -38,10 +41,13 @@
                             processed-entities))))))
 
 
-(sm/defn make-system-runner []
-  (let [{:keys [publish-chan publication]} (make-pub)
-        systems [move-system
+(sm/defn make-system-runner
+  "Returns a function from game-state -> game-state, which you can call to make a unit
+  of time pass in the game-world."
+  []
+  (let [systems [move-system
                  render-system]
+        {:keys [publish-chan publication]} (make-pub)
         event-handlers (flatten
                          (keep identity
                                (map :event-handlers systems)))]
@@ -56,6 +62,7 @@
     (fn [state]
       ; feels like there must be a simpler way to express this loop statement, but i haven't found one
       (loop [state state
+             ; TODO what about systems that don't have an every-tick function (eg damage)?
              tick-functions (map system-to-tick-fn systems)]
         (if (seq tick-functions)
           (recur ((first tick-functions) state publish-chan)

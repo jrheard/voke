@@ -958,3 +958,10 @@ opened all those tabs from above back up again
 http://www.goodboydigital.com/pixi-js-tutorial-getting-started/ "launch last month" april 2013 (?!)
 "Stage represents the root of our display tree."
 " A renderer draws a stage and all its contents to the screen"
+
+ok i'm almost out of battery and need to take a break
+but the next thing i need to work on is getting super familiar with pixi and like adding
+something to the stage and moving it around and drawing it
+
+i'll need to read through all these goddang tabs to get super familiar with how pixi works
+and eventually i'll want to make a pretty api that sits on top of it

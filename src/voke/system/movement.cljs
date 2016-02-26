@@ -9,6 +9,9 @@
                                :right {:x 1}})
 
 (sm/defn apply-intended-movement-directions :- Entity
+  "Takes an Entity with some :intended-move-directions and updates the entity's
+  :position to reflect its intention to move in those directions."
+  ; TODO above comment will be out of date when collision system is implemneted
   [entity :- Entity]
   (loop [directions (entity :intended-move-direction)
          entity entity]
