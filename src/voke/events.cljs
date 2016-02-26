@@ -26,18 +26,6 @@
       (handler-fn (<! subscriber))
       (recur))))
 
-(comment
-  (def foo (make-pub))
-  (:publisher foo)
-  (subscribe-to-event (:publication foo)
-                      :movement
-                      (fn [event] (reset! thing 10)))
-  (identity @thing)
-  (put! (:publisher foo) {:event-type :movement :blat :bar})
-  (identity @thing)
-  )
-
-
 ; ok are events primarily for side effects?
 ; otherwise like how do they affect the state of the game
 ; you can't just pass a global mutable game-state atom around, that's no good

@@ -1,23 +1,12 @@
 (ns voke.core
-  (:require [schema.core :as s]
-            [goog.events :as events])
+  (:require [goog.events :as events]
+            [voke.events :refer [make-pub subscribe-to-event]]
+            [voke.schemas :refer [GameState]]
+            [voke.system.core :refer [run-systems]])
   (:import [goog.events KeyCodes])
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]]
+  (:require-macros [cljs.core.async.macros :refer [go-loop]]
                    [schema.core :as sm])
-  (:use [cljs.core.async :only [chan <! >! put! timeout]]))
-
-(sm/defschema Direction (s/enum :up :right :down :left))
-(sm/defschema IntendedDirection #{Direction})
-
-(sm/defschema Entity {:id                                s/Int
-                      (s/maybe :position)                {:x s/Num
-                                                          :y s/Num}
-                      (s/maybe :collision-box)           {:width  s/Int
-                                                          :height s/Int}
-                      (s/maybe :render-info)             {:shape (s/enum :square)}
-                      (s/maybe :human-controlled)        s/Bool
-                      (s/maybe :indended-move-direction) IntendedDirection
-                      (s/maybe :intended-fire-direction) IntendedDirection})
+  (:use [cljs.core.async :only [chan <! put!]]))
 
 (def player {:id                      1
              :position                {:x 500
@@ -28,8 +17,8 @@
              :intended-move-direction #{}
              :intended-fire-direction #{}})
 
-; TODO perhaps a map by entity id
-(sm/defschema GameState {:entities [Entity]})
+; TODO move keyboard handling code to input.cljs
+; and have core expose some functions for modifying the player's intended directions
 
 (def move-key-mappings {KeyCodes.W :up
                         KeyCodes.A :left
@@ -79,52 +68,10 @@
         :fire-key-up (swap! state update-player [:intended-fire-direction] disj (msg :direction)))
       (recur))))
 
-(sm/defn render-system
-  [entities :- [Entity]]
-  ; TODO  get a good canvas library via cljsjs, fabric or phaser seem to be top contenders, research
-  (let [canvas (js/document.getElementById "screen")
-        ctx (.getContext canvas "2d")]
-    (.clearRect ctx
-                0
-                0
-                (.-width canvas)
-                (.-height canvas))
-    (aset ctx "fillStyle" "rgb(50,50,50)")
-    (doseq [entity entities]
-      (.fillRect ctx
-                 (-> entity :position :x)
-                 (-> entity :position :y)
-                 (-> entity :collision-box :width)
-                 (-> entity :collision-box :height)))))
-
-(def direction-value-mappings {:up    {:y -1}
-                               :down  {:y 1}
-                               :left  {:x -1}
-                               :right {:x 1}})
-
-(sm/defn move-system :- GameState
-  [state :- GameState]
-  (update-in state [:entities] #(mapv (fn [entity]
-                                        (loop [directions (entity :intended-move-direction)
-                                               entity entity]
-                                          (if (seq directions)
-                                            (let [direction (first directions)
-                                                  [axis value] (first (direction-value-mappings direction))]
-                                              (recur (rest directions)
-                                                     (update-in entity [:position axis] + (* 5 value))))
-                                            entity)))
-                                      %)))
-
-(sm/defn run-systems :- GameState
-  [state :- GameState]
-  (render-system (:entities state))
-  (-> state
-      move-system))
-
 ; TODO :mode? :active-level?
 (defonce game-state (atom {:entities [player]}))
 
-; useful in dev, so fighweel doesn't cause a jillion ticks of the system to happen at once
+; Useful in dev, so fighweel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))
 
 (defn ^:export main []
