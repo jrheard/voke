@@ -50,9 +50,10 @@
                                 :direction (key-mappings code)}))))))))
 
 (sm/defn update-player [state :- GameState & args]
+  ; TODO tear down, rethink API, reimplement
   (apply update-in
          state
-         (concat [:entities 0] (first args))
+         (concat [:entities 1] (first args))
          (rest args)))
 
 (defn handle-events [state event-chan]
@@ -69,7 +70,7 @@
       (recur))))
 
 ; TODO :mode? :active-level?
-(defonce game-state (atom {:entities [player]}))
+(defonce game-state (atom {:entities {1 player}}))
 
 ; Useful in dev, so fighweel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))

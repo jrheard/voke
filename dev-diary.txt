@@ -877,3 +877,12 @@ ok i split things up a bit and made an events ns
 next up: have move-system send a dummy event to render-system
 
 ok, that worked pretty well. now let's get move-system only send the event when an entity has actually moved
+
+ok wow i went into a fugue for a bit and all the code is all fucked up now but i think systems are now maps
+and that their tick function gets called with a list of only the relevant entities
+TODO that sure sounds worth writing tests for
+
+anyway tomorrow i should look at all this code with fresh eyes and look for things that seem insane
+and refactor them and simplify them
+but right now the box is moving around like it's supposed to and i have no idea what i did and i'm going to
+eat something soon, so i'm going to take a break

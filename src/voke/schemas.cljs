@@ -5,15 +5,31 @@
 (sm/defschema Direction (s/enum :up :right :down :left))
 (sm/defschema IntendedDirection #{Direction})
 
-(sm/defschema Entity {:id                                s/Int
-                      (s/maybe :position)                {:x s/Num
-                                                          :y s/Num}
-                      (s/maybe :collision-box)           {:width  s/Int
-                                                          :height s/Int}
-                      (s/maybe :render-info)             {:shape (s/enum :square)}
-                      (s/maybe :human-controlled)        s/Bool
-                      (s/maybe :indended-move-direction) IntendedDirection
-                      (s/maybe :intended-fire-direction) IntendedDirection})
+(sm/defschema EntityField (s/enum :position
+                                  :collision-box
+                                  :render-info
+                                  :human-controlled
+                                  :intended-move-direction
+                                  :intended-fire-direction))
 
-; TODO perhaps a map by entity id
-(sm/defschema GameState {:entities [Entity]})
+(sm/defschema Entity {:id                                       s/Int
+                      (s/optional-key :position)                {:x s/Num
+                                                                 :y s/Num}
+                      (s/optional-key :collision-box)           {:width  s/Int
+                                                                 :height s/Int}
+                      (s/optional-key :render-info)             {:shape (s/enum :square)}
+                      (s/optional-key :human-controlled)        s/Bool
+                      (s/optional-key :indended-move-direction) IntendedDirection
+                      (s/optional-key :intended-fire-direction) IntendedDirection})
+
+(sm/defschema GameState {:entities {:s/Int Entity}})
+
+(sm/defschema EventType (s/enum :movement))
+
+(sm/defschema Event {:type EventType
+                     s/Any s/Any})
+
+(sm/defschema System {:every-tick                      {:reads #{EntityField}
+                                                        :fn    s/Any}
+                      (s/optional-key :event-handlers) {:event-type EventType
+                                                        :fn         s/Any}})

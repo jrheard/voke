@@ -1,6 +1,6 @@
 (ns voke.system.movement
   (:require [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity GameState]])
+            [voke.schemas :refer [Entity GameState System]])
   (:require-macros [schema.core :as sm]))
 
 (def direction-value-mappings {:up    {:y -1}
@@ -19,8 +19,10 @@
                (update-in entity [:position axis] + (* 5 value))))
       entity)))
 
-(sm/defn move-system :- GameState
-  [state :- GameState
-   publish-chan]
-  ;(publish-event publish-chan {:event-type :movement :foo :bar})
-  (update-in state [:entities] #(mapv apply-intended-movement-directions %)))
+(sm/def move-system :- System
+  {:every-tick {:reads #{:intended-move-direction}
+                :fn    (fn move-system-tick [entities publish-chan]
+                         (for [entity entities]
+                           (let [moved-entity (apply-intended-movement-directions entity)]
+                             (publish-event publish-chan {:event-type :movement :entity :moved-entity})
+                             moved-entity)))}})

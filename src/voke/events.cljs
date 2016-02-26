@@ -1,13 +1,8 @@
 (ns voke.events
   (:require [cljs.core.async :refer [chan <! >! put! pub sub]]
-            [schema.core :as s])
+            [voke.schemas :refer [EventType]])
   (:require-macros [cljs.core.async.macros :refer [go go-loop]]
                    [schema.core :as sm]))
-
-(s/defschema EventType (s/enum :movement))
-
-(s/defschema Event {:type EventType
-                    :entity-id s/Int})
 
 (defn make-pub []
   ; context: https://yobriefca.se/blog/2014/06/04/publish-and-subscribe-with-core-dot-asyncs-pub-and-sub/
