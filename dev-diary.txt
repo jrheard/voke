@@ -875,3 +875,5 @@ here goes
 
 ok i split things up a bit and made an events ns
 next up: have move-system send a dummy event to render-system
+
+ok, that worked pretty well. now let's get move-system only send the event when an entity has actually moved
