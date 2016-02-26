@@ -1,5 +1,6 @@
 (ns voke.system.rendering
-  (:require [voke.schemas :refer [Entity System]])
+  (:require [cljsjs.pixi]
+            [voke.schemas :refer [Entity System]])
   (:require-macros [schema.core :as sm]))
 
 (sm/defn render-entity
@@ -13,23 +14,24 @@
              (-> entity :collision-box :width)
              (-> entity :collision-box :height)))
 
+(sm/defn render-system-tick [renderer stage entities publish-chan]
+  (.render renderer stage)
+  entities)
+
 (defn a-rendering-event-handler [event]
+  ; TODO event has an :entity
   (js/console.log (clj->js event)))
 
-(sm/def render-system :- System
-  {:every-tick {:reads #{:position :render-info}
-                :fn    (fn render-system-tick [entities publish-chan]
-                         ; TODO this will become a no-op when pixi happens
-                         ; nvm! we *will* need to perform a side effect every tick
-                         (let [canvas (js/document.getElementById "screen")
-                               ctx (.getContext canvas "2d")]
-                           (.clearRect ctx
-                                       0
-                                       0
-                                       (.-width canvas)
-                                       (.-height canvas))
+; TODO does this defonce fuck us figwheel-wise? irritating if so
+; gonna need to rethink this defonce.
+; gonna need to put some thought into how to make this whole system reloadable in general
+(defonce render-system
+         (let [renderer (js/PIXI.autoDetectRenderer. 800 600)
+               stage (js/PIXI.Container.)]
+           (.appendChild js/document.body (.-view renderer))
 
-                           (doseq [entity entities]
-                             (render-entity ctx entity)))
-                         entities)}})
-
+           {:every-tick {:reads #{:position :render-info}
+                         :fn    (fn [& args]
+                                  (apply render-system-tick renderer stage args))}
+            :event-handlers [{:event-type :movement
+                              :fn a-rendering-event-handler}]}))

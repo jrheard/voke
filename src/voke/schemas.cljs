@@ -32,5 +32,5 @@
 
 (sm/defschema System {(s/optional-key :every-tick)     {(s/optional-key :reads) #{EntityField}
                                                         :fn                     s/Any}
-                      (s/optional-key :event-handlers) {:event-type EventType
-                                                        :fn         s/Any}})
+                      (s/optional-key :event-handlers) [{:event-type EventType
+                                                         :fn         s/Any}]})

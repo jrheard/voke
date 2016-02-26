@@ -951,3 +951,10 @@ i think this system will work. i'll need to do some thinking/designing in order 
 API for changing the state of the world, and will want to come up with a way of hiding the actual mutable
 `state` atom from the rest of the program (likely via a closure of some sort), but i think i can make this work.
 i don't think the ephemeral-component approach is a good one, i think this event one will work though.
+
+cool so i did a tiny amount of refactoring and now i think i'm ready to dive into pixi
+opened all those tabs from above back up again
+
+http://www.goodboydigital.com/pixi-js-tutorial-getting-started/ "launch last month" april 2013 (?!)
+"Stage represents the root of our display tree."
+" A renderer draws a stage and all its contents to the screen"

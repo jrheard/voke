@@ -39,13 +39,24 @@
 
 
 (sm/defn make-system-runner []
-  (let [{:keys [publish-chan publication]} (make-pub)]
-    (subscribe-to-event publication :movement a-rendering-event-handler)
+  (let [{:keys [publish-chan publication]} (make-pub)
+        systems [move-system
+                 render-system]
+        event-handlers (flatten
+                         (keep identity
+                               (map :event-handlers systems)))]
 
+    ; Set up event handlers...
+    (doseq [handler-map event-handlers]
+      (subscribe-to-event publication
+                          (handler-map :event-type)
+                          (handler-map :fn)))
+
+    ; And return a run-systems-every-tick function.
     (fn [state]
       ; feels like there must be a simpler way to express this loop statement, but i haven't found one
       (loop [state state
-             tick-functions (map system-to-tick-fn [move-system render-system])]
+             tick-functions (map system-to-tick-fn systems)]
         (if (seq tick-functions)
           (recur ((first tick-functions) state publish-chan)
                  (rest tick-functions))
