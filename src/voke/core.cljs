@@ -72,7 +72,7 @@
 ; TODO :mode? :active-level?
 (defonce game-state (atom {:entities {1 player}}))
 
-; Useful in dev, so fighweel doesn't cause a jillion ticks of the system to happen at once
+; Useful in dev, so figwheel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))
 
 (defn ^:export main []

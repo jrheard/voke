@@ -886,3 +886,68 @@ anyway tomorrow i should look at all this code with fresh eyes and look for thin
 and refactor them and simplify them
 but right now the box is moving around like it's supposed to and i have no idea what i did and i'm going to
 eat something soon, so i'm going to take a break
+
+also TODO afterward (ONCE ALL THE CODE DOESN'T LOOK INSANE ANY MORE): actually automatically wire up event handlers
+
+also eventually i should make the character tinier like in RoR, i like that style, too big atm
+
+=======
+
+2/26/16
+
+ok so here's where i'm at
+it is not super clear how systems should talk to each other
+google has no obvious single best accepted solution
+
+my favorites so far:
+* ephemeral, "pending-foo" components - so when the collision system detects that two things have collided
+  (and either kills the projectile or cancels the pending movement event), it adds a "pendingdamage" component
+  to the relevant entities, and the damage system looks for those and handles them and removes them when they've
+  been processed
+  * pros:
+    * easy to remain purely functional in this world ++
+    * every system runs once per tick, they communicate with one another via ephemeral components that are
+      processed / removed each tick, everything's just a function, everything's synchronous and relatively easy
+      to reason about
+  * cons:
+    * extremely tight coupling. collision system has to know that damage system exists and emit a "pendingdamage"
+      component. that seems super dumb. or it emits a "pendingcontact" component, but if several different systems
+      read from those, only *one* of them can be responsible for removing them when they've been handled,
+      and so all of a sudden like ordering of functions in the tick matters and everything is super tightly
+      coupled together and life is awful
+
+so probably not that one. the other alternative i have so far is
+
+* event system - so when the collision system's sole responsibility is to _listen for_ entities that are
+  attempting to move, and then either apply the movement or reject it and notify the rest of the world
+  that a contact event happened, and the rest of the world can like render differently / play a noise / apply
+  damage / whatever
+  * pros:
+    * loose coupling holy grail basically
+  cons:
+    * when, say, the damage component's :contact event handler gets run and it decides that entity 4 should
+      have its :health decremented by 25 or whatever, it is not immediately clear *how* that change should take
+      place. all the event handler has is an event - it doesn't (shouldn't!) have access to the game-state atom,
+      because that'd be global mutable state.
+    * everything is asynchronous now, and so i worry that this will open me up to more difficult-to-reason-about
+      performance problems / general bugs
+
+so my current plan is to go with the event-based system, and just deal with the fact that i'll have some
+sort of global-ish mutable-ish state [i'll have it hidden behind an interface of functions, like
+(update-entity! entity-id update-in [:foo] bar baz) or whatever].
+
+and so the way that event handlers will update the game is by sending an event like
+
+{:event-type :update-entity
+ :entity-id 1234
+ :fn (fn [entity] updated-entity)}
+
+and there'll be a single go-block consumer whose job it is to handle these events (maybe just :update-entity,
+but maybe other events like :pause-game or whatever too, not sure yet we'll get there later) and update the state
+of the world to reflect decisions that have been made in systems' event handlers. and so event handlers
+will take args [the-event publish-chan], and that's how they'll be able to emit messages like this.
+
+i think this system will work. i'll need to do some thinking/designing in order to come up with a good
+API for changing the state of the world, and will want to come up with a way of hiding the actual mutable
+`state` atom from the rest of the program (likely via a closure of some sort), but i think i can make this work.
+i don't think the ephemeral-component approach is a good one, i think this event one will work though.
