@@ -19,3 +19,6 @@
                  (-> entity :position :y)
                  (-> entity :collision-box :width)
                  (-> entity :collision-box :height)))))
+
+(defn a-rendering-event-handler [event]
+  (js/console.log (clj->js event)))

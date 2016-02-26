@@ -872,3 +872,6 @@ https://github.com/search?utf8=%E2%9C%93&q=core.async+pub+extension%3Aclj+extens
 
 ok it looks like i'm *kinda* on my own here re: prior art
 here goes
+
+ok i split things up a bit and made an events ns
+next up: have move-system send a dummy event to render-system
