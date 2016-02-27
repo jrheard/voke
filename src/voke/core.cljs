@@ -1,5 +1,5 @@
 (ns voke.core
-  (:require [voke.system.core :refer [handle-update-entity-events make-system-runner]]))
+  (:require [voke.system.core :refer [make-system-runner]]))
 
 ; TODO make-player function... somewhere.
 (def player {:id                      1
