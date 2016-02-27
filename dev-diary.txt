@@ -1058,6 +1058,32 @@ in each iteration."
  Update in map or record is slow. Much faster is to have a custom type and copy it on every update."
 hrm. hrm hrm hrm.
 
+http://www.yeahbutisitflash.com/?p=5666 talks about viewports
+iii think we can sort of ignore it for now. come back to it when we implement the camera system
+(which will follow the player i guess, i haven't thought about this at all yet)
+
+http://www.yeahbutisitflash.com/?p=6496 sort of talks about level generation
+ok it talks about performance too
+GPUs and stuff, sprite sheets
+
+talks about object pooling, which i'd like to avoid since we're in cljs but it's good to keep in mind for perf
+if it becomes necessary
+
+interesting re: "borrow"/"return" terminology
+that's actually an interesting idea/technique
+
+https://en.wikipedia.org/wiki/Object_pool_pattern
+"When it is necessary to work with a large number of objects that are particularly **expensive to instantiate**
+and each object is only needed for a short period of time, the performance of an entire application may be
+adversely affected. An object pool design pattern may be deemed desirable in cases such as these."
+none of our stuff is that expensive to instantiate
+"Some publications do not recommend using object pooling with certain languages, such as Java,
+especially for objects that only use memory and hold no external resources."
+
+http://www.yeahbutisitflash.com/?p=7046 talks about maps
+these articles are actually really surprisingly well put together
+gj, this person
+
 ok, that's probably enough for now.
 next up:
 do a pass on voke.core, split out user input logic

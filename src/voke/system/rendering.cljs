@@ -4,9 +4,12 @@
   (:require-macros [schema.core :as sm]))
 
 ; TODO not yet implemented: removing entities (eg dead monsters, collided bullets, etc)
+; TODO also what about when entities are no longer visible? should we remove their objects?
+; watch perf first i guess and then see what happens
 
 (defn handle-unknown-entities! [stage objects-by-entity-id entities]
   (doseq [entity entities]
+    ; TODO - only actually operate on the entity if it's visible!!!!!!
     (let [obj (entity->graphic entity)]
       (add-to-stage! stage obj)
       (swap! objects-by-entity-id assoc (:id entity) obj))))
