@@ -24,7 +24,12 @@
 
 (sm/defn system-to-tick-fn
   "Takes a System map, returns a function of [game-state publish-chan] -> game-state.
-  Basically takes a System map and turns it into something you can run every tick."
+  Basically takes a System map and turns it into something you can run every tick.
+
+  The job of a System-based tick function (found in a System's [:every-tick :fn]) is to take
+  a list of 'relevant' entities (defined by the System's [:every-tick :reads] set) as input,
+  and return a list of 'processed' entities as output. For instance, the movement system takes a list of
+  moving entities and returns a list of entities that have been nudged a bit in the direction they're pointing."
   [system :- System]
   (sm/fn [state :- GameState
           publish-chan]
