@@ -1,5 +1,6 @@
 (ns voke.system.rendering
-  (:require [voke.pixi :refer [add-to-stage! entity->graphic make-renderer make-stage render! update-obj-position!]]
+  (:require [voke.pixi :refer [add-to-stage! entity->graphic make-renderer
+                               make-stage render! update-obj-position!]]
             [voke.schemas :refer [Entity System]])
   (:require-macros [schema.core :as sm]))
 

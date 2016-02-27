@@ -35,7 +35,7 @@
 
 (sm/defschema EventType (s/enum :movement :update-entity))
 
-; TODO unused / not well defined
+; TODO not well defined
 (sm/defschema Event {:event-type EventType
                      s/Any s/Any})
 

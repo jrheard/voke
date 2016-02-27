@@ -1,6 +1,7 @@
 (ns voke.core
   (:require [voke.system.core :refer [make-system-runner]]))
 
+; TODO make a voke.entity namespace with convenience functions like player, wall, etc
 ; TODO make-player function... somewhere.
 (def player {:id                      1
              :position                {:x 488
@@ -9,6 +10,7 @@
              :render-info             {:shape :square}
              :human-controlled        true
              :intended-move-direction #{}
+             ; TODO make fire direction be an ordered set
              :intended-fire-direction #{}})
 
 ; TODO :mode? :active-level?
@@ -23,7 +25,6 @@
   ;(.profile js/console "hello")
   ;(js/window.setTimeout #(.profileEnd js/console "hello") 5000)
 
-  ; TODO actually get player's id
   (let [run-systems-fn (make-system-runner game-state (player :id))]
 
     (js/window.requestAnimationFrame (fn process-frame [ts]

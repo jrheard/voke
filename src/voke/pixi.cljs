@@ -32,7 +32,7 @@
     (aset "y" (new-position :y))))
 
 (defn make-renderer [width height node]
-  (doto (js/PIXI.autoDetectRenderer.
+  (doto (js/PIXI.CanvasRenderer.
           width
           height
           #js {:view node})

@@ -1117,3 +1117,5 @@ i can't easily find a way to subscribe to *all* topics on a publication, which w
 
 actually nvm, listening for `nil` as described in https://yobriefca.se/blog/2014/06/04/publish-and-subscribe-with-core-dot-asyncs-pub-and-sub/
 would have helped debug this, so i'll try that next time.
+
+ok, time to read about collision systems
