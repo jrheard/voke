@@ -23,7 +23,9 @@
                 (.endFill)
                 (aset "x" (-> entity :position :x))
                 (aset "y" (-> entity :position :y)))]
+      (js/console.log (clj->js entity))
       (.addChild stage obj)
+      (js/console.log (clj->js stage))
       (swap! objects-by-entity-id assoc (:id entity) obj))))
 
 (sm/defn render-system-tick [renderer stage objects-by-entity-id entities publish-chan]
@@ -39,25 +41,18 @@
   (if-let [obj (@objects-by-entity-id (-> event :entity :id))]
     (do
       (doto obj
-       ; TODO clean up all this code obviously
-       (aset "x" (-> event :entity :position :x))
-       (aset "y" (-> event :entity :position :y))))
+        ; TODO clean up all this code obviously
+        (aset "x" (-> event :entity :position :x))
+        (aset "y" (-> event :entity :position :y))))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
-(defonce ^:private -rendering-engine
-         {:renderer             (js/PIXI.autoDetectRenderer.
-                                  1000
-                                  700
-                                  #js {:view (js/document.getElementById "screen")})
-          :stage                (js/PIXI.Container.)
-          :objects-by-entity-id (atom {})})
-
-; TODO pretty sure this defonce isn't necessary and that we can go back to a let-clojure for render-system
-; since the system is capable of dealing with entities that it hasn't seen before
-
 (def render-system
-  (let [{:keys [renderer stage objects-by-entity-id]} -rendering-engine]
-
+  (let [renderer (js/PIXI.autoDetectRenderer.
+                   1000
+                   700
+                   #js {:view (js/document.getElementById "screen")})
+        stage (js/PIXI.Container.)
+        objects-by-entity-id (atom {})]
     ;(.appendChild js/document.body (.-view renderer))
 
     {:every-tick     {:reads #{:position :render-info}
