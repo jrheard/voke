@@ -3,14 +3,7 @@
             [voke.schemas :refer [Entity System]])
   (:require-macros [schema.core :as sm]))
 
-; ok. here is how things have to work
-; there are a few situations we need to account for
-; 1) level start - lots of entities exist, none (or maybe some!) have moved
-; 2) preexisting entity moves
-; 3) new entity is created
-; 4) old entity is removed
-; so we need to listen to :entity-created, :entity-removed, and also :movement.
-; and we need to be able to detect situations where there's an entity that we don't yet render
+; TODO not yet implemented: removing entities (eg dead monsters, collided bullets, etc)
 
 (defn handle-unknown-entities! [stage objects-by-entity-id entities]
   (doseq [entity entities]

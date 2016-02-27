@@ -23,10 +23,3 @@
     (go-loop []
       (handler-fn (<! subscriber))
       (recur))))
-
-; ok are events primarily for side effects?
-; otherwise like how do they affect the state of the game
-; you can't just pass a global mutable game-state atom around, that's no good
-; so for now let's just say that events are solely for side effects - updating the rendering
-; system, playing a sound, whatever - and that `every-tick` functions are where the bulk
-; of the game's work gets done, because they're pure

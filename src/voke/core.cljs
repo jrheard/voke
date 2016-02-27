@@ -8,6 +8,7 @@
                    [schema.core :as sm])
   (:use [cljs.core.async :only [chan <! put!]]))
 
+; TODO make-player function... somewhere.
 (def player {:id                      1
              :position                {:x 488
                                        :y 300}

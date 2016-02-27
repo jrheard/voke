@@ -1057,3 +1057,10 @@ in each iteration."
 "Assoc in map or record is slow. Much faster is to have a custom type and copy it on every assoc.
  Update in map or record is slow. Much faster is to have a custom type and copy it on every update."
 hrm. hrm hrm hrm.
+
+ok, that's probably enough for now.
+next up:
+do a pass on voke.core, split out user input logic
+figure out how to communicate to the game that the player has pressed or unpressed a movement key
+
+after that.. dunno! read about collision detection algorithms, add walls?
