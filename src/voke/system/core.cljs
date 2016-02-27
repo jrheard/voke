@@ -3,7 +3,7 @@
             [schema.core :as s]
             [voke.events :refer [make-pub subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
-            [voke.schemas :refer [Entity EntityField GameState System]]
+            [voke.schemas :refer [Entity EntityField Event GameState System]]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]
@@ -43,14 +43,8 @@
                        (map (juxt :id identity)
                             processed-entities))))))
 
-; ok whose job is it to make the publisher/publish-chan
-; system.core or voke.core?
-; we need 'em here
-(sm/defn handle-update-entity-events [publish-chan ])
-
 (sm/defn apply-update-entity-event [state :- GameState
-                                    event ; TODO schematize
-                                    ]
+                                    event :- Event]
   (let [{:keys [entity-id args]} event]
     (apply update-in
            state
@@ -69,17 +63,24 @@
                          (keep identity
                                (map :event-handlers systems)))]
 
-    ; Set up event handlers...
+    ; Set up systems' event handlers.
     (doseq [handler-map event-handlers]
       (subscribe-to-event publication
                           (handler-map :event-type)
                           ; TODO should event handlers get a publish-chan, too? they don't currently
                           (handler-map :fn)))
 
-    ; Listen to keyboard input...
+    ; Listen to keyboard input.
     (handle-keyboard-events publish-chan player-entity-id)
 
-    ; Handle :update-entity events...
+    ; Handle :update-entity events.
+    ; This is one of the main ways in which change is propagated through the game world.
+    ; For instance, if voke.input notices the player's pressed a key on the keyboard,it updates the player's
+    ; entity's state by publishing an :update-entity message, which the subscriber function below
+    ; processes and applies. By the same token, the damage system listens for :contact events published
+    ; by the collision system, and if it determines that a :contact event was between a body and a hostile
+    ; bullet, it'll publish an :update-entity message which applies the relevant amount of damage to the
+    ; relevant entity, etc.
     (subscribe-to-event publication
                         :update-entity
                         (fn [event]
