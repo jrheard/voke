@@ -1090,3 +1090,30 @@ do a pass on voke.core, split out user input logic
 figure out how to communicate to the game that the player has pressed or unpressed a movement key
 
 after that.. dunno! read about collision detection algorithms, add walls?
+
+======
+
+2/27/16
+
+so is input.cljs a *system*? or is it just a file?
+what characterizes a system? it's either something that runs every tick, or something that listens to and
+optionally publishes messages that affect the state of the game, or both.
+
+the input system won't run every tick, but it *will* publish messages that affect the state of the game,
+so let's go ahead and make it a system.
+
+ah - but the events it *listens* to *aren't* game events!
+so i don't think it's a System after all.
+
+it's a ns that is given access to voke.system.core's `publish-chan`
+
+ok cool input is moved out of voke.core and totally works afaict
+and we have a system set up that supports :update-entity events
+
+i had one interesting bug where my events were looking like :type :update-entity instead of
+:event-type :update-entity, and so my events were being dropped on the ground and i couldn't figure out why.
+was irritating to debug; i know to look for it now, but still.
+i can't easily find a way to subscribe to *all* topics on a publication, which would aid debugging. asking in slack.
+
+actually nvm, listening for `nil` as described in https://yobriefca.se/blog/2014/06/04/publish-and-subscribe-with-core-dot-asyncs-pub-and-sub/
+would have helped debug this, so i'll try that next time.

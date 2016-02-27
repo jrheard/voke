@@ -28,6 +28,8 @@
     (update-obj-position! obj (-> event :entity :position))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
+;;; System definition
+
 (def render-system
   (let [renderer (make-renderer 1000 700 (js/document.getElementById "screen"))
         stage (make-stage)

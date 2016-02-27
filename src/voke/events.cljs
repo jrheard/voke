@@ -6,7 +6,6 @@
 
 (defn make-pub []
   ; context: https://yobriefca.se/blog/2014/06/04/publish-and-subscribe-with-core-dot-asyncs-pub-and-sub/
-  ; TODO document
   (let [publish-chan (chan)]
     {:publish-chan publish-chan
      :publication (pub publish-chan :event-type)}))

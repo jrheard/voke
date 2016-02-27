@@ -22,6 +22,8 @@
                (update-in entity [:position axis] + (* 5 value))))
       entity)))
 
+;;; System definition
+
 (sm/def move-system :- System
   {:every-tick {:reads #{:intended-move-direction}
                 :fn    (fn move-system-tick [entities publish-chan]

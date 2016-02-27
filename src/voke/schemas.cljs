@@ -33,7 +33,7 @@
 
 (sm/defschema GameState {:entities {:s/Int Entity}})
 
-(sm/defschema EventType (s/enum :movement))
+(sm/defschema EventType (s/enum :movement :update-entity))
 
 ; TODO unused / not well defined
 (sm/defschema Event {:type EventType
