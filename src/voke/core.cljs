@@ -9,7 +9,7 @@
   (:use [cljs.core.async :only [chan <! put!]]))
 
 (def player {:id                      1
-             :position                {:x 500
+             :position                {:x 475
                                        :y 300}
              :collision-box           {:width 50 :height 50}
              :render-info             {:shape :square}

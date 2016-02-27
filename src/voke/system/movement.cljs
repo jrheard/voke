@@ -28,5 +28,5 @@
                          (for [entity entities]
                            (let [moved-entity (apply-intended-movement-directions entity)]
                              (publish-event publish-chan {:event-type :movement
-                                                          :entity     :moved-entity})
+                                                          :entity     moved-entity})
                              moved-entity)))}})

@@ -982,3 +982,36 @@ mutable data essentially global
 
 yeah i think having a private rendering-engine atom in the rendering system's NS is fine
 if we want to we can always with-redefs it in tests
+
+ok, gotta learn more about pixi's API
+does everything need to be a Sprite?
+what's a Graphics?
+
+http://sam-koblenski.blogspot.com/2015/08/a-barely-adequate-guide-to-javascript.html
+
+objects appear to have a .clear() function
+
+ok christ finally
+******** https://github.com/kittykatattack/learningPixi appears to be the way to learn pixi
+"I know for a fact that it's the best book, because I wrote it!" ugh
+"If you aren't running a webserver, Pixi won't work" concerning
+lots of bullshit about how you need to "install" pixi, urgh, false/misleading
+
+apparently http://www.goodboydigital.com/pixi-js-v2-fastest-2d-webgl-renderer/ explains the "resolution"
+option you can pass when creating a renderer
+
+https://github.com/kittykatattack/learningPixi#pixi-sprites for when i eventually want to add sprites/images
+how to render boxes, though?
+do i need a Graphics for that?
+
+https://github.com/bhauman/flappy-bird-demo/blob/master/src/flappy_bird_demo/core.cljs
+is a good example for how to make your animationframe function take+handle timestamp delta
+
+https://github.com/kittykatattack/learningPixi#positioning-sprites positioning
+
+https://github.com/kittykatattack/learningPixi#velocity can set sprite velocity rather than x and y
+
+*****
+https://github.com/kittykatattack/learningPixi#pixis-graphic-primitives here we go fuckin finally
+
+https://github.com/kittykatattack/learningPixi#the-hittestrectangle-function notes on collision detection

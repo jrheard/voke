@@ -12,6 +12,11 @@
                                   :intended-move-direction
                                   :intended-fire-direction))
 
+; TODO i guess i should read up on the strategy pattern if i want to use this term
+(sm/defschema MovementStrategy {:type (s/enum :human-controlled
+                                              :skeleton
+                                              :projectile)})
+
 (sm/defschema Entity {:id                                       s/Int
                       (s/optional-key :position)                {:x s/Num
                                                                  :y s/Num}
@@ -19,6 +24,8 @@
                                                                  :height s/Int}
                       (s/optional-key :render-info)             {:shape (s/enum :square)}
                       (s/optional-key :human-controlled)        s/Bool
+                      ; TODO - replace the line above with the line below
+                      (s/optional-key :movement-strategy) MovementStrategy
                       (s/optional-key :indended-move-direction) IntendedDirection
                       (s/optional-key :intended-fire-direction) IntendedDirection})
 

@@ -12,29 +12,50 @@
 ; so we need to listen to :entity-created, :entity-removed, and also :movement.
 ; and we need to be able to detect situations where there's an entity that we don't yet render
 
-(sm/defn render-system-tick [renderer stage entities publish-chan]
-  ;(let [unknown-entities ]) ; TODO add some sort of map of entitiy id to sprite or whatever
-  ; and detect if there are any entities in `entities` that aren't in our map atom
-  (.render renderer stage)
+(defn handle-unknown-entities! [stage objects-by-entity-id entities]
+  (doseq [entity entities]
+    (let [obj (doto (js/PIXI.Graphics.)
+                (.beginFill 0xEEEEEE)
+                (.drawRect 0
+                           0
+                           (-> entity :collision-box :width)
+                           (-> entity :collision-box :height))
+                (.endFill)
+                (aset "x" (-> entity :position :x))
+                (aset "y" (-> entity :position :y)))]
+      (.addChild stage obj)
+      (swap! objects-by-entity-id assoc (:id entity) obj))))
+
+(sm/defn render-system-tick [renderer stage objects-by-entity-id entities publish-chan]
+  (let [unknown-entities (filter #(not (contains? @objects-by-entity-id
+                                                  (:id %)))
+                                 entities)]
+    (handle-unknown-entities! stage objects-by-entity-id unknown-entities)
+
+    (.render renderer stage))
   entities)
 
-(defn a-rendering-event-handler [event]
-  ; TODO event has an :entity
-  (js/console.log (clj->js event)))
+(defn a-rendering-event-handler [stage objects-by-entity-id event]
+  (if-let [obj (@objects-by-entity-id (-> event :entity :id))]
+    (do
+      (doto obj
+       ; TODO clean up all this code obviously
+       (aset "x" (-> event :entity :position :x))
+       (aset "y" (-> event :entity :position :y))))
+    (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
-(defonce ^:private rendering-engine
-         {:renderer (js/PIXI.autoDetectRenderer. 800 600)
-          :stage    (js/PIXI.Container.)
-          ; TODO likely also an atom mapping entity-id to sprite-or-equivalent js object
-          })
+(defonce ^:private -rendering-engine
+         {:renderer             (js/PIXI.autoDetectRenderer. 1000 700)
+          :stage                (js/PIXI.Container.)
+          :objects-by-entity-id (atom {})})
 
 (def render-system
-  (let [{:keys [renderer stage]} rendering-engine]
+  (let [{:keys [renderer stage objects-by-entity-id]} -rendering-engine]
 
     (.appendChild js/document.body (.-view renderer))
 
     {:every-tick     {:reads #{:position :render-info}
                       :fn    (fn [& args]
-                               (apply render-system-tick renderer stage args))}
+                               (apply render-system-tick renderer stage objects-by-entity-id args))}
      :event-handlers [{:event-type :movement
-                       :fn         a-rendering-event-handler}]}))
+                       :fn         #(a-rendering-event-handler stage objects-by-entity-id %)}]}))
