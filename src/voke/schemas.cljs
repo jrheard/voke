@@ -17,15 +17,17 @@
                                               :skeleton
                                               :projectile)})
 
+(sm/defschema Position {:x s/Num
+                        :y s/Num})
+
 (sm/defschema Entity {:id                                       s/Int
-                      (s/optional-key :position)                {:x s/Num
-                                                                 :y s/Num}
+                      (s/optional-key :position)                Position
                       (s/optional-key :collision-box)           {:width  s/Int
                                                                  :height s/Int}
                       (s/optional-key :render-info)             {:shape (s/enum :square)}
                       (s/optional-key :human-controlled)        s/Bool
                       ; TODO - replace the line above with the line below
-                      (s/optional-key :movement-strategy) MovementStrategy
+                      (s/optional-key :movement-strategy)       MovementStrategy
                       (s/optional-key :indended-move-direction) IntendedDirection
                       (s/optional-key :intended-fire-direction) IntendedDirection})
 

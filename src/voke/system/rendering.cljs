@@ -1,5 +1,5 @@
 (ns voke.system.rendering
-  (:require [cljsjs.pixi]
+  (:require [voke.pixi :refer [add-to-stage! entity->graphic make-renderer make-stage render! update-obj-position!]]
             [voke.schemas :refer [Entity System]])
   (:require-macros [schema.core :as sm]))
 
@@ -14,49 +14,31 @@
 
 (defn handle-unknown-entities! [stage objects-by-entity-id entities]
   (doseq [entity entities]
-    (let [obj (doto (js/PIXI.Graphics.)
-                (.beginFill 0xEEEEEE)
-                (.drawRect 0
-                           0
-                           (-> entity :collision-box :width)
-                           (-> entity :collision-box :height))
-                (.endFill)
-                (aset "x" (-> entity :position :x))
-                (aset "y" (-> entity :position :y)))]
-      (js/console.log (clj->js entity))
-      (.addChild stage obj)
-      (js/console.log (clj->js stage))
+    (let [obj (entity->graphic entity)]
+      (add-to-stage! stage obj)
       (swap! objects-by-entity-id assoc (:id entity) obj))))
 
 (sm/defn render-system-tick [renderer stage objects-by-entity-id entities publish-chan]
   (let [unknown-entities (filter #(not (contains? @objects-by-entity-id
                                                   (:id %)))
                                  entities)]
-    (handle-unknown-entities! stage objects-by-entity-id unknown-entities)
+    (handle-unknown-entities! stage objects-by-entity-id unknown-entities))
 
-    (.render renderer stage))
+  (render! renderer stage)
   entities)
 
-(defn a-rendering-event-handler [stage objects-by-entity-id event]
+(defn handle-movement-event [stage objects-by-entity-id event]
   (if-let [obj (@objects-by-entity-id (-> event :entity :id))]
-    (do
-      (doto obj
-        ; TODO clean up all this code obviously
-        (aset "x" (-> event :entity :position :x))
-        (aset "y" (-> event :entity :position :y))))
+    (update-obj-position! obj (-> event :entity :position))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
 (def render-system
-  (let [renderer (js/PIXI.autoDetectRenderer.
-                   1000
-                   700
-                   #js {:view (js/document.getElementById "screen")})
-        stage (js/PIXI.Container.)
+  (let [renderer (make-renderer 1000 700 (js/document.getElementById "screen"))
+        stage (make-stage)
         objects-by-entity-id (atom {})]
-    ;(.appendChild js/document.body (.-view renderer))
 
     {:every-tick     {:reads #{:position :render-info}
                       :fn    (fn [& args]
                                (apply render-system-tick renderer stage objects-by-entity-id args))}
      :event-handlers [{:event-type :movement
-                       :fn         #(a-rendering-event-handler stage objects-by-entity-id %)}]}))
+                       :fn         #(handle-movement-event stage objects-by-entity-id %)}]}))

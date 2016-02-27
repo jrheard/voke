@@ -61,7 +61,6 @@
 
   (go-loop []
     (let [msg (<! event-chan)]
-      (js/console.log (clj->js msg))
       (case (msg :type)
         :move-key-down (swap! state update-player [:intended-move-direction] conj (msg :direction))
         :move-key-up (swap! state update-player [:intended-move-direction] disj (msg :direction))

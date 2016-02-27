@@ -3,7 +3,7 @@
             [voke.events :refer [make-pub subscribe-to-event]]
             [voke.schemas :refer [Entity EntityField GameState System]]
             [voke.system.movement :refer [move-system]]
-            [voke.system.rendering :refer [render-system a-rendering-event-handler]])
+            [voke.system.rendering :refer [render-system]])
   (:require-macros [schema.core :as sm]))
 
 ; TODO use safe-get-in
