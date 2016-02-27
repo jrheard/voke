@@ -45,14 +45,20 @@
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
 (defonce ^:private -rendering-engine
-         {:renderer             (js/PIXI.autoDetectRenderer. 1000 700)
+         {:renderer             (js/PIXI.autoDetectRenderer.
+                                  1000
+                                  700
+                                  #js {:view (js/document.getElementById "screen")})
           :stage                (js/PIXI.Container.)
           :objects-by-entity-id (atom {})})
+
+; TODO pretty sure this defonce isn't necessary and that we can go back to a let-clojure for render-system
+; since the system is capable of dealing with entities that it hasn't seen before
 
 (def render-system
   (let [{:keys [renderer stage objects-by-entity-id]} -rendering-engine]
 
-    (.appendChild js/document.body (.-view renderer))
+    ;(.appendChild js/document.body (.-view renderer))
 
     {:every-tick     {:reads #{:position :render-info}
                       :fn    (fn [& args]

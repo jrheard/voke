@@ -78,6 +78,8 @@
 (defn ^:export main []
   (js/window.cancelAnimationFrame @animation-frame-request-id)
 
+  ;(.profile js/console "hello")
+  ;(js/window.setTimeout #(.profileEnd js/console "hello") 5000)
   (let [event-chan (chan)]
     (handle-events game-state event-chan))
 
