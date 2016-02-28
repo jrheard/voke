@@ -38,8 +38,8 @@
 ;;; Public
 
 (defn handle-keyboard-events [publish-chan player-id]
-  "Listens to keyboard events, and publishes :update-entity events to `publish-chan` for `player-id`'s
-  entity id whenever a move key or fire key is pressed/raised."
+  "Listens to keyboard events, and publishes :update-entity events to `publish-chan` for the `player-id` entity
+  whenever a move key or fire key is pressed/raised."
   (let [event-chan (chan)]
     (listen-to-keyboard-inputs event-chan)
 

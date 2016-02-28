@@ -1119,3 +1119,121 @@ actually nvm, listening for `nil` as described in https://yobriefca.se/blog/2014
 would have helped debug this, so i'll try that next time.
 
 ok, time to read about collision systems
+
+https://www.toptal.com/game/video-game-physics-part-i-an-introduction-to-rigid-body-dynamics
+"A rigid body naturally rotates around its center of mass, and the position of a rigid body is
+considered to be the position of its center of mass."
+
+boy there is a lot of physics in this article
+
+********************
+http://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects
+"In the context of rigid body simulations, a collision happens when the shapes of two rigid bodies are
+intersecting, or when the distance between these shapes falls below a small tolerance."
+"If we have n bodies in our simulation, the computational complexity of detecting collisions with
+pairwise tests is O(n2), a number that makes computer scientists cringe."
+"In order to optimize the collision detection process, we generally split it in two phases:
+broad phase and narrow phase."
+
+all this stuff here is about 3d simulations i think
+for the broad phase he talks about "space partitioning"
+
+"There are plenty of space partitioning algorithms and data structures that can be used for this,
+such as uniform grids, quadtrees in 2D, octrees in 3D, and spatial hashing."
+
+great summary on sort and sweep here, looks like a really interesting+simple heuristic/approach
+
+mentions that box2d implements all this stuff, so maybe i'll end up using that library after all
+
+"concave shapes are harder to work with" - why, though?
+
+"In a convex shape, a line segment between any two points within the shape always falls completelyx
+ inside the shape. However for a concave (or “non-convex”) shape, the same is not true for all possible
+ line segments connecting points in the shape. If you can find at least one line segment that falls
+ outside of the shape at all, then the shape is concave." oh that makes sense
+
+convex hull, convex decomposition
+support functions
+
+i'm really impressed by this article
+
+https://gamedev.stackexchange.com/questions/26501/how-does-a-collision-engine-work
+" In discrete methods, objects will end up penetrating each other, and the physics
+engine then works to push them apart"
+talks about "sleeping" objects, and a "contact cache"
+
+***************
+http://games.greggman.com/game/programming_m_c__kids/ (from 1993 [!!!!])
+"In M.C. Kids the Hamburglar has stolen Ronald’s magic bag and you, as Mick or Mack, must find
+the magic bag before Hamburglar does something we’ll all regret."
+
+"Every object can only collide with one other object per frame, so every object is assigned a
+collision priority so that it will collide with the most important object. It is more important
+to know that the kid hit a monster than to know that the kid hit a PickupBlock."
+
+********
+"All objects have a collision matrix, so that they can only collide with certain other objects.
+The kid collides with everything. A PickupBlock only collides with the kid and monsters.
+Some monsters collide with the kid, other monsters, and various project tiles. Certain other
+monsters don’t collide with other monsters. Not having to check every possible collision saves tons of time."
+
+"Collisions: Now for the fun part. NOT!" hee
+
+"Many of the reasons for these contortions have to do with speed. Most video game systems must
+run at 60 frames a second, and if you have to look up 4 or 5 tile positions per collision pixel
+per frame you are going to run out of time. All this is something you should consider when
+designing a platform game. It is much easier the create a platform game with no slopes, so if
+you are short on time, then design your game so that it doesn’t need slopes."
+
+http://games.greggman.com/game/tweening/ tweening/lerping
+
+*****
+http://www.hobbygamedev.com/adv/2d-platformer-advanced-collision-detection/
+"Once again, as with the tile-based example, we’ll be relying on the age-old trick of waiting until
+after overlap occurs in logic, then correcting for the overlap before it has a chance to render incorrectly.
+That will be “collision”. (I.e. no predictive/extrapolation calculations!)"
+
+i'm glad this guy says that's legit, because that was my exact plan
+
+**********
+"Mathematically and computationally, it’s simple to tell whether two rectangles are overlapping:
+two axis-aligned rectangles don’t overlap if and only if the left of either is right of the other’s
+right or the top of either is below of the other’s bottom."
+
+well, that's for *axis-aligned* rectangles... which, maybe all of the things in voke will be?
+will bullets really be ellipses or will they have rectangular bounding boxes?
+probably the latter, right? no reason to do the former IMO
+but i've considered like diamond-shaped bullets, and those won't be axis-aligned
+so maybe this approach won't work for me. good to know about though, makes sense
+although i guess the point re: axis-aligned rectangular bounding boxes is that you could *construct* one
+around a diamond relatively easily (how ?), and then use *it* to test for collisions.
+
+quad trees are good
+
+"the simplest way to avoid tunneling – and the method used by most 2D platformers,
+including Everyone’s Platformer – is to just enforce safe upper bounds on speed and design
+with safe lower bounds on sizes"
+
+makes sense
+
+http://devmag.org.za/2009/04/13/basic-collision-detection-in-2d-part-1/
+
+http://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
+more detail on quadtrees/implementation
+
+https://katyscode.wordpress.com/2013/01/18/2d-platform-games-collision-detection-for-dummies/
+
+the "mask approach" described here is very similar to what i'd had in mind when i was thinking about how i'd
+implement collision detection from scratch
+
+basically the main thread through all of these articles is that, yes, detecting everything one pair at a time
+is n^2, and so you want to do less work than that. quadtrees and aabbs are a good way of doing a broad pass
+at collision detection. see the sort-and-sweep algorithm described in an article above.
+
+so anyway in this game i'll only be doing the broad stuff because i don't care about like actual super fine
+grained detection of like whether or not a circle *really just barely* missed a rectangle
+
+https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+
+https://www.quora.com/How-can-I-self-study-Linear-Algebra tips on linear algebra
+

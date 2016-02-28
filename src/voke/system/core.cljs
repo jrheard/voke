@@ -29,7 +29,7 @@
   The job of a System-based tick function (found in a System's [:every-tick :fn]) is to take
   a list of 'relevant' entities (defined by the System's [:every-tick :reads] set) as input,
   and return a list of 'processed' entities as output. For instance, the movement system takes a list of
-  moving entities and returns a list of entities that have been nudged a bit in the direction they're pointing."
+  moving entities and returns a list of entities that have been nudged a bit in the direction they're heading."
   [system :- System]
   (sm/fn [state :- GameState
           publish-chan]
@@ -63,6 +63,10 @@
    player-entity-id]
   (let [systems [move-system
                  render-system]
+        ; TODO consider splitting this out into a private atom, and unsubbing everything from the previous
+        ; publication at the start of this function. right now after a bunch of figwheel reloads
+        ; i'm seeing behavior where the box is zooming around the screen because 5 different copies of
+        ; the system are nudging it in its direction
         {:keys [publish-chan publication]} (make-pub)
         event-handlers (flatten
                          (keep identity
