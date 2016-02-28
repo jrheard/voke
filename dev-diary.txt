@@ -1236,4 +1236,15 @@ grained detection of like whether or not a circle *really just barely* missed a 
 https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
 
 https://www.quora.com/How-can-I-self-study-Linear-Algebra tips on linear algebra
+i.... don't understand this advice
 
+http://betterexplained.com/articles/linear-algebra-guide/
+ok sure let's spend a while working through this
+eventually i'll look up js collision detection libraries
+but i don't know anything about matrices/vectors and this seems like as good a time as any
+to sit down and learn some about 'em
+
+"In math terms, an operation F is linear if scaling inputs scales the output, and adding inputs adds the outputs"
+"Our only hope is to multiply by a constant"
+"However, we can still combine linear operations to make a new linear operation"
+"And how could we run the same input through several operations? Have a row for each operation"
