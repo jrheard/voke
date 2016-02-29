@@ -26,13 +26,14 @@
 ;;; System definition
 
 (sm/def move-system :- System
-  {:every-tick {:reads #{:intended-move-direction}
-                :fn    (fn move-system-tick [entities publish-chan]
-                         (for [entity entities]
-                           (let [moved-entity (apply-intended-movement-directions entity)]
-                             (publish-event publish-chan {:event-type :movement
-                                                          :entity     moved-entity})
-                             (publish-event publish-chan {:event-type :intended-movement
-                                                          :entity     moved-entity
-                                                          :new-shape  nil})
-                             moved-entity)))}})
+  {:every-tick {:fn (fn move-system-tick [entities publish-chan]
+                      (for [entity (filter #(not-empty (:intended-move-direction %)) entities)]
+                        (let [moved-entity (apply-intended-movement-directions entity)]
+                          (publish-event publish-chan {:event-type :movement
+                                                       :entity     moved-entity})
+
+                          (publish-event publish-chan {:event-type   :intended-movement
+                                                       :moved-entity moved-entity
+                                                       :all-entities entities})
+
+                          moved-entity)))}})

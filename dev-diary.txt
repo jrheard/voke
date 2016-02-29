@@ -1408,3 +1408,27 @@ he solves a memory leak / cpu problem having to do with core.async
 i have no idea how i'd go about doing that - the cpu i could diagnose via the profile tool, but memory?
 
 http://ku1ik.com/2015/10/12/sweet-core-async.html
+
+ok, i'm running into some issues when implementing the collision system
+
+so basically, right now the plan was to have the movement system fire :intended-movement events whenever
+a human- or ai-controlled entity wants to move somewhere, and the collision system listens for those events
+and applies the new movement if the spot's clear, or rejects it and fires a :contact event if the spot's not clear.
+
+and so in order for this to work, the collision systems needs to have access to the list of entities in the game
+i suppose you could have the system keep a shadow list that basically mimics the master game state's list,
+but that seems retarded.
+
+and so the thing is that right now, there isn't a way for event handlers to get access to the state of the game.
+they just get the event and a publish-chan.
+well, can we pass it along in the event? i wonder
+
+ok yeah i guess we really could
+
+so here's what has to happen
+
+the movement system's :reads field will be empty to indicate that it operates on the entire set of entities
+
+the movement system then filters down so that it only operates on dudes with :intended-directions or whatever
+
+and on each of those, it fires an :intended-movement event with fields :moved-entity, :all-entities

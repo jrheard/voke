@@ -35,11 +35,10 @@
   (sm/fn [state :- GameState
           publish-chan]
     (let [tick-specification (system :every-tick)
-          ; TODO - if the system has no :reads key, *all* entities are relevant.
-          ; i feel like there was a case where this was important. maybe not. if there's not a case
-          ; like that then delete this comment and make :reads required in the schema again
-          relevant-entities (filter #(has-relevant-fields? % (tick-specification :reads))
-                                    (vals (state :entities)))
+          filter-fn (if (contains? tick-specification :reads)
+                      identity
+                      #(has-relevant-fields? % (tick-specification :reads)))
+          relevant-entities (filter filter-fn (vals (state :entities)))
           processed-entities ((tick-specification :fn) relevant-entities publish-chan)]
 
       (update-in state
@@ -78,6 +77,8 @@
     (doseq [handler-map event-handlers]
       (subscribe-to-event publication
                           (handler-map :event-type)
+                          ; TODO need all entities - pass game-state-atom? kinda gross
+                          ; or just run every tick?
                           #((handler-map :fn) % publish-chan)))
 
     ; Listen to keyboard input.
