@@ -1216,6 +1216,7 @@ with safe lower bounds on sizes"
 
 makes sense
 
+***** favorite explanation/diagram for bounding box collision
 http://devmag.org.za/2009/04/13/basic-collision-detection-in-2d-part-1/
 
 http://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
