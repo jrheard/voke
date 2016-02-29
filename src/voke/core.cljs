@@ -4,13 +4,13 @@
             [voke.system.core :refer [make-system-runner]])
   (:require-macros [schema.core :as sm]))
 
-(def player (e/player 488 300))
-
 (sm/defn make-game-state :- GameState
   [entities :- [Entity]]
   {:entities (into {}
                    (map (juxt :id identity)
                         entities))})
+
+(defonce player (e/player 488 300))
 
 ; TODO :mode? :active-level?
 (defonce game-state
