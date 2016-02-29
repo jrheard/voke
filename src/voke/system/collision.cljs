@@ -21,7 +21,9 @@
                 (shape2 :x))]))
 
 (sm/defn find-contacting-entity :- (s/maybe Entity)
-  "TODO: DOCUMENT SEMANTICS"
+  "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
+  Entities in the game. Returns another Entity if the space `entity` is trying to occupy is already filled,
+  nil if the space `entity` is trying to occupy is empty."
   [entity :- Entity
    all-entities :- [Entity]]
   (let [entity-shape (entity :shape)
@@ -39,7 +41,7 @@
    publish-chan]
   (let [entity (event :moved-entity)]
     (if-let [contacted-entity (find-contacting-entity entity (event :all-entities))]
-      ; New position wasn't clear; contact!
+      ; New position wasn't clear; notify the world that a contact event occurred!
       (publish-event publish-chan {:event-type :contact
                                    :entities   [entity contacted-entity]})
 
