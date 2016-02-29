@@ -26,7 +26,7 @@
 
 (defn handle-movement-event [stage objects-by-entity-id event]
   (if-let [obj (@objects-by-entity-id (-> event :entity :id))]
-    (update-obj-position! obj (-> event :entity :position))
+    (update-obj-position! obj (-> event :entity :shape))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
 ;;; System definition
@@ -36,7 +36,7 @@
         stage (make-stage)
         objects-by-entity-id (atom {})]
 
-    {:every-tick     {:reads #{:position :render-info}
+    {:every-tick     {:reads #{:shape :renderable}
                       :fn    (fn [& args]
                                (apply render-system-tick renderer stage objects-by-entity-id args))}
      :event-handlers [{:event-type :movement

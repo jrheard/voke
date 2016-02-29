@@ -18,9 +18,9 @@
 (sm/defn player :- Entity
   [x y]
   (make-entity
-    {:position                {:x x :y y}
-     :collision-box           {:width 25 :height 25}
-     :render-info             {:shape :rect}
+    {:shape                   {:x x :y y :width 25 :height 25 :type :rectangle}
+     :collision               {:type :player}
+     :renderable              true
      :human-controlled        true
      :intended-move-direction #{}
      ; TODO make fire direction be an ordered set
@@ -29,6 +29,6 @@
 (sm/defn wall :- Entity
   [x y width height]
   (make-entity
-    {:position      {:x x :y y}
-     :collision-box {:width width :height height}
-     :render-info   {:shape :rect}}))
+    {:shape      {:x x :y y :width width :height height :type :rectangle}
+     :collision  {:type :obstacle}
+     :renderable true}))

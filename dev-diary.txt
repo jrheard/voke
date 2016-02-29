@@ -1406,3 +1406,5 @@ https://github.com/asciinema/asciinema-player/blob/master/src/cljs/asciinema_pla
 in https://github.com/asciinema/asciinema-player/commit/ab5aad1edde90f4a86e3ada80f8866e0b42d21d7
 he solves a memory leak / cpu problem having to do with core.async
 i have no idea how i'd go about doing that - the cpu i could diagnose via the profile tool, but memory?
+
+http://ku1ik.com/2015/10/12/sweet-core-async.html

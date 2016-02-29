@@ -10,7 +10,7 @@
                    (map (juxt :id identity)
                         entities))})
 
-(defonce player (e/player 488 300))
+(defonce player (e/player 500 300))
 
 ; TODO :mode? :active-level?
 (defonce game-state

@@ -20,7 +20,7 @@
       (let [direction (first directions)
             [axis value] (first (direction-value-mappings direction))]
         (recur (rest directions)
-               (update-in entity [:position axis] + (* 5 value))))
+               (update-in entity [:shape axis] + (* 5 value))))
       entity)))
 
 ;;; System definition

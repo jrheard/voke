@@ -5,9 +5,9 @@
 (sm/defschema Direction (s/enum :up :right :down :left))
 (sm/defschema IntendedDirection #{Direction})
 
-(sm/defschema EntityField (s/enum :position
-                                  :collision-box
-                                  :render-info
+(sm/defschema EntityField (s/enum :shape
+                                  :collision
+                                  :renderable
                                   :human-controlled
                                   :intended-move-direction
                                   :intended-fire-direction))
@@ -17,14 +17,23 @@
                                               :skeleton
                                               :projectile)})
 
-(sm/defschema Position {:x s/Num
-                        :y s/Num})
+; TODO - x/y should be the *center*, not the topleft
+(sm/defschema Shape {:x     s/Num
+                     :y     s/Num
+                     :type  (s/enum :rectangle :circle)
+                     :angle s/Num                           ; Orientation in radians
+                     s/Any  s/Any})
 
 (sm/defschema Entity {:id                                       s/Int
-                      (s/optional-key :position)                Position
-                      (s/optional-key :collision-box)           {:width  s/Int
-                                                                 :height s/Int}
-                      (s/optional-key :render-info)             {:shape (s/enum :square)}
+                      (s/optional-key :shape)                   Shape
+                      ; If it doesn't have a :collision-info, the entity isn't collidable.
+                      (s/optional-key :collision-info)          {:type (s/enum
+                                                                         :player
+                                                                         :projectile
+                                                                         :monster
+                                                                         :obstacle
+                                                                         :level-end)}
+                      (s/optional-key :renderable)              s/Bool ; TODO this will have like colors and stuff
                       (s/optional-key :human-controlled)        s/Bool
                       ; TODO - replace the line above with the line below
                       (s/optional-key :movement-strategy)       MovementStrategy
@@ -37,7 +46,7 @@
 
 ; TODO not well defined
 (sm/defschema Event {:event-type EventType
-                     s/Any s/Any})
+                     s/Any       s/Any})
 
 (sm/defschema System {(s/optional-key :every-tick)     {(s/optional-key :reads) #{EntityField}
                                                         :fn                     s/Any}
