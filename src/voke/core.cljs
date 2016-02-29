@@ -1,20 +1,26 @@
 (ns voke.core
-  (:require [voke.system.core :refer [make-system-runner]]))
+  (:require [voke.entity :as e]
+            [voke.schemas :refer [Entity GameState]]
+            [voke.system.core :refer [make-system-runner]])
+  (:require-macros [schema.core :as sm]))
 
-; TODO make a voke.entity namespace with convenience functions like player, wall, etc
-; TODO make-player function... somewhere.
-(def player {:id                      1
-             :position                {:x 488
-                                       :y 300}
-             :collision-box           {:width 25 :height 25}
-             :render-info             {:shape :square}
-             :human-controlled        true
-             :intended-move-direction #{}
-             ; TODO make fire direction be an ordered set
-             :intended-fire-direction #{}})
+(def player (e/player 488 300))
+
+(sm/defn make-game-state :- GameState
+  [entities :- [Entity]]
+  {:entities (into {}
+                   (map (juxt :id identity)
+                        entities))})
 
 ; TODO :mode? :active-level?
-(defonce game-state (atom {:entities {1 player}}))
+(defonce game-state
+         (atom
+           (make-game-state
+             [player
+              (e/wall 0 0 1000 30)
+              (e/wall 0 30 30 670)
+              (e/wall 970 30 30 670)
+              (e/wall 0 670 1000 30)])))
 
 ; Useful in dev, so figwheel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))

@@ -93,6 +93,7 @@
     (subscribe-to-event publication
                         :update-entity
                         (fn [event]
+                          ; TODO consider batching this if it becomes a perf bottleneck
                           (swap! game-state-atom apply-update-entity-event event)))
 
     ; And return a run-systems-every-tick function.

@@ -13,8 +13,6 @@
      :publication (pub publish-chan :event-type)}))
 
 (sm/defn publish-event [publish-chan event]
-  ; TODO consider making `event-type` be an arg that's assoc'd onto the given event
-  ; this would prevent dumb bugs like the time i had an event with a :type rather than an :event-type
   (put! publish-chan event))
 
 (sm/defn subscribe-to-event

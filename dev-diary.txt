@@ -1331,7 +1331,18 @@ https://github.com/wellcaffeinated/PhysicsJS (unmaintained)
 
 https://github.com/liabru/matter-js
 
-matter looks neat, how does it work?
+https://github.com/liabru/matter-js/blob/master/src/collision/Detector.js super well commented
+
+overall approach appears to be this series of passes:
+1. quadtree or some other space partitioning method (broad test)
+2. bounding-box tests (mid)
+3. SAT test (narrow)
+
+https://github.com/liabru/matter-js/blob/master/src/collision/SAT.js sat implementation
+
+https://github.com/liabru/matter-js/blob/master/src/geometry/Bounds.js AABBs
+
+https://github.com/kripken/box2d.js/ if i really want it (i don't)
 
 actually you know what the blurb on https://www.ibm.com/developerworks/library/wa-build2dphysicsengine/
 looks pretty good
