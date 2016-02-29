@@ -1351,3 +1351,28 @@ looks pretty good
 for your JavaScript game"
 
 that sure sounds like it's the case for me
+
+here are the things i expect to build
+
+collision detection
+velocity/acceleration
+
+here are the things i do *not* plan on including in the game
+
+gravity
+elastic collisions (eg bouncing off of things realistically) - you'll just come to a stop, not bounce off
+  TODO: how will you come to a stop? immediately set velocity to 0 when you collide with a monster/wall?
+    feels like there must be lots of edge cases there - what if monster runs straight at you? are you stuck to it?
+
+all of the shapes in this game will be concave
+there'll be rectangles, diamonds (obviously just rotated rectangles), spheres, ellipses
+and that's it
+
+ok i'll start on this tomorrow. will start by just doing something like
+
+whenever an entity attempts to move:
+for each other entity in the game that has a collision component: <----- TODO OPTIMIZE LATER VIA QUADTREES
+compare AABBs to see if a collision happened
+
+if moved entity collided with something, cancel its movement and fire a :contact message
+if it didn't collide with anything, apply the movement (how? :update-event message?) and fire a :movement message

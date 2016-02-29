@@ -15,6 +15,7 @@
   [entity :- Entity]
   (loop [directions (entity :intended-move-direction)
          entity entity]
+    ; TODO velocity / acceleration
     (if (seq directions)
       (let [direction (first directions)
             [axis value] (first (direction-value-mappings direction))]
