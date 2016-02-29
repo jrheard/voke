@@ -1373,6 +1373,36 @@ ok i'll start on this tomorrow. will start by just doing something like
 whenever an entity attempts to move:
 for each other entity in the game that has a collision component: <----- TODO OPTIMIZE LATER VIA QUADTREES
 compare AABBs to see if a collision happened
+TODO eventually implement SAT for wavy obstacles / angled rectangles / etc
 
 if moved entity collided with something, cancel its movement and fire a :contact message
 if it didn't collide with anything, apply the movement (how? :update-event message?) and fire a :movement message
+
+========
+
+2/29/16
+
+https://github.com/asciinema/asciinema-player uses phantom+doo, worth looking at when it comes time for tests
+
+https://github.com/asciinema/asciinema-player/blob/master/src/cljs/asciinema_player/core.cljs#L31
+good example of taking a ton of kwargs+defaults
+
+he has two primary player implementations, "recorded" and "stream", and throughout core.cljs he has various
+multimethods that have different implementations based on whether the player map they're operating on
+is :recorded or :stream, interesting. this is basically how i'd expect people to use multimethods, but i haven't
+seen them used often in the wild, people usually seem to favor protocols+records instead and i've
+never been all that sure why (best guess: performance, better encapsulation?).
+
+https://github.com/asciinema/asciinema-player/blob/master/src/cljs/asciinema_player/util.cljs#L6
+is interesting, never seen/used js->clj before
+
+tried it out, works like this:
+(js->clj #js {:foo :bar} :keywordize-keys true)
+{:foo :bar}
+
+hella terminal command codes and shit in
+https://github.com/asciinema/asciinema-player/blob/master/src/cljs/asciinema_player/vt.cljs
+
+in https://github.com/asciinema/asciinema-player/commit/ab5aad1edde90f4a86e3ada80f8866e0b42d21d7
+he solves a memory leak / cpu problem having to do with core.async
+i have no idea how i'd go about doing that - the cpu i could diagnose via the profile tool, but memory?
