@@ -1248,3 +1248,95 @@ to sit down and learn some about 'em
 "Our only hope is to multiply by a constant"
 "However, we can still combine linear operations to make a new linear operation"
 "And how could we run the same input through several operations? Have a row for each operation"
+
+=====
+
+2/28/16
+
+taking a break, reading through various unrelated things for fun
+
+https://www.toptal.com/aws/service-oriented-architecture-aws-lambda
+
+TODO: i have no idea how makefiles work, should learn about how to write/use 'em one of these days
+
+https://facebook.github.io/immutable-js/ neat
+"the case for immutability" section a bit incoherent
+
+http://tech.noredink.com/post/107617838018/switching-from-immutablejs-to-seamless-immutable
+
+god, lots of reading today. forgot to paste a lot of the links i was looking at.
+
+https://scott.mn/2014/01/20/reference_types_separate_identities_and_values/
+atoms for beginners / nonclojurists
+
+http://jlongster.com/Removing-User-Interface-Complexity,-or-Why-React-is-Awesome
+
+https://www.youtube.com/watch?v=MDZpSIngwm4
+"single atom app state is good"
+
+http://www.gamasutra.com/view/feature/3429/crashing_into_the_new_year_.php
+
+******** GOOD ARTICLE ON COLLISION DETECTION
+http://www.gamasutra.com/view/feature/3426/when_two_hearts_collide_.php
+"The bounding box of the two objects clearly are colliding. It’s also just as clear that the objects
+themselves are not. This is why being a human is great and being a game programmer is difficult."
+"the game developer’s philosophy: "Do as much work up front as possible, especially if it saves run time.""
+
+******** NOTE
+"We assume that collision has not occurred and update the object’s position. If we find that a collision
+has occurred, we move the object back and do not allow it to pass the boundary (or destroy it or take
+some other preventative measure). However, this assumption is too simplistic because we don’t know if
+the object’s previous position is still available. You’ll have to devise a scheme for what to do in this
+case (otherwise, you’ll probably experience a crash or you’ll be stuck)"
+
+on tunneling:
+"An easy approach is to create a convex hull around an object’s location at two different times.
+This approach is very inefficient and will definitely slow down your game. Instead of constructing
+a convex hull, we could construct a bounding box around the solid."
+
+"we can divide our world into objects that are stationary (collidees) and objects that move (colliders)
+even with a v=0. For example, a rigid wall in a room is a collidee and a tennis ball thrown at the wall
+is a collider. We can build two spatial trees (one for each group) out of these objects, and then check
+which objects really have a chance of colliding. We can even restrict our environment further so that
+some colliders won’t collide with each other — we don’t have to compute collisions between two bullets,
+for example."
+
+"In practice, these methods have manifested as octrees and axis-aligned bounding boxes (AABBs)"
+"There are several ways to precompute OBBs, and they all involve a lot of math"
+
+anyway current status is that i'm planning on just using dumb AABBs for collision detection
+(if i even implement it myself! i'm mainly learning about all this stuff for fun, but expect to actually
+end up just using some js library for this)
+
+ok back to http://betterexplained.com/articles/linear-algebra-guide/
+learning about matrices
+[Operation Matrix] [Input Matrix]
+[operation count x operation size] [input size x input count]
+[m x n] [p x q] = [m x q]
+[2 x 3] [3 x 2] = [2 x 2]
+"Notice the matrices touch at the “size of operation” and “size of input” (n = p). They should match!
+If our inputs have 3 components, our operations should expect 3 items. In fact, we can only multiply
+matrices when n = p."
+
+hm anyway i understand matrices *slightly* more but wouldn't say i have a firm handle on linear algebra.
+would be worth doing the khan academy unit on it sometime
+ok, anyway that's enough of that, let's go look for js collision detection libraries
+
+hm i might have to implement something myself
+something simple using SAT / AABBs
+
+https://github.com/jriecken/sat-js relatively unused but perhaps a good learning aid
+
+https://github.com/wellcaffeinated/PhysicsJS (unmaintained)
+
+https://github.com/liabru/matter-js
+
+matter looks neat, how does it work?
+
+actually you know what the blurb on https://www.ibm.com/developerworks/library/wa-build2dphysicsengine/
+looks pretty good
+
+"Sometimes, the complexity and overhead of a third-party physics library, such as Box2D, is overkill
+for your JavaScript game"
+
+that sure sounds like it's the case for me
