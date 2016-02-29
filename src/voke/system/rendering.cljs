@@ -24,7 +24,7 @@
   (render! renderer stage)
   entities)
 
-(defn handle-movement-event [stage objects-by-entity-id event]
+(defn handle-movement-event [stage objects-by-entity-id event publish-chan]
   (if-let [obj (@objects-by-entity-id (-> event :entity :id))]
     (update-obj-position! obj (-> event :entity :shape))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
@@ -40,4 +40,4 @@
                       :fn    (fn [& args]
                                (apply render-system-tick renderer stage objects-by-entity-id args))}
      :event-handlers [{:event-type :movement
-                       :fn         #(handle-movement-event stage objects-by-entity-id %)}]}))
+                       :fn         (partial handle-movement-event stage objects-by-entity-id)}]}))

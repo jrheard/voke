@@ -32,4 +32,7 @@
                            (let [moved-entity (apply-intended-movement-directions entity)]
                              (publish-event publish-chan {:event-type :movement
                                                           :entity     moved-entity})
+                             (publish-event publish-chan {:event-type :intended-movement
+                                                          :entity     moved-entity
+                                                          :new-shape  nil})
                              moved-entity)))}})

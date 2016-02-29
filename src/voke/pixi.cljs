@@ -14,6 +14,7 @@
 (sm/defn entity->graphic
   ; FIXME only supports rectangles atm, doesn't look to see if you've got other shapes
   [entity :- Entity]
+  ; TODO x/y should be center, not topleft. ...right? i dunno
   (rectangle (js/PIXI.Graphics.)
              (-> entity :shape :x)
              (-> entity :shape :y)

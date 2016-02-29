@@ -4,6 +4,7 @@
             [voke.events :refer [make-pub subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
             [voke.schemas :refer [Entity EntityField Event GameState System]]
+            [voke.system.collision :refer [collision-system]]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]
@@ -61,7 +62,8 @@
   of time pass in the game-world."
   [game-state-atom
    player-entity-id]
-  (let [systems [move-system
+  (let [systems [collision-system
+                 move-system
                  render-system]
         ; TODO consider splitting this out into a private atom, and unsubbing everything from the previous
         ; publication at the start of this function. right now after a bunch of figwheel reloads
@@ -76,8 +78,7 @@
     (doseq [handler-map event-handlers]
       (subscribe-to-event publication
                           (handler-map :event-type)
-                          ; TODO should event handlers get a publish-chan, too? they don't currently
-                          (handler-map :fn)))
+                          #((handler-map :fn) % publish-chan)))
 
     ; Listen to keyboard input.
     (handle-keyboard-events publish-chan player-entity-id)
@@ -100,8 +101,8 @@
     (fn [state]
       ; feels like there must be a simpler way to express this loop statement, but i haven't found one
       (loop [state state
-             ; TODO what about systems that don't have an every-tick function (eg damage)?
-             tick-functions (map system-to-tick-fn systems)]
+             tick-functions (map system-to-tick-fn
+                                 (filter :every-tick systems))]
         (if (seq tick-functions)
           (recur ((first tick-functions) state publish-chan)
                  (rest tick-functions))
