@@ -27,13 +27,8 @@
 
 (sm/def move-system :- System
   {:every-tick {:fn (fn move-system-tick [entities publish-chan]
-                      (for [entity (filter #(not-empty (:intended-move-direction %)) entities)]
-                        (let [moved-entity (apply-intended-movement-directions entity)]
-                          (publish-event publish-chan {:event-type :movement
-                                                       :entity     moved-entity})
-
-                          (publish-event publish-chan {:event-type   :intended-movement
-                                                       :moved-entity moved-entity
-                                                       :all-entities entities})
-
-                          moved-entity)))}})
+                      (doseq [entity (filter #(not-empty (:intended-move-direction %)) entities)]
+                        (publish-event publish-chan {:event-type   :intended-movement
+                                                     :moved-entity (apply-intended-movement-directions entity)
+                                                     :all-entities entities}))
+                      entities)}})
