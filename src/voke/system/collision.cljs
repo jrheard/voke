@@ -1,7 +1,7 @@
 (ns voke.system.collision
   (:require [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity Event]])
+            [voke.schemas :refer [Entity Event System]])
   (:require-macros [schema.core :as sm]))
 
 (defn left-edge-x [rect] (- (rect :x)
@@ -57,6 +57,8 @@
         (publish-event publish-chan {:event-type :movement
                                      :entity     entity})))))
 
-(def collision-system
+;; System definition
+
+(sm/def collision-system :- System
   {:event-handlers [{:event-type :intended-movement
                      :fn         handle-intended-movement}]})

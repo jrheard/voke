@@ -29,9 +29,9 @@
     (update-obj-position! obj (-> event :entity :shape))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
-;;; System definition
+;; System definition
 
-(def render-system
+(sm/def render-system :- System
   (let [renderer (make-renderer 1000 700 (js/document.getElementById "screen"))
         stage (make-stage)
         objects-by-entity-id (atom {})]

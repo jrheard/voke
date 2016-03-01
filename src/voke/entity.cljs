@@ -18,6 +18,7 @@
 (sm/defn player :- Entity
   [x y]
   (make-entity
+    ; TODO - the shapes in this file don't have :angles
     {:shape                   {:x x :y y :width 25 :height 25 :type :rectangle}
      :collision               {:type :player}
      :renderable              true
