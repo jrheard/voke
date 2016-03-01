@@ -1485,3 +1485,29 @@ yeah, attack system, why not; it's clear enough from the name that it's distinct
 
 sidenote: what sets AI-controlled entities' intended move directions / fire directions?
 system.ai?
+
+ok anyway nvm i started work on projectiles and then realized that none of it will make any sense
+until i've implemented proper velocity/acceleration vector-based movement
+so we gotta do that first
+
+i'll probably think about it overnight and do it tomorrow
+
+so how would a system like this work?
+i've considered adding a new system that's separate from the movement system, but don't see the point
+so i guess the movement system's responsibilities expand to look like this:
+
+1) for each entity that *wants* to move somewhere (human-controlled, ai-controlled)
+2) update its acceleration to reflect that
+
+then,
+
+1) for each entity with an acceleration,
+2) update its velocity to reflect that
+
+then,
+
+1) for each entity that has a velocity,
+2) update its position to reflect that
+
+velocity is a vector with a direction in radians and a magnitude in pixels/tick
+acceleratio is a vector with a direction in radians and a magnitude in pixels/tick
