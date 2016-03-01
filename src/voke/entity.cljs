@@ -38,3 +38,7 @@
     {:shape      {:x x :y y :width width :height height :type :rectangle :orientation 0}
      :collision  {:type :obstacle}
      :renderable true}))
+
+(sm/defn projectile :- Entity
+  [x y width height motion]
+  )
