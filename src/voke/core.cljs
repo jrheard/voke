@@ -17,10 +17,10 @@
          (atom
            (make-game-state
              [player
-              (e/wall 0 0 1000 30)
-              (e/wall 0 30 30 670)
-              (e/wall 970 30 30 670)
-              (e/wall 0 670 1000 30)])))
+              (e/wall 500 15 1000 30)
+              (e/wall 15 350 30 640)
+              (e/wall 985 350 30 640)
+              (e/wall 500 685 1000 30)])))
 
 ; Useful in dev, so figwheel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))

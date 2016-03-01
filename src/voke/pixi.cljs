@@ -8,13 +8,12 @@
     (.beginFill color)
     (.drawRect 0 0 w h)
     (.endFill)
-    (aset "x" x)
-    (aset "y" y)))
+    (aset "x" (- x (/ w 2)))
+    (aset "y" (- y (/ h 2)))))
 
 (sm/defn entity->graphic
   ; FIXME only supports rectangles atm, doesn't look to see if you've got other shapes
   [entity :- Entity]
-  ; TODO x/y should be center, not topleft. ...right? i dunno
   (rectangle (js/PIXI.Graphics.)
              (-> entity :shape :x)
              (-> entity :shape :y)
@@ -25,9 +24,11 @@
 (sm/defn update-obj-position!
   [obj
    new-position :- Shape]
-  (doto obj
-    (aset "x" (new-position :x))
-    (aset "y" (new-position :y))))
+  ; xxx also only supports rectangles
+  (let [{:keys [x y width height]} new-position]
+    (doto obj
+      (aset "x" (- x (/ width 2)))
+      (aset "y" (- y (/ height 2))))))
 
 (defn make-renderer [width height node]
   (doto (js/PIXI.CanvasRenderer.

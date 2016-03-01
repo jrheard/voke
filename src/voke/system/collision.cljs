@@ -4,21 +4,24 @@
             [voke.schemas :refer [Entity Event]])
   (:require-macros [schema.core :as sm]))
 
+(defn left-edge-x [rect] (- (rect :x)
+                            (/ (rect :width) 2)))
+(defn right-edge-x [rect] (+ (rect :x)
+                             (/ (rect :width) 2)))
+(defn top-edge-y [rect] (- (rect :y)
+                           (/ (rect :height) 2)))
+(defn bottom-edge-y [rect] (+ (rect :y)
+                              (/ (rect :height) 2)))
+
 (sm/defn shapes-collide? :- s/Bool
   [shape1 shape2]
   ; right now everything's just aabbs
   ; when that changes, this function will need to get smarter
-  ; TODO also will need to rework this when x/y positions become center of rectangles; add helper functions
-  ; or just a let statement with like left-x right-x etc
   (not-any? identity
-            [(< (+ (shape1 :y) (shape1 :height))
-                (shape2 :y))
-             (> (shape1 :y)
-                (+ (shape2 :y) (shape2 :height)))
-             (> (shape1 :x)
-                (+ (shape2 :x) (shape2 :width)))
-             (< (+ (shape1 :x) (shape1 :width))
-                (shape2 :x))]))
+            [(< (bottom-edge-y shape1) (top-edge-y shape2))
+             (> (top-edge-y shape1) (bottom-edge-y shape2))
+             (> (left-edge-x shape1) (right-edge-x shape2))
+             (< (right-edge-x shape1) (left-edge-x shape2))]))
 
 (sm/defn find-contacting-entity :- (s/maybe Entity)
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
