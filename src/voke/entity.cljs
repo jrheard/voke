@@ -18,8 +18,10 @@
 (sm/defn player :- Entity
   [x y]
   (make-entity
-    ; TODO - the shapes in this file don't have :angles
-    {:shape                   {:x x :y y :width 25 :height 25 :type :rectangle}
+    {:shape                   {:x x :y y :width 25 :height 25 :type :rectangle :orientation 0}
+     :motion {:velocity {:x 0 :y 0}
+              :max-acceleration 1.0
+              :max-speed 10}
      :collision               {:type :player}
      :renderable              true
      :human-controlled        true
@@ -30,6 +32,6 @@
 (sm/defn wall :- Entity
   [x y width height]
   (make-entity
-    {:shape      {:x x :y y :width width :height height :type :rectangle}
+    {:shape      {:x x :y y :width width :height height :type :rectangle :orientation 0}
      :collision  {:type :obstacle}
      :renderable true}))

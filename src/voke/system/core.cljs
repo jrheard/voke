@@ -50,11 +50,9 @@
 
 (sm/defn apply-update-entity-event [state :- GameState
                                     event :- Event]
-  (let [{:keys [entity-id args]} event]
-    (apply update-in
-           state
-           (concat [:entities entity-id] (first args))
-           (rest args))))
+  (update-in state
+             [:entities (event :entity-id)]
+             (event :fn)))
 
 (sm/defn make-system-runner
   "Returns a function from game-state -> game-state, which you can call to make a unit

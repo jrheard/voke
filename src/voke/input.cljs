@@ -56,5 +56,6 @@
         (publish-event publish-chan {:event-type :update-entity
                                      :origin     :keyboard-input
                                      :entity-id  player-id
-                                     :args       update-entity-args})
+                                     :fn         (fn [entity]
+                                                   (apply update-in entity update-entity-args))})
         (recur)))))

@@ -26,6 +26,7 @@
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/compiled/voke.js"
                            :output-dir "resources/public/js/compiled/out"
+                           ;:source-map true
                            :source-map-timestamp true}}
                {:id "min"
                 :source-paths ["src"]

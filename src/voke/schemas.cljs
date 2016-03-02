@@ -18,16 +18,16 @@
                                               :projectile)})
 
 ; TODO - x/y should be the *center*, not the topleft
-(sm/defschema Shape {:x     s/Num
-                     :y     s/Num
-                     :type  (s/enum :rectangle :circle)
-                     :angle s/Num                           ; Orientation in radians
-                     s/Any  s/Any})
+(sm/defschema Shape {:x           s/Num
+                     :y           s/Num
+                     :type        (s/enum :rectangle :circle)
+                     :orientation s/Num                     ; Orientation in radians
+                     s/Any        s/Any})
 
-; TODO - ugh - velocity is a vector AND so is acceleration
-; they're not just numbers along the axis that the shape is pointing in!!!!!!
-(sm/defschema Motion {:velocity     s/Num
-                      :acceleration s/Num})
+(sm/defschema Motion {:velocity         {:x s/Num
+                                         :y s/Num}
+                      :max-speed        s/Num
+                      :max-acceleration s/Num})
 
 (sm/defschema Entity {:id                                       s/Int
                       ; TODO - give me a single example of an entity that doesn't have a shape

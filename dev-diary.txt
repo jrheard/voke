@@ -1634,3 +1634,9 @@ update position
 
 so Motion is really just a Velocity? nah it's got a top-speed too, so let's keep calling it Motion
 give it an acceleration too
+
+unit circle is from -pi to 0 to pi (is this insane or good?)
+
+ok so if we do that, then down is -pi/2, right is 0, up is pi/2, left is -pi (or pi?)
+
+what if you add each key's sins/coses together? is that retarded

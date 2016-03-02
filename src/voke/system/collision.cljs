@@ -53,7 +53,10 @@
         (publish-event publish-chan {:event-type :update-entity
                                      :origin     :collision-system
                                      :entity-id  (entity :id)
-                                     :args       [[:shape] merge (entity :shape)]})
+                                     :fn         (fn [old-entity]
+                                                   (-> old-entity
+                                                       (update-in [:shape] merge (entity :shape))
+                                                       (update-in [:motion] merge (entity :motion))))})
         (publish-event publish-chan {:event-type :movement
                                      :entity     entity})))))
 
