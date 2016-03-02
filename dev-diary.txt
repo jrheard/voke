@@ -1567,3 +1567,70 @@ http://blog.wolfire.com/2010/07/Linear-algebra-for-game-developers-part-3
 "if we are rotating by 49 degrees, then we get the new x-axis by rotating (1,0) by 49 degrees and we
 get the y-axis by rotating (0,1) by 49 degrees. Our new x-axis is (0.66, 0.75),
 and our new y-axis is (-0.75, 0.66)."
+
+basis vector explanation
+"multiplying a 2x2 matrix with a 2D vector is the same thing as changing its basis vectors"
+
+http://www.randygaul.net/2012/02/22/basic-2d-vector-physics-acceleration-orientation-and-friction/
+is a bit more what i had in mind i think
+
+https://gamedev.stackexchange.com/questions/14850/how-to-calculate-falling-and-accelerating-velocity
+
+http://www.metanetsoftware.com/technique/tutorialA.html#appendixA gives good definitions of normal, dotproduct
+
+======
+
+3/2/16
+
+still reading through http://www.randygaul.net/2012/02/22/basic-2d-vector-physics-acceleration-orientation-and-friction/
+
+"Once you have this set up, you can easily use this radians orientation value to find a direction vector for your
+object. A direction vector is a vector whose length is 1, which allows you as a programmer to multiply it by a
+value and easily get a vector in a specific direction of a specific length.
+In order to get your normalized direction vector from your angle of orientation, just use:
+dirVect.x = cos( radianOrientation );
+dirVect.y = sin( radianOrientation );"
+
+yeah this article is way hackier than the other ones listed above but like doesn't require me to spend an extra
+week thinking about linear algebra so i might just cheat and go with this approach :/
+
+"Now, what if you need to solve for the angle between two points? This could be useful for homing missiles, or
+AI. Knowing the angle between an enemy and the player, for instance, could be used to let the enemy know
+which direction to go from there. In order to solve for the angle between two points I used atan2:
+angle = atan2( player.y - enemy.y, player.x - enemy.x )
+This lets me find the angle between two points, namely between an enemy object and the player. You can then
+use this result and compare it with the angle of orientation of the enemy in order to deduce of the enemy
+should turn clockwise or counterclockwise, or anything else you'd want!"
+
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atan2 js atan
+
+the comments talk about variable vs fixed timestep
+
+ok so what now?
+entities can have a Shape, with an x/y and an orientation
+orientation is from negative pi to positive pi
+
+they can also have a Motion, with a velocity that's a dx and a dy, and a top speed
+you can get the entity's current speed by doing sqrt of dx^2 + dy^2
+
+on each tick,
+for each entity with a Motion,
+update orientation
+  (for player, it's the angle defined by the currently-held-down movement keys)
+  (for monsters, it's atan2 or something, it's the angle that directly leads them to the player)
+  (for projectiles, it's the angle they were created with)
+calculate acceleration
+  (if player is moving, acceleration is just like always 0.1 or something, or 10% of top speed or whatever)
+  (same with monsters)
+find direction vector
+  dirVect.x = cos( radianOrientation );
+  dirVect.y = sin( radianOrientation );
+update velocity, capped at top-speed
+  vel.x += acceleration * dirVect.x;
+  vel.y += acceleration * dirVect.y;
+update position
+  pos.x += vel.x
+  pos.y += vel.y
+
+so Motion is really just a Velocity? nah it's got a top-speed too, so let's keep calling it Motion
+give it an acceleration too
