@@ -49,7 +49,7 @@
 
 (sm/defschema GameState {:entities {:s/Int Entity}})
 
-(sm/defschema EventType (s/enum :movement :update-entity))
+(sm/defschema EventType (s/enum :movement :update-entity :intended-movement))
 
 ; TODO not well defined
 ; maybe best thing to do would be to schematize each individual event and then say an Event is any of 'em

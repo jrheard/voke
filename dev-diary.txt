@@ -1511,3 +1511,59 @@ then,
 
 velocity is a vector with a direction in radians and a magnitude in pixels/tick
 acceleratio is a vector with a direction in radians and a magnitude in pixels/tick
+
+fwiw,
+current set of games i'm mainly thinking about as inspirations
+isaac, diablo, risk of rain, teleglitch
+
+=====
+
+3/1/16
+
+http://buildnewgames.com/gamephysics/
+makin' a case for vectors
+"Vectors are like arrows–they have a length and they have a direction. They do not have
+an absolute position in space. The vector [5,3] points north-east, but it doesn’t have a “starting point”."
+
+"If you model points A and B as vectors, then you can get the line segment AB simply by
+doing the vector subtraction B-A."
+
+"Using vectors also helps you do intuitive things like adding and subtracting vectors–and keep in
+mind that you can model points as vectors, so any math you can do to vectors you can do to points
+as well, including rotation around any other point."
+
+garrick's haskell SAT: http://pastebin.com/UG01CB6H
+
+back to the gamephysics article, note his "velocity verlet" integration method
+
+holy shit dude his bouncing+gravity ball example is really short
+
+i... don't really want to do his full 2d example though
+spring forces?
+
+"This implementation of the separating axis theorem test is certainly not definitive, however, and you
+should craft your own to fit your use-case. This example does not quit early if there’s a test axis with
+no overlap; quitting early is a great performance optimization. " **** TODO WHEN SAT HAPPENS
+
+" Also think about the difference between using quadtrees and using a simple fixed grid. Choose whichever
+better fits your application; will your objects be evenly distributed throughout the game world, or
+will they be clumped together?"
+
+this is a super good point - in isaac a fixed grid would be fine, but i think in voke we'll have bigger maps
+with lots of clumping (cleared parts, parts where player is actively fighting monsters / shooting / etc)
+and so we'll need quadtrees
+
+http://blog.wolfire.com/2009/07/linear-algebra-for-game-developers-part-1/ looks promising
+
+TODO should my game world be expressed in terms of meters, and only translated to pixels at render time?
+seems like a reasonable idea
+
+ok http://blog.wolfire.com/2009/07/linear-algebra-for-game-developers-part-2/ looks pretty good
+does a good job of explaining normalization, dot product
+
+http://blog.wolfire.com/2010/07/Linear-algebra-for-game-developers-part-3
+"What if instead of rotating each point in the model, we just rotate the model's x and y axes instead?"
+
+"if we are rotating by 49 degrees, then we get the new x-axis by rotating (1,0) by 49 degrees and we
+get the y-axis by rotating (0,1) by 49 degrees. Our new x-axis is (0.66, 0.75),
+and our new y-axis is (-0.75, 0.66)."
