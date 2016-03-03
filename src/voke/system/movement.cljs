@@ -47,7 +47,7 @@
 
 (sm/defn update-position :- Entity
   [entity :- Entity]
-  (js/console.log (clj->js (get-in entity [:motion :velocity])))
+  ;(js/console.log (clj->js (get-in entity [:motion :velocity])))
   (-> entity
       (update-in [:shape :x]
                  (fn [x]

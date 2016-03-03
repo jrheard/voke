@@ -44,12 +44,24 @@
    publish-chan]
   (let [entity (event :moved-entity)]
     (if-let [contacted-entity (find-contacting-entity entity (event :all-entities))]
-      ; New position wasn't clear; notify the world that a contact event occurred!
-      (publish-event publish-chan {:event-type :contact
-                                   :entities   [entity contacted-entity]})
-
-      ; Position was clear, go ahead and apply the intended movement.
+      ; New position wasn't clear.
       (do
+        ; Slow this guy down.
+        (publish-event publish-chan {:event-type :update-entity
+                                     :origin :collision-system
+                                     :entity-id (entity :id)
+                                     :fn (fn [old-entity]
+                                           (-> old-entity
+                                               (update-in [:motion :velocity :x] #(* % 0.5))
+                                               (update-in [:motion :velocity :y] #(* % 0.5))))})
+
+        ; Notify the rest of the world that a contact event occurred.
+        (publish-event publish-chan {:event-type :contact
+                                    :entities   [entity contacted-entity]}))
+
+      ; Position was clear.
+      (do
+        ; Go ahead and apply the intended movement.
         (publish-event publish-chan {:event-type :update-entity
                                      :origin     :collision-system
                                      :entity-id  (entity :id)
