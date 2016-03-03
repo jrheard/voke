@@ -24,7 +24,6 @@
                                :max-speed        11}
      :collision               {:type :player}
      :renderable              true
-     :human-controlled        true
      :intended-move-direction #{}
      ; TODO make fire direction be an ordered set
      :intended-fire-direction #{}}))

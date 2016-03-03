@@ -12,12 +12,6 @@
                                   :intended-move-direction
                                   :intended-fire-direction))
 
-; TODO i guess i should read up on the strategy pattern if i want to use this term
-(sm/defschema MovementStrategy {:type (s/enum :human-controlled
-                                              :skeleton
-                                              :projectile)})
-
-; TODO - x/y should be the *center*, not the topleft
 (sm/defschema Shape {:x           s/Num
                      :y           s/Num
                      :type        (s/enum :rectangle :circle)
@@ -28,6 +22,11 @@
                                          :y s/Num}
                       :max-speed        s/Num
                       :max-acceleration s/Num})
+
+(sm/defschema Brain {:type (s/enum :player :skeleton :projectile)
+                     ; TODO - these will be *angles* for non-player entities, not sets!!!!!
+                     :intended-move-direction IntendedDirection
+                     :intended-fire-direction IntendedDirection})
 
 (sm/defschema Entity {:id                                       s/Int
                       ; TODO - give me a single example of an entity that doesn't have a shape
@@ -41,9 +40,8 @@
                                                                          :obstacle
                                                                          :level-end)}
                       (s/optional-key :renderable)              s/Bool ; TODO this will have like colors and stuff
-                      (s/optional-key :human-controlled)        s/Bool
-                      ; TODO - replace the line above with the line below
-                      (s/optional-key :movement-strategy)       MovementStrategy
+                      (s/optional-key :brain)                   Brain
+                      ; TODO - kill the next two lines
                       (s/optional-key :indended-move-direction) IntendedDirection
                       (s/optional-key :intended-fire-direction) IntendedDirection})
 
