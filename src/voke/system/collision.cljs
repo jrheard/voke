@@ -57,19 +57,19 @@
                             [:x true] (- (shape2 :x)
                                          (/ (shape2 :width) 2)
                                          (/ (shape1 :width) 2)
-                                         0.1)
+                                         0.01)
                             [:x false] (+ (shape2 :x)
                                           (/ (shape2 :width) 2)
                                           (/ (shape1 :width) 2)
-                                          0.1)
+                                          0.01)
                             [:y true] (- (shape2 :y)
                                          (/ (shape2 :height) 2)
                                          (/ (shape1 :height) 2)
-                                         0.1)
+                                         0.01)
                             [:y false] (+ (shape2 :y)
                                           (/ (shape2 :height) 2)
                                           (/ (shape1 :height) 2)
-                                          0.1))]
+                                          0.01))]
     (when-not (find-contacting-entity (assoc-in (event :entity)
                                                 [:shape (event :axis)]
                                                 axis-value-to-try)
