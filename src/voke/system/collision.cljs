@@ -41,35 +41,22 @@
                                      entity-shape)
                    collidable-entities))))
 
-
-; TODO dear god all the code i added in this commit is fuckin nuts and insane
-; TODO REFACTOR ALL THIS
-
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
   [event :- Event
    contacted-entity :- Entity]
-
-  (let [; TODO AABBs for non-rect shapes
-        shape1 (get-in event [:entity :shape])
+  "Takes an :intended-movement event (for entity A) and the Entity that occupies the position that entity A
+  is trying to move to (entity B). Finds the closest x- or y-value (depending on the value of `(event :axis)`)
+  that entity A can occupy without contacting entity B and returns it if entity A fits there, or returns nil
+  if no open spot exists."
+  ; TODO - only supports rectangles
+  (let [shape1 (get-in event [:entity :shape])
         shape2 (contacted-entity :shape)
-        axis-value-to-try (match [(event :axis) (pos? (event :new-velocity))]
-                            ; TODO refactor
-                            [:x true] (- (shape2 :x)
-                                         (/ (shape2 :width) 2)
-                                         (/ (shape1 :width) 2)
-                                         0.01)
-                            [:x false] (+ (shape2 :x)
-                                          (/ (shape2 :width) 2)
-                                          (/ (shape1 :width) 2)
-                                          0.01)
-                            [:y true] (- (shape2 :y)
-                                         (/ (shape2 :height) 2)
-                                         (/ (shape1 :height) 2)
-                                         0.01)
-                            [:y false] (+ (shape2 :y)
-                                          (/ (shape2 :height) 2)
-                                          (/ (shape1 :height) 2)
-                                          0.01))]
+        arithmetic-fn (if (pos? (event :new-velocity)) - +)
+        field (if (= (event :axis) :x) :width :height)
+        axis-value-to-try (arithmetic-fn (shape2 (event :axis))
+                                         (/ (shape2 field) 2)
+                                         (/ (shape1 field) 2)
+                                         0.01)]
     (when-not (find-contacting-entity (assoc-in (event :entity)
                                                 [:shape (event :axis)]
                                                 axis-value-to-try)
