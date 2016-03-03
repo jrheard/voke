@@ -3,12 +3,24 @@
             [voke.schemas :refer [Entity GameState System]])
   (:require-macros [schema.core :as sm]))
 
+; A dumb-as-rocks velocity/acceleration system.
+; Based on http://www.randygaul.net/2012/02/22/basic-2d-vector-physics-acceleration-orientation-and-friction/ .
+;
+; If I were a better man, I would have implemented http://buildnewgames.com/gamephysics/
+; or http://blog.wolfire.com/2009/07/linear-algebra-for-game-developers-part-2/
+;
+; This system was easy to implement and I don't need all the bells/whistles in the linear-algebra-based
+; articles, though, so I don't feel *too* bad.
+
 ; TODO - make this a static map, calculated at compile time, that maps all the permutations of
 ; up/down/left/right to their angle values; no need to do all this sin/cos/atan2 math on every tick
 (def direction-value-mappings {:down  (/ Math/PI 2)
                                :up    (- (/ Math/PI 2))
                                :left  Math/PI
                                :right 0})
+
+(def friction-value 0.88)
+(def min-velocity 0.05)
 
 (sm/defn update-orientation :- Entity
   [entity :- Entity]
@@ -29,14 +41,14 @@
             (> (or (get-in entity [:motion :velocity :x] 0)
                    (get-in entity [:motion :velocity :y] 0))))
       (let [orientation (get-in entity [:shape :orientation])
-            update-axis-velocity (fn [trig-fn axis-value]
-                                   (let [new-value (min (get-in entity [:motion :max-speed])
-                                                        (* (+ axis-value
+            update-axis-velocity (fn [trig-fn axis-velocity]
+                                   (let [new-velocity (min (get-in entity [:motion :max-speed])
+                                                        (* (+ axis-velocity
                                                               (* acceleration
                                                                  (trig-fn orientation)))
-                                                           0.9))]
-                                     (if (> (Math/abs new-value) 0.05)
-                                       new-value
+                                                           friction-value))]
+                                     (if (> (Math/abs new-velocity) min-velocity)
+                                       new-velocity
                                        0)))]
         (-> entity
             (update-in [:motion :velocity :x]
@@ -47,7 +59,6 @@
 
 (sm/defn update-position :- Entity
   [entity :- Entity]
-  ;(js/console.log (clj->js (get-in entity [:motion :velocity])))
   (-> entity
       (update-in [:shape :x]
                  (fn [x]

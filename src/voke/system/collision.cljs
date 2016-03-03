@@ -57,7 +57,7 @@
                                      :fn         (fn [old-entity]
                                                    (update-in old-entity
                                                               [:motion :velocity axis]
-                                                              #(* % 0.05)))})
+                                                              #(* % 0.8)))})
 
         ; Notify the rest of the world that a contact event occurred.
         (publish-event publish-chan {:event-type :contact
