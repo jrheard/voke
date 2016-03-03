@@ -51,6 +51,7 @@
       ; New position wasn't clear.
       (do
         ; Slow this guy down.
+        ; TODO - do something smarter than this
         (publish-event publish-chan {:event-type :update-entity
                                      :origin     :collision-system
                                      :entity-id  (entity :id)

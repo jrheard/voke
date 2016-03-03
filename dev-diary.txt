@@ -1652,3 +1652,13 @@ there are a bunch of things left to do
 3) projectiles shouldn't experience friction
 
 wow it really does feel surprisingly good right now though, and i haven't even tweaked any values yet
+
+ok rough acceleration/velocity are in
+
+still need to tweak values, and really in particular need to figure out a better way of dealing with collisions
+with walls. how to calculate the closest non-wall spot to put the entity in?
+
+well, i guess you know that entity 1 collided with entity 2..
+but you don't currently know what *side* they collided on
+
+oh wow zeke really wasn't kidding, corners are totally fucked up
