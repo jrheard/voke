@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "1.7.170"]
                  [org.clojure/core.async "0.2.374"
                   :exclusions [org.clojure/tools.reader]]
+                 [org.clojure/core.match "0.3.0-alpha4"]
                  [figwheel-sidecar "0.5.0"]
                  [prismatic/schema "1.0.4"]
                  [cljsjs/pixi "3.0.7-0"]]

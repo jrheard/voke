@@ -1662,3 +1662,8 @@ well, i guess you know that entity 1 collided with entity 2..
 but you don't currently know what *side* they collided on
 
 oh wow zeke really wasn't kidding, corners are totally fucked up
+
+so yeah the main next thing i need to work on is walls, then i can do bullets after
+
+ok i think i figured it out but the code i added is, like, voluminous
+refactor it tomorrow!!!!!!!!!
