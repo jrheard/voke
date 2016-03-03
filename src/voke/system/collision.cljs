@@ -52,16 +52,16 @@
       (do
         ; Slow this guy down.
         (publish-event publish-chan {:event-type :update-entity
-                                     :origin :collision-system
-                                     :entity-id (entity :id)
-                                     :fn (fn [old-entity]
-                                           (-> old-entity
-                                               (update-in [:motion :velocity :x] #(* % 0.5))
-                                               (update-in [:motion :velocity :y] #(* % 0.5))))})
+                                     :origin     :collision-system
+                                     :entity-id  (entity :id)
+                                     :fn         (fn [old-entity]
+                                                   (update-in old-entity
+                                                              [:motion :velocity axis]
+                                                              #(* % 0.05)))})
 
         ; Notify the rest of the world that a contact event occurred.
         (publish-event publish-chan {:event-type :contact
-                                    :entities   [entity contacted-entity]}))
+                                     :entities   [entity contacted-entity]}))
 
       ; Position was clear.
       (do
@@ -71,8 +71,10 @@
                                      :entity-id  (entity :id)
                                      :fn         (fn [old-entity]
                                                    (-> old-entity
-                                                       (assoc-in [:shape axis] (event :new-position))
-                                                       (assoc-in [:motion :velocity axis] (event :new-velocity))))})
+                                                       (assoc-in [:shape axis]
+                                                                 (event :new-position))
+                                                       (assoc-in [:motion :velocity axis]
+                                                                 (event :new-velocity))))})
         (publish-event publish-chan {:event-type :movement
                                      :entity     entity})))))
 
