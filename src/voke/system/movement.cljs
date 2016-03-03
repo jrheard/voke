@@ -1,6 +1,7 @@
 (ns voke.system.movement
-  (:require [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity GameState System]])
+  (:require [clojure.set :refer [intersection difference]]
+            [voke.events :refer [publish-event]]
+            [voke.schemas :refer [Direction Entity GameState System]])
   (:require-macros [schema.core :as sm]))
 
 ; A dumb-as-rocks velocity/acceleration system.
@@ -12,8 +13,6 @@
 ; This system was easy to implement and I don't need all the bells/whistles in the linear-algebra-based
 ; articles, though, so I don't feel *too* bad.
 
-; TODO - make this a static map, calculated at compile time, that maps all the permutations of
-; up/down/left/right to their angle values; no need to do all this sin/cos/atan2 math on every tick
 (def direction-value-mappings {:down  (/ Math/PI 2)
                                :up    (- (/ Math/PI 2))
                                :left  Math/PI
@@ -22,19 +21,31 @@
 (def friction-value 0.80)
 (def min-velocity 0.05)
 
+(sm/defn remove-conflicting-directions :- [Direction]
+  "Takes a seq of directions like #{:up :down :left} and returns a seq of directions
+  where the pairs of conflicting directions - up+down, left+right - are stripped out if they're present."
+  [directions :- [Direction]]
+  (reduce (fn [directions conflicting-pair]
+            (if (= (intersection directions conflicting-pair)
+                   conflicting-pair)
+              (difference directions conflicting-pair)
+              directions))
+          directions
+          [#{:up :down} #{:left :right}]))
+
 (sm/defn update-orientation :- Entity
   [entity :- Entity]
   ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters/projectiles
   (assoc-in entity
             [:shape :orientation]
-            (let [intended-direction-values (map direction-value-mappings
-                                                 (entity :intended-move-direction))]
+            (let [directions (remove-conflicting-directions (entity :intended-move-direction))
+                  intended-direction-values (map direction-value-mappings directions)]
               (Math/atan2 (apply + (map Math/sin intended-direction-values))
                           (apply + (map Math/cos intended-direction-values))))))
 
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
-  (let [acceleration (if (not-empty (entity :intended-move-direction))
+  (let [acceleration (if (not-empty (remove-conflicting-directions (entity :intended-move-direction)))
                        (get-in entity [:motion :max-acceleration])
                        0)]
     (if (or (> acceleration 0)

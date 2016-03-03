@@ -74,7 +74,6 @@
                                                 [:shape (event :axis)]
                                                 axis-value-to-try)
                                       (event :all-entities))
-      (js/console.log "sweet we're going with " axis-value-to-try)
       axis-value-to-try)))
 
 (sm/defn handle-contact
