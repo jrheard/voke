@@ -42,8 +42,12 @@
 (sm/defn handle-intended-movement
   [event :- Event
    publish-chan]
-  (let [entity (event :moved-entity)]
-    (if-let [contacted-entity (find-contacting-entity entity (event :all-entities))]
+  (let [entity (event :entity)
+        axis (event :axis)
+        moved-entity (assoc-in entity
+                               [:shape axis]
+                               (event :new-position))]
+    (if-let [contacted-entity (find-contacting-entity moved-entity (event :all-entities))]
       ; New position wasn't clear.
       (do
         ; Slow this guy down.
@@ -67,8 +71,8 @@
                                      :entity-id  (entity :id)
                                      :fn         (fn [old-entity]
                                                    (-> old-entity
-                                                       (update-in [:shape] merge (entity :shape))
-                                                       (update-in [:motion] merge (entity :motion))))})
+                                                       (assoc-in [:shape axis] (event :new-position))
+                                                       (assoc-in [:motion :velocity axis] (event :new-velocity))))})
         (publish-event publish-chan {:event-type :movement
                                      :entity     entity})))))
 

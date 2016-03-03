@@ -58,21 +58,18 @@
 
 ;; System definition
 
-; TODO if you collide with a wall you are stuck there forever
-; upate the collision system to do something smarter to your velocity/position when you collide with something
-
 (sm/def move-system :- System
   {:every-tick {:fn (fn move-system-tick [entities publish-chan]
                       (doseq [entity (filter #(contains? % :intended-move-direction) entities)]
+                        (let [moved-entity (-> entity
+                                               update-orientation
+                                               update-velocity
+                                               update-position)]
 
-                        ; TODO - problem!
-                        ; if you're contacting a wall on the right, and you're trying to move up+right,
-                        ; you *don't* move up because the position would be invalid!
-                        ; you should be able to move up, though!
-
-                        (publish-event publish-chan {:event-type   :intended-movement
-                                                     :moved-entity (-> entity
-                                                                       update-orientation
-                                                                       update-velocity
-                                                                       update-position)
-                                                     :all-entities entities})))}})
+                          (doseq [axis [:x :y]]
+                            (publish-event publish-chan {:event-type   :intended-movement
+                                                         :entity       entity
+                                                         :axis         axis
+                                                         :new-position (get-in moved-entity [:shape axis])
+                                                         :new-velocity (get-in moved-entity [:motion :velocity axis])
+                                                         :all-entities entities})))))}})
