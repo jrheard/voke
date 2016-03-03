@@ -19,7 +19,7 @@
                                :left  Math/PI
                                :right 0})
 
-(def friction-value 0.85)
+(def friction-value 0.80)
 (def min-velocity 0.05)
 
 (sm/defn update-orientation :- Entity

@@ -20,8 +20,8 @@
   (make-entity
     {:shape                   {:x x :y y :width 25 :height 25 :type :rectangle :orientation 0}
      :motion                  {:velocity         {:x 0 :y 0}
-                               :max-acceleration 1.3
-                               :max-speed        8}
+                               :max-acceleration 2.0
+                               :max-speed        11}
      :collision               {:type :player}
      :renderable              true
      :human-controlled        true
