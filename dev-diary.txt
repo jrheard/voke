@@ -1640,3 +1640,15 @@ unit circle is from -pi to 0 to pi (is this insane or good?)
 ok so if we do that, then down is -pi/2, right is 0, up is pi/2, left is -pi (or pi?)
 
 what if you add each key's sins/coses together? is that retarded
+
+ok i hacked around and acceleration/velocity sort of exists
+
+there are a bunch of things left to do
+
+1) don't keep recalculating 0.9* velocity forever and ever as it approaches 0 infinitely
+  just like have it be the case that if your velocity falls below 0.01 or something, your velocity is set to 0
+  and if you've got 0 velocity and 0 acceleration, skip velocity-updating calculations
+2) update collision system so that if you try to bump into something, your velocity's cut in half or something
+3) projectiles shouldn't experience friction
+
+wow it really does feel surprisingly good right now though, and i haven't even tweaked any values yet
