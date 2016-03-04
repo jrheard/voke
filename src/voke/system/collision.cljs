@@ -31,14 +31,12 @@
   nil if the space `entity` is trying to occupy is empty."
   [entity :- Entity
    all-entities :- [Entity]]
-  (let [entity-shape (entity :shape)
-        collidable-entities (filter (fn [another-entity]
+  (let [collidable-entities (filter (fn [another-entity]
                                       (and
                                         (contains? entity :collision)
                                         (not= (entity :id) (another-entity :id))))
                                     all-entities)]
-    (first (filter #(shapes-collide? (% :shape)
-                                     entity-shape)
+    (first (filter #(shapes-collide? (% :shape) (entity :shape))
                    collidable-entities))))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
