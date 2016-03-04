@@ -49,6 +49,7 @@
 
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
+  ; TODO - acceleration will be computed differently for AI-controlled monsters
   (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
                        (get-in entity [:motion :max-acceleration])
                        0)]
@@ -58,10 +59,9 @@
       (let [orientation (get-in entity [:shape :orientation])
             update-axis-velocity (fn [trig-fn axis-velocity]
                                    (let [new-velocity (min (get-in entity [:motion :max-speed])
-                                                        (* (+ axis-velocity
+                                                           (+ axis-velocity
                                                               (* acceleration
-                                                                 (trig-fn orientation)))
-                                                           friction-value))]
+                                                                 (trig-fn orientation))))]
                                      (if (> (Math/abs new-velocity) min-velocity)
                                        new-velocity
                                        0)))]
@@ -71,6 +71,14 @@
             (update-in [:motion :velocity :y]
                        (partial update-axis-velocity Math/sin))))
       entity)))
+
+(sm/defn apply-friction :- Entity
+  [entity :- Entity]
+  (reduce
+    (fn [entity axis]
+      (update-in entity [:motion :velocity axis] #(* % friction-value)))
+    entity
+    [:x :y]))
 
 (sm/defn update-position :- Entity
   [entity :- Entity]
@@ -90,6 +98,7 @@
                         (let [moved-entity (-> entity
                                                update-orientation
                                                update-velocity
+                                               apply-friction
                                                update-position)]
 
                           (doseq [axis [:x :y]]
