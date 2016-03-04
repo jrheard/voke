@@ -1703,3 +1703,10 @@ either a :damage-sources field that's a list of EntityIDs, or a :time-last-damag
 anyway for now i guess i can start working on emitting projectiles and having a grim-reaper system reap 'em
 
 damage can come (much) later
+
+ok, today ended up being focused mainly on refactoring; i'll deal with projectiles next time.
+
+
+ask julio for austin for cljs game stuff
+
+met austin, see http://pettomato.tumblr.com/ , https://twitter.com/AustinTHaas
