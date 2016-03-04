@@ -61,67 +61,63 @@
                                       (event :all-entities))
       axis-value-to-try)))
 
+(sm/defn apply-movement
+  [entity :- Entity
+   axis :- (s/enum :x :y)
+   new-position :- s/Num
+   new-velocity :- s/Num
+   publish-chan]
+  "Fires events to notify the world that a particular entity should have a new position+velocity."
+  (let [update-entity-fn (fn [entity]
+                           (-> entity
+                               (assoc-in [:shape axis] new-position)
+                               (assoc-in [:motion :velocity axis] new-velocity)))]
+    (publish-event publish-chan {:event-type :update-entity
+                                 :origin     :collision-system
+                                 :entity-id  (entity :id)
+                                 :fn         update-entity-fn})
+    (publish-event publish-chan {:event-type :movement
+                                 :entity     (update-entity-fn entity)})))
+
 (sm/defn handle-contact
   [event :- Event
    contacted-entity :- Entity
    publish-chan]
-  (let [fire-update-event (fn [entity-update-fn]
-                            (publish-event publish-chan {:event-type :update-entity
-                                                         :origin     :collision-system
-                                                         :entity-id  ((event :entity) :id)
-                                                         :fn         entity-update-fn}))
-        closest-clear-spot (find-closest-clear-spot event contacted-entity)]
+  (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
+    ; Great, we found a clear spot! Move there and stand still.
+    (apply-movement (event :entity)
+                    (event :axis)
+                    closest-clear-spot
+                    0
+                    publish-chan)
 
-    (if closest-clear-spot
-      ; Great, we found a clear spot! Move there and stand still.
-      (do
-        (fire-update-event (fn [old-entity]
-                             (-> old-entity
-                                 (assoc-in [:shape (event :axis)] closest-clear-spot)
-                                 (assoc-in [:motion :velocity (event :axis)] 0))))
-        (publish-event publish-chan {:event-type :movement
-                                     :entity     (assoc-in (event :entity)
-                                                           [:shape (event :axis)]
-                                                           closest-clear-spot)}))
+    ; Couldn't find a clear spot; slow him down, he can try moving again next tick.
+    (publish-event publish-chan {:event-type :update-entity
+                                 :origin     :collision-system
+                                 :entity-id  ((event :entity) :id)
+                                 :fn         (fn [old-entity]
+                                               (update-in old-entity
+                                                          [:motion :velocity (event :axis)]
+                                                          #(* % 0.7)))}))
 
-      ; Couldn't find a clear spot; slow down and let him try moving again next tick.
-      (fire-update-event (fn [old-entity]
-                           (update-in old-entity
-                                      [:motion :velocity (event :axis)]
-                                      #(* % 0.7)))))))
+  (publish-event publish-chan {:event-type :contact
+                               :entities   [(event :entity) contacted-entity]}))
 
 (sm/defn handle-intended-movement
   [event :- Event
    publish-chan]
   (let [entity (event :entity)
-        axis (event :axis)
         moved-entity (assoc-in entity
-                               [:shape axis]
+                               [:shape (event :axis)]
                                (event :new-position))]
+
     (if-let [contacted-entity (find-contacting-entity moved-entity (event :all-entities))]
-
-      ; New position wasn't clear.
-      (do
-        (handle-contact event contacted-entity publish-chan)
-
-        ; Notify the rest of the world that a contact event occurred.
-        (publish-event publish-chan {:event-type :contact
-                                     :entities   [entity contacted-entity]}))
-
-      ; Position was clear.
-      (do
-        ; Go ahead and apply the intended movement.
-        (publish-event publish-chan {:event-type :update-entity
-                                     :origin     :collision-system
-                                     :entity-id  (entity :id)
-                                     :fn         (fn [old-entity]
-                                                   (-> old-entity
-                                                       (assoc-in [:shape axis]
-                                                                 (event :new-position))
-                                                       (assoc-in [:motion :velocity axis]
-                                                                 (event :new-velocity))))})
-        (publish-event publish-chan {:event-type :movement
-                                     :entity     entity})))))
+      (handle-contact event contacted-entity publish-chan)
+      (apply-movement entity
+                      (event :axis)
+                      (event :new-position)
+                      (event :new-velocity)
+                      publish-chan))))
 
 ;; System definition
 
