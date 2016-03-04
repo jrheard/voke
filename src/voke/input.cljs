@@ -48,10 +48,10 @@
             direction (msg :direction)
 
             update-entity-args (case (msg :type)
-                                 :move-key-down [[:intended-move-direction] conj direction]
-                                 :move-key-up [[:intended-move-direction] disj direction]
-                                 :fire-key-down [[:intended-fire-direction] conj direction]
-                                 :fire-key-up [[:intended-fire-direction] disj direction])]
+                                 :move-key-down [[:brain :intended-move-direction] conj direction]
+                                 :move-key-up [[:brain :intended-move-direction] disj direction]
+                                 :fire-key-down [[:brain :intended-fire-direction] conj direction]
+                                 :fire-key-up [[:brain :intended-fire-direction] disj direction])]
 
         (publish-event publish-chan {:event-type :update-entity
                                      :origin     :keyboard-input

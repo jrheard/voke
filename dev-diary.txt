@@ -1667,3 +1667,39 @@ so yeah the main next thing i need to work on is walls, then i can do bullets af
 
 ok i think i figured it out but the code i added is, like, voluminous
 refactor it tomorrow!!!!!!!!!
+
+=====
+
+3/3/16
+
+ok, spent some time refactoring that code, and fixed a bug dmitriy found that made you move down if
+you held left+right (nice).
+
+walls feel good now.
+
+dmitriy reported some aliasing
+zeke reported some shuddering [either RAF was falling behind due to his cpu doing other stuff, or events aren't
+keeping up to realtime], should keep an eye out for that.
+
+cos/sin/atan2 perf seems fine according to benchmarks, 10k atan2 invocations -> 3ms, and we won't be
+doing anywhere near that many.
+
+had some ideas re: projectiles this morning, jotting 'em down:
+
+collision system doesn't know/care about projectiles, just emits :contact events
+grim-reaper system listens for :contact events (and eventually :damage ones, but that's a diff story), and
+  if both entities are projectiles,
+    drops the event on the floor
+  if one entity is a projectile, and the other is not its :owner,
+    removes the projectile
+damage system listens for :contact events and behaves similarly
+
+i'm worried about race conditions for applying damage - what if the grim-reaper system doesn't get around
+to deleting the projectile in time, and 2+ damage ticks are emitted for the same projectile?
+entities need some way of tracking damage so that damage application is idempotent.
+
+either a :damage-sources field that's a list of EntityIDs, or a :time-last-damaged, or *something*.
+
+anyway for now i guess i can start working on emitting projectiles and having a grim-reaper system reap 'em
+
+damage can come (much) later

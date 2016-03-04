@@ -3,7 +3,7 @@
             [schema.core :as s]
             [voke.events :refer [make-pub subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
-            [voke.schemas :refer [Entity EntityField Event GameState System]]
+            [voke.schemas :refer [Entity Event GameState System]]
             [voke.system.collision :refer [collision-system]]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]])
@@ -14,7 +14,7 @@
 
 (sm/defn has-relevant-fields? :- s/Bool
   [entity :- Entity
-   fields :- #{EntityField}]
+   fields]
   (every?
     (fn [field]
       (let [value (entity field)]

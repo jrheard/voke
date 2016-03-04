@@ -33,19 +33,23 @@
           directions
           [#{:up :down} #{:left :right}]))
 
+(sm/defn human-controlled-entity-movement-directions
+  [entity :- Entity]
+  (remove-conflicting-directions (get-in entity [:brain :intended-move-direction])))
+
 (sm/defn update-orientation :- Entity
   [entity :- Entity]
   ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters/projectiles
   (assoc-in entity
             [:shape :orientation]
-            (let [directions (remove-conflicting-directions (entity :intended-move-direction))
+            (let [directions (human-controlled-entity-movement-directions entity)
                   intended-direction-values (map direction-value-mappings directions)]
               (Math/atan2 (apply + (map Math/sin intended-direction-values))
                           (apply + (map Math/cos intended-direction-values))))))
 
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
-  (let [acceleration (if (not-empty (remove-conflicting-directions (entity :intended-move-direction)))
+  (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
                        (get-in entity [:motion :max-acceleration])
                        0)]
     (if (or (> acceleration 0)
@@ -82,7 +86,7 @@
 
 (sm/def move-system :- System
   {:every-tick {:fn (fn move-system-tick [entities publish-chan]
-                      (doseq [entity (filter #(contains? % :intended-move-direction) entities)]
+                      (doseq [entity (filter #(get-in % [:brain :intended-move-direction]) entities)]
                         (let [moved-entity (-> entity
                                                update-orientation
                                                update-velocity

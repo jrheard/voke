@@ -1,5 +1,5 @@
 (ns voke.entity
-  (:require [voke.schemas :refer [Entity]])
+  (:require [voke.schemas :refer [Brain Entity]])
   (:require-macros [schema.core :as sm]))
 
 (defonce next-entity-id (atom 0))
@@ -15,18 +15,22 @@
 
 ;; Public
 
+(sm/defn make-player-brain :- Brain
+  []
+  {:type                    :player
+   :intended-move-direction #{}
+   :intended-fire-direction #{}})
+
 (sm/defn player :- Entity
   [x y]
   (make-entity
-    {:shape                   {:x x :y y :width 25 :height 25 :type :rectangle :orientation 0}
-     :motion                  {:velocity         {:x 0 :y 0}
-                               :max-acceleration 2.0
-                               :max-speed        11}
-     :collision               {:type :player}
-     :renderable              true
-     :intended-move-direction #{}
-     ; TODO make fire direction be an ordered set
-     :intended-fire-direction #{}}))
+    {:shape      {:x x :y y :width 25 :height 25 :type :rectangle :orientation 0}
+     :motion     {:velocity         {:x 0 :y 0}
+                  :max-acceleration 2.0
+                  :max-speed        11}
+     :collision  {:type :player}
+     :renderable true
+     :brain      (make-player-brain)}))
 
 (sm/defn wall :- Entity
   [x y width height]
