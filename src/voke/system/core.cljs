@@ -10,8 +10,6 @@
   (:require-macros [cljs.core.async.macros :refer [go-loop]]
                    [schema.core :as sm]))
 
-; TODO use safe-get-in
-
 (sm/defn has-relevant-fields? :- s/Bool
   [entity :- Entity
    fields]

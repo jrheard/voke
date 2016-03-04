@@ -1,5 +1,6 @@
 (ns voke.system.movement
   (:require [clojure.set :refer [intersection difference]]
+            [plumbing.core :refer [safe-get-in]]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Direction Entity GameState System]])
   (:require-macros [schema.core :as sm]))
@@ -35,7 +36,7 @@
 
 (sm/defn human-controlled-entity-movement-directions
   [entity :- Entity]
-  (remove-conflicting-directions (get-in entity [:brain :intended-move-direction])))
+  (remove-conflicting-directions (safe-get-in entity [:brain :intended-move-direction])))
 
 (sm/defn update-orientation :- Entity
   [entity :- Entity]
@@ -51,14 +52,14 @@
   [entity :- Entity]
   ; TODO - acceleration will be computed differently for AI-controlled monsters
   (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
-                       (get-in entity [:motion :max-acceleration])
+                       (safe-get-in entity [:motion :max-acceleration])
                        0)]
     (if (or (> acceleration 0)
-            (> (or (get-in entity [:motion :velocity :x] 0)
-                   (get-in entity [:motion :velocity :y] 0))))
-      (let [orientation (get-in entity [:shape :orientation])
+            (> (or (safe-get-in entity [:motion :velocity :x] 0)
+                   (safe-get-in entity [:motion :velocity :y] 0))))
+      (let [orientation (safe-get-in entity [:shape :orientation])
             update-axis-velocity (fn [trig-fn axis-velocity]
-                                   (let [new-velocity (min (get-in entity [:motion :max-speed])
+                                   (let [new-velocity (min (safe-get-in entity [:motion :max-speed])
                                                            (+ axis-velocity
                                                               (* acceleration
                                                                  (trig-fn orientation))))]
@@ -85,10 +86,10 @@
   (-> entity
       (update-in [:shape :x]
                  (fn [x]
-                   (+ x (get-in entity [:motion :velocity :x]))))
+                   (+ x (safe-get-in entity [:motion :velocity :x]))))
       (update-in [:shape :y]
                  (fn [y]
-                   (+ y (get-in entity [:motion :velocity :y]))))))
+                   (+ y (safe-get-in entity [:motion :velocity :y]))))))
 
 ;; System definition
 
@@ -105,6 +106,8 @@
                             (publish-event publish-chan {:event-type   :intended-movement
                                                          :entity       entity
                                                          :axis         axis
-                                                         :new-position (get-in moved-entity [:shape axis])
-                                                         :new-velocity (get-in moved-entity [:motion :velocity axis])
+                                                         :new-position (safe-get-in moved-entity
+                                                                                    [:shape axis])
+                                                         :new-velocity (safe-get-in moved-entity
+                                                                                    [:motion :velocity axis])
                                                          :all-entities entities})))))}})

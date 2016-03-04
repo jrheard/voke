@@ -1,10 +1,9 @@
 (ns voke.system.collision
-  (:require [cljs.core.match]
+  (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Entity Event System]])
-  (:require-macros [cljs.core.match :refer [match]]
-                   [schema.core :as sm]))
+  (:require-macros [schema.core :as sm]))
 
 (defn left-edge-x [rect] (- (rect :x)
                             (/ (rect :width) 2)))
@@ -47,7 +46,7 @@
   that entity A can occupy without contacting entity B and returns it if entity A fits there, or returns nil
   if no open spot exists."
   ; TODO - only supports rectangles
-  (let [shape1 (get-in event [:entity :shape])
+  (let [shape1 (safe-get-in event [:entity :shape])
         shape2 (contacted-entity :shape)
         arithmetic-fn (if (pos? (event :new-velocity)) - +)
         field (if (= (event :axis) :x) :width :height)
