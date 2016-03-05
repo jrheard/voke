@@ -1710,3 +1710,12 @@ ok, today ended up being focused mainly on refactoring; i'll deal with projectil
 ask julio for austin for cljs game stuff
 
 met austin, see http://pettomato.tumblr.com/ , https://twitter.com/AustinTHaas
+
+=====
+
+3/4/16
+
+concepts in http://pettomato.tumblr.com/image/66011458408 i haven't given any thought to:
+
+wall time vs sim time
+z-index
