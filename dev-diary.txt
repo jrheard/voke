@@ -1719,3 +1719,10 @@ concepts in http://pettomato.tumblr.com/image/66011458408 i haven't given any th
 
 wall time vs sim time
 z-index
+
+=====
+
+3/6/16
+
+need to replace the core.async-based event system with a synchronous one
+determinism
