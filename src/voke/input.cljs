@@ -2,6 +2,7 @@
   (:require [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
             [voke.events :refer [publish-event]]
+            [voke.util :refer [in?]]
             [voke.schemas :refer [Entity GameState System]])
   (:import [goog.events KeyCodes])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
@@ -50,8 +51,14 @@
             update-entity-args (case (msg :type)
                                  :move-key-down [[:brain :intended-move-direction] conj direction]
                                  :move-key-up [[:brain :intended-move-direction] disj direction]
-                                 :fire-key-down [[:brain :intended-fire-direction] conj direction]
-                                 :fire-key-up [[:brain :intended-fire-direction] disj direction])]
+                                 :fire-key-down [[:brain :intended-fire-direction]
+                                                 (fn [fire-directions]
+                                                   (if (in? fire-directions direction)
+                                                     fire-directions
+                                                     (conj fire-directions direction)))]
+                                 :fire-key-up [[:brain :intended-fire-direction]
+                                               (fn [fire-directions]
+                                                 (filterv #(not= direction %) fire-directions))])]
 
         (publish-event publish-chan {:event-type :update-entity
                                      :origin     :keyboard-input

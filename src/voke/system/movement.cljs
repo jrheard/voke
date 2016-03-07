@@ -102,12 +102,13 @@
                                                apply-friction
                                                update-position)]
 
-                          (doseq [axis [:x :y]]
-                            (publish-event publish-chan {:event-type   :intended-movement
-                                                         :entity       entity
-                                                         :axis         axis
-                                                         :new-position (safe-get-in moved-entity
-                                                                                    [:shape axis])
-                                                         :new-velocity (safe-get-in moved-entity
-                                                                                    [:motion :velocity axis])
-                                                         :all-entities entities})))))}})
+                          (when (not= moved-entity entity)
+                            (doseq [axis [:x :y]]
+                              (publish-event publish-chan {:event-type   :intended-movement
+                                                           :entity       entity
+                                                           :axis         axis
+                                                           :new-position (safe-get-in moved-entity
+                                                                                      [:shape axis])
+                                                           :new-velocity (safe-get-in moved-entity
+                                                                                      [:motion :velocity axis])
+                                                           :all-entities entities}))))))}})

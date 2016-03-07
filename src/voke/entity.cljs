@@ -19,7 +19,7 @@
   []
   {:type                    :player
    :intended-move-direction #{}
-   :intended-fire-direction #{}})
+   :intended-fire-direction []})
 
 (sm/defn player :- Entity
   [x y]
