@@ -1726,3 +1726,23 @@ z-index
 
 need to replace the core.async-based event system with a synchronous one
 determinism
+
+====
+
+3/7/16
+
+ok so in my 2/26/16 notes, i talk about how it's not super clear how systems should talk to each other,
+and how i ended up deciding to go with an event-based system because that gives you the loosest coupling
+possible.
+
+so i implemented one, based on core.async's pub/sub features. but since then i've been really nervous about it,
+because the fact that it's built on core.async means that it's asynchronous, and so i'm worried about eg
+living in a world where an :intended-movement event fired on frame 5 doesn't end up getting processed
+until frame 8, etc etc.
+
+i've been reading through "game programming patterns", which is pretty good, and realized that the solution
+to this problem is super simple - if i want an event-based system here, it should be a simple *synchronous* one
+that i build myself. it'll have some simple state, just a map like {:event-name [list-of-callback-functions]}.
+
+so when i get around to it, i'll change the event system to be implemented in that way, and i will be able
+to sleep way better.

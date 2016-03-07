@@ -1,6 +1,9 @@
 (ns voke.events
   "A simple pub/sub system.
 
+  TODO REIMPLEMENT AS A SIMPLE SYNCHRONOUS SYSTEM THAT DOESN'T USE CORE.ASYNC
+  SEE dev-diary.txt
+
   See https://yobriefca.se/blog/2014/06/04/publish-and-subscribe-with-core-dot-asyncs-pub-and-sub"
   (:require [cljs.core.async :refer [chan <! put! pub sub]]
             [voke.schemas :refer [EventType]])
