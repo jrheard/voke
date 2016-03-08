@@ -1840,5 +1840,16 @@ when they're created by bad guys, they get {:good-guy :obstacle :item}
 projectiles will also have an :owner-id field (not on :collision, just a standalone component)
 this is mainly for stuff like lifesteal, etc; collision system doesn't know/care about it
 
-TODO: profile what happens when 30 projectiles are on screen
-TODO: some sort of event circular loop happening when a bunch of projectiles touch bottom at once
+ok, now projectiles don't collide with their owner, and they're removed from the game+screen when they collide
+with obstacles.
+
+next up:
+* projectiles should be fired in the direction specified by :intended-fire-direction
+* projectiles should inherit their owner's dx/dy
+* refactor all this
+
+i'm seeing some perf slowdown when 30 projectiles are on the screen at once.
+profiling indicates that all of our time is spent in handle-intended-movement.
+i'd like to start by replacing the event system with a synchronous one, then seeing how perf goes
+if perf is still bad, profile handle-intended-movement
+
