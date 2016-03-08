@@ -1773,3 +1773,16 @@ systems that still need to be massively updated to account for projectiles:
   * TODO figure out what should be updated here
 * grim-reaper
   * TODO add this system at all
+
+one thing i've been struggling with is the notion of entity "types".
+
+several times now, i've found myself wanting to add a :type key to a component (collision, movement, brain, etc)
+to indicate that a particular entity is a :monster, or a :player, or an :obstacle, or a :projectile.
+
+an example: certain entities are projectiles, and thye shouldn't be subject to friction,
+and they can't collide with other projectiles
+
+maybe a better way of doing things would be to add an :affected-by-friction s/Bool k/v pair to :motion
+and a :doesnt-collide-with #{:foo} k/v pair to :collision
+
+that's a more direct way of expressing what i'm trying to express, i think i like it

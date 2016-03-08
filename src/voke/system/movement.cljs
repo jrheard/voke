@@ -1,6 +1,7 @@
 (ns voke.system.movement
   (:require [clojure.set :refer [intersection difference]]
             [plumbing.core :refer [safe-get-in]]
+            [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Direction Entity GameState System]])
   (:require-macros [schema.core :as sm]))
@@ -38,18 +39,18 @@
   [entity :- Entity]
   (remove-conflicting-directions (safe-get-in entity [:brain :intended-move-direction])))
 
-; XXXX TODOOOO
-(defn should-update-velocity? [entity]
+(sm/defn should-update-orientation? :- s/Bool
+  [entity :- Entity]
   (and
     (get-in entity [:brain :intended-move-direction])
-    (not-empty (human-controlled-entity-movement-directions entity)))
-  )
+    (not-empty (human-controlled-entity-movement-directions entity))))
+
+(def should-update-velocity? should-update-orientation?)
 
 (sm/defn update-orientation :- Entity
   [entity :- Entity]
-  ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters/projectiles
-  ; TODO don't do any of this for projectiles
-  (if (should-update-velocity? entity)
+  ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters
+  (if (should-update-orientation? entity)
     (assoc-in entity
               [:shape :orientation]
               (let [directions (human-controlled-entity-movement-directions entity)
@@ -60,8 +61,7 @@
 
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
-  ; TODO - acceleration will be computed differently for AI-controlled monsters
-  ; TODO don't do any of this for projectiles
+  ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters
   (if-let [acceleration (when (should-update-velocity? entity)
                           (safe-get-in entity [:motion :max-acceleration]))]
     (let [orientation (safe-get-in entity [:shape :orientation])
@@ -82,14 +82,13 @@
 
 (sm/defn apply-friction :- Entity
   [entity :- Entity]
-  (if (= (get-in entity [:collision :type])
-         :projectile)
-    entity
+  (if (safe-get-in entity [:motion :affected-by-friction])
     (reduce
       (fn [entity axis]
         (update-in entity [:motion :velocity axis] #(* % friction-value)))
       entity
-      [:x :y])))
+      [:x :y])
+    entity))
 
 (sm/defn update-position :- Entity
   [entity :- Entity]
@@ -101,10 +100,8 @@
     entity
     [:x :y]))
 
-; XXXX TODO
-(defn relevant?
-  [entity]
-  (js/console.log (clj->js entity))
+(sm/defn relevant-to-movement-system? :- s/Bool
+  [entity :- Entity]
   (or
     (seq (get-in entity [:brain :intended-move-direction] nil))
     (not= (get-in entity [:motion :velocity :x] 0) 0)
@@ -114,7 +111,7 @@
 
 (sm/def move-system :- System
   {:every-tick {:fn (fn move-system-tick [entities publish-chan]
-                      (doseq [entity (filter relevant? entities)]
+                      (doseq [entity (filter relevant-to-movement-system? entities)]
                         (let [moved-entity (-> entity
                                                update-orientation
                                                update-velocity
