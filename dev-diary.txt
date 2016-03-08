@@ -1760,3 +1760,16 @@ entities also have an associated :last-fire-timestamp. does that live on some pr
 can several related components be combined together into one?
 
 ok so entities can have a :weapon, which contains information that controls the creation of projectiles
+
+ok, gonna take a break from implementing projectiles for a bit.
+
+systems that still need to be massively updated to account for projectiles:
+
+* movement
+  * don't only move player-based entities
+  * don't only move entities with acceleration
+  * don't apply friction to projectiles
+* collision
+  * TODO figure out what should be updated here
+* grim-reaper
+  * TODO add this system at all

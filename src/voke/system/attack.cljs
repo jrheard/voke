@@ -9,9 +9,11 @@
 (sm/defn can-attack? :- s/Bool
   [entity :- Entity]
   ; TODO support monsters
-  (> (- (now)
-        (get-in entity [:weapon :last-attack-timestamp]))
-     5000))
+  (and
+    (seq (get-in entity [:brain :intended-fire-direction]))
+    (> (- (now)
+          (get-in entity [:weapon :last-attack-timestamp]))
+       5000)))
 
 (sm/defn process-firing-entities :- [Entity]
   ; NOTE - only called on things that intend to fire
@@ -31,22 +33,20 @@
 
 
       ; TODO - consider having projectiles start right at the border of their parent entity, instead of inside
-      nil
 
-      #_[(assoc-in entity
-                 [:weapon :last-attack-timestamp]
-                 (now))
-       (projectile (entity :id)
-                   (get-in entity [:shape :x])
-                   (get-in entity [:shape :y])
-                   (get-in entity [:shape :orientation])
-                   10
-                   10
-                   1
-                   1)])))
+      [(assoc-in entity
+                   [:weapon :last-attack-timestamp]
+                   (now))
+         (projectile (entity :id)
+                     (get-in entity [:shape :x])
+                     (get-in entity [:shape :y])
+                     (get-in entity [:shape :orientation])
+                     10
+                     10
+                     1
+                     1)])))
 
 ;; System definition
 
 (sm/def attack-system :- System
-  {:every-tick {:reads #{:intended-fire-direction}
-                :fn    process-firing-entities}})
+  {:every-tick {:fn process-firing-entities}})
