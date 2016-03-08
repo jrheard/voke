@@ -127,4 +127,8 @@
                                                                                       [:shape axis])
                                                            :new-velocity (safe-get-in moved-entity
                                                                                       [:motion :velocity axis])
+                                                           ; XXXX does this system actually work at all?
+                                                           ; what happens if two entities try to move to the
+                                                           ; same spot in the same tick?
+                                                           ; does collision system not notice?
                                                            :all-entities entities}))))))}})

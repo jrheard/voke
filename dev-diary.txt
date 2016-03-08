@@ -1786,3 +1786,56 @@ maybe a better way of doing things would be to add an :affected-by-friction s/Bo
 and a :doesnt-collide-with #{:foo} k/v pair to :collision
 
 that's a more direct way of expressing what i'm trying to express, i think i like it
+
+ok taking a break for today.
+
+tomorrow:
+look into collision system
+start grim-reaper system if it seems sane
+refactor all this new projectile-related code
+
+later this week:
+sit down and really tighten up schema definitions, particularly around events
+make events system synchronous
+
+====
+
+3/8/16
+
+transcribing notes taken down on paper this morning, continuing thoughts on "type" fields in component schemas:
+
+be wary of :type fields in component schemas. they're alluring because of course i know that a :projectile
+should behave like X and Y, but that's _implicit_. the _explicit_ approach is better. see below:
+
+:collision components should look like
+
+{:type (s/enum :good-guy :bad-guy :projectile :obstacle :trap :projectile :gold :item :explosion)
+ (s/optional-key :collides-with) #{CollisionType}
+ (s/optional-key :destroyed-on-contact) s/Bool}
+
+type :type field here is just used as a marker - it doesn't have any implicit behavior tied up in it.
+the collision system doesn't have code in it that goes "ok if one of these entities is a projectile,
+it should behave like thus and so". instead, the other two fields control special behavior.
+
+the :collides-with k/v pair is optional.
+if unspecified, it means that the given entity collides with everything.
+if specified, it's a set that's a _whitelist_ of the things that the entity will collide with.
+only entities that can move should have this field. it feels weird to specify that constraint, but it keeps
+the system easier to reason about.
+
+good guys collide with everything except projectiles owned by good guys
+bad guys don't collide with gold and projectiles owned by bad guys
+
+if i wanted to implement ghosts, i could just have them not collide with obstacles
+
+for entities like projectiles, items, and gold, there's an optional :destroyed-on-contact k/v pair.
+if this is true, when the collision system goes to fire a :contact event involving one of these entities,
+
+the collision system is responsible for removing entities with :destroyed-on-contact true;
+the grim reaper system is responsible for removing damaged/killed good/bad guys
+
+when projectiles are created by good guys, they have a :collides-with that's like {:bad-guy :obstacle :item}
+when they're created by bad guys, they get {:good-guy :obstacle :item}
+
+projectiles will also have an :owner-id field (not on :collision, just a standalone component)
+this is mainly for stuff like lifesteal, etc; collision system doesn't know/care about it
