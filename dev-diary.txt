@@ -1839,3 +1839,6 @@ when they're created by bad guys, they get {:good-guy :obstacle :item}
 
 projectiles will also have an :owner-id field (not on :collision, just a standalone component)
 this is mainly for stuff like lifesteal, etc; collision system doesn't know/care about it
+
+TODO: profile what happens when 30 projectiles are on screen
+TODO: some sort of event circular loop happening when a bunch of projectiles touch bottom at once

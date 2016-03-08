@@ -98,22 +98,27 @@
   [event :- Event
    contacted-entity :- Entity
    publish-chan]
-  (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
-    ; Great, we found a clear spot! Move there and stand still.
-    (apply-movement (event :entity)
-                    (event :axis)
-                    closest-clear-spot
-                    0
-                    publish-chan)
-
-    ; Couldn't find a clear spot; slow him down, he can try moving again next tick.
-    (publish-event publish-chan {:event-type :update-entity
+  (if (get-in event [:entity :collision :destroyed-on-contact])
+    (publish-event publish-chan {:event-type :remove-entity
                                  :origin     :collision-system
-                                 :entity-id  ((event :entity) :id)
-                                 :fn         (fn [old-entity]
-                                               (update-in old-entity
-                                                          [:motion :velocity (event :axis)]
-                                                          #(* % 0.7)))}))
+                                 :entity-id  (safe-get-in event [:entity :id])})
+
+    (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
+      ; Great, we found a clear spot! Move there and stand still.
+      (apply-movement (event :entity)
+                      (event :axis)
+                      closest-clear-spot
+                      0
+                      publish-chan)
+
+      ; Couldn't find a clear spot; slow him down, he can try moving again next tick.
+      (publish-event publish-chan {:event-type :update-entity
+                                   :origin     :collision-system
+                                   :entity-id  (safe-get-in event [:entity :id])
+                                   :fn         (fn [old-entity]
+                                                 (update-in old-entity
+                                                            [:motion :velocity (event :axis)]
+                                                            #(* % 0.7)))})))
 
   (publish-event publish-chan {:event-type :contact
                                :entities   [(event :entity) contacted-entity]}))

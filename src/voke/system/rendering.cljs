@@ -1,5 +1,6 @@
 (ns voke.system.rendering
-  (:require [voke.pixi :refer [add-to-stage! entity->graphic make-renderer
+  (:require [plumbing.core :refer [safe-get-in]]
+            [voke.pixi :refer [add-to-stage! remove-from-stage! entity->graphic make-renderer
                                make-stage render! update-obj-position!]]
             [voke.schemas :refer [Entity System]])
   (:require-macros [schema.core :as sm]))
@@ -29,6 +30,10 @@
     (update-obj-position! obj (-> event :entity :shape))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
+(defn handle-remove-entity-event [stage objects-by-entity-id event publish-chan]
+  (remove-from-stage! stage
+                      (@objects-by-entity-id (safe-get-in event [:entity-id]))))
+
 ;; System definition
 
 (sm/def render-system :- System
@@ -40,4 +45,6 @@
                       :fn    (fn [& args]
                                (apply render-system-tick renderer stage objects-by-entity-id args))}
      :event-handlers [{:event-type :movement
-                       :fn         (partial handle-movement-event stage objects-by-entity-id)}]}))
+                       :fn         (partial handle-movement-event stage objects-by-entity-id)}
+                      {:event-type :remove-entity
+                       :fn         (partial handle-remove-entity-event stage objects-by-entity-id)}]}))

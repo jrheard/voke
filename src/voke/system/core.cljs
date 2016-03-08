@@ -75,8 +75,6 @@
     (doseq [handler-map event-handlers]
       (subscribe-to-event publication
                           (handler-map :event-type)
-                          ; TODO need all entities - pass game-state-atom? kinda gross
-                          ; or just run every tick?
                           #((handler-map :fn) % publish-chan)))
 
     ; Listen to keyboard input.
@@ -95,6 +93,12 @@
                         (fn [event]
                           ; TODO consider batching this if it becomes a perf bottleneck
                           (swap! game-state-atom apply-update-entity-event event)))
+
+    ; Handle :remove-entity events.
+    (subscribe-to-event publication
+                        :remove-entity
+                        (fn [event]
+                          (swap! game-state-atom update-in [:entities] dissoc (event :entity-id))))
 
     ; And return a run-systems-every-tick function.
     (fn [state]
