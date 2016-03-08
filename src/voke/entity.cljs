@@ -33,7 +33,7 @@
                   :affected-by-friction true
                   :max-acceleration     2.0
                   :max-speed            11}
-     :collision  {:type :player}
+     :collision  {:type :good-guy}
      :renderable true
      :weapon     (make-weapon)
      :brain      (make-player-brain)}))
@@ -50,7 +50,10 @@
   (make-entity
     {:shape      {:x x :y y :width width :height height :orientation orientation}
      :owner-id   owner-id
-     :collision  {:type :projectile}
+     :collision  {:type :projectile
+                  ; XXXX TODO parameterize good/bad guy
+                  :collides-with #{:bad-guy :obstacle :item}
+                  :destroyed-on-contact true}
      :renderable true
      :motion     {:velocity         {:x x-velocity
                                      :y y-velocity}

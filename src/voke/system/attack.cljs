@@ -13,7 +13,7 @@
     (seq (get-in entity [:brain :intended-fire-direction]))
     (> (- (now)
           (get-in entity [:weapon :last-attack-timestamp]))
-       5000)))
+       50)))
 
 (sm/defn process-firing-entities :- [Entity]
   ; NOTE - only called on things that intend to fire

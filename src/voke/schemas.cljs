@@ -2,6 +2,8 @@
   (:require [schema.core :as s])
   (:require-macros [schema.core :as sm]))
 
+(sm/defschema EntityID s/Int)
+
 (sm/defschema Direction (s/enum :up :right :down :left))
 (sm/defschema IntendedDirection #{Direction})
 
@@ -24,23 +26,29 @@
                      :intended-move-direction IntendedDirection
                      :intended-fire-direction IntendedDirection})
 
-(sm/defschema Entity {:id                          s/Int
+(sm/defschema CollisionType (s/enum
+                              :good-guy
+                              :bad-guy
+                              :projectile
+                              :obstacle
+                              :trap
+                              :projectile
+                              :gold
+                              :item
+                              :explosion))
+
+(sm/defschema Collision {:type                                  CollisionType
+                         (s/optional-key :collides-with)        #{CollisionType}
+                         (s/optional-key :destroyed-on-contact) s/Bool})
+
+(sm/defschema Entity {:id                          EntityID
                       ; TODO - give me a single example of an entity that doesn't have a shape
                       (s/optional-key :shape)      Shape
                       (s/optional-key :motion)     Motion
                       ; If it doesn't have a :collision, the entity isn't collidable.
-                      ; XXXXXXX TODO WHAT FIELDS SHOULD :COLLISION HAVE
-                      ; doesnt-collide-with?
-                      ; motivation: projectiles can't collide with each other or with their owner
-                      ; the "or with their owner" part is super sticky!!!!!
-                      (s/optional-key :collision)  {:type (s/enum
-                                                            :player
-                                                            :projectile
-                                                            :monster
-                                                            :obstacle
-                                                            :level-end)}
+                      (s/optional-key :collision)  Collision
                       (s/optional-key :renderable) s/Bool   ; TODO this will have like colors and stuff
-                      (s/optional-key :owner-id)   s/Int
+                      (s/optional-key :owner-id)   EntityID
                       (s/optional-key :weapon)     Weapon
                       (s/optional-key :brain)      Brain})
 
