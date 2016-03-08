@@ -16,6 +16,8 @@
                       :max-speed        s/Num
                       :max-acceleration s/Num})
 
+(sm/defschema Weapon {:last-attack-timestamp s/Int})
+
 (sm/defschema Brain {:type                    (s/enum :player :skeleton :projectile)
                      ; TODO - these will be *angles* for non-player entities, not sets!!!!!
                      :intended-move-direction IntendedDirection
@@ -25,14 +27,16 @@
                       ; TODO - give me a single example of an entity that doesn't have a shape
                       (s/optional-key :shape)          Shape
                       (s/optional-key :motion)         Motion
-                      ; If it doesn't have a :collision-info, the entity isn't collidable.
-                      (s/optional-key :collision-info) {:type (s/enum
+                      ; If it doesn't have a :collision, the entity isn't collidable.
+                      (s/optional-key :collision) {:type (s/enum
                                                                 :player
                                                                 :projectile
                                                                 :monster
                                                                 :obstacle
                                                                 :level-end)}
                       (s/optional-key :renderable)     s/Bool ; TODO this will have like colors and stuff
+                      (s/optional-key :owner-id)       s/Int
+                      (s/optional-key :weapon) Weapon
                       (s/optional-key :brain)          Brain})
 
 (sm/defschema GameState {:entities {:s/Int Entity}})

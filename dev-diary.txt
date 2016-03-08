@@ -1746,3 +1746,17 @@ that i build myself. it'll have some simple state, just a map like {:event-name 
 
 so when i get around to it, i'll change the event system to be implemented in that way, and i will be able
 to sleep way better.
+
+ok, now i'm puzzling about projectiles. how will they work?
+
+they don't have a :brain - they *do* have a shape, a motion, and an owner
+
+they inherit their owner's velocity (dx and dy)
+added to that is a single dx or dy number based on :intended-fire-direction
+
+EVENTUALLY there will be a range stat that controls how far projectiles go
+
+entities also have an associated :last-fire-timestamp. does that live on some preexisting component?
+can several related components be combined together into one?
+
+ok so entities can have a :weapon, which contains information that controls the creation of projectiles

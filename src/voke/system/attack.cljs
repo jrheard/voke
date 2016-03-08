@@ -2,36 +2,51 @@
   (:require [schema.core :as s]
             [voke.entity :refer [projectile]]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity System]])
+            [voke.schemas :refer [Entity System]]
+            [voke.util :refer [now]])
   (:require-macros [schema.core :as sm]))
 
-(sm/defschema AttackState {:last-attack-timestamp (s/Int)})
-
-(sm/defn make-attack-state :- AttackState
-  []
-  {:last-attack-timestamp nil})
-
 (sm/defn can-attack? :- s/Bool
-  [attack-state :- AttackState
-   entity :- Entity]
-  ; TODO
-  true)
+  [entity :- Entity]
+  ; TODO support monsters
+  (> (- (now)
+        (get-in entity [:weapon :last-attack-timestamp]))
+     5000))
 
 (sm/defn process-firing-entities :- [Entity]
-  [attack-state
-   entities :- [Entity]
-   publish-chan]
-  (let [attack-state @attack-state]
-    (for [entity (filter #(can-attack? attack-state %)
-                         entities)]
-      (let [{:keys [x y]} (entity :shape)]
-        ; UGH UGH UGH TODO can't implement this until velocity/acceleration are done
-        (projectile x y 10 10))
-      )))
+  ; NOTE - only called on things that intend to fire
+  [entities :- [Entity]
+   _]
+  (flatten
+    (for [entity (filter can-attack? entities)]
+      ; for each entity that can attack
+
+      ; update the entity's weapon's last-attack-timestamp
+
+      ; return a projectile moving in the right direction (based on :intended-fire-direction)
+
+      ; ok so really we just want to build up a list of updated entities and new projectiles, and return them
+
+
+
+
+      ; TODO - consider having projectiles start right at the border of their parent entity, instead of inside
+      nil
+
+      #_[(assoc-in entity
+                 [:weapon :last-attack-timestamp]
+                 (now))
+       (projectile (entity :id)
+                   (get-in entity [:shape :x])
+                   (get-in entity [:shape :y])
+                   (get-in entity [:shape :orientation])
+                   10
+                   10
+                   1
+                   1)])))
 
 ;; System definition
 
 (sm/def attack-system :- System
-  (let [attack-state (atom {})]
-    {:every-tick {:reads #{:intended-fire-direction}
-                  :fn    (fn [& args] (apply process-firing-entities attack-state args))}}))
+  {:every-tick {:reads #{:intended-fire-direction}
+                :fn    process-firing-entities}})

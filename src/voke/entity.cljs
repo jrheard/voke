@@ -1,5 +1,5 @@
 (ns voke.entity
-  (:require [voke.schemas :refer [Brain Entity]])
+  (:require [voke.schemas :refer [Brain Entity Weapon]])
   (:require-macros [schema.core :as sm]))
 
 (defonce next-entity-id (atom 0))
@@ -13,13 +13,17 @@
   [entity-map]
   (assoc entity-map :id (get-next-entity-id)))
 
-;; Public
-
 (sm/defn make-player-brain :- Brain
   []
   {:type                    :player
    :intended-move-direction #{}
    :intended-fire-direction []})
+
+(sm/defn make-weapon :- Weapon
+  []
+  {:last-attack-timestamp 0})
+
+;; Public
 
 (sm/defn player :- Entity
   [x y]
@@ -40,5 +44,13 @@
      :renderable true}))
 
 (sm/defn projectile :- Entity
-  [x y width height motion]
-  )
+  [owner-id x y orientation width height x-velocity y-velocity]
+  (make-entity
+    {:shape    {:x x :y y :width width :height height :orientation orientation}
+     :owner-id owner-id
+     :collision {:type :projectile}
+     :renderable true
+     :motion   {:velocity         {:x x-velocity
+                                   :y y-velocity}
+                :max-speed        (max x-velocity y-velocity)
+                :max-acceleration 0}}))

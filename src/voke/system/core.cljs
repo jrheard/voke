@@ -4,6 +4,7 @@
             [voke.events :refer [make-pub subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
             [voke.schemas :refer [Entity Event GameState System]]
+            [voke.system.attack :refer [attack-system]]
             [voke.system.collision :refer [collision-system]]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]])
@@ -58,6 +59,7 @@
   [game-state-atom
    player-entity-id]
   (let [systems [collision-system
+                 attack-system
                  move-system
                  render-system]
         ; TODO consider splitting this out into a private atom, and unsubbing everything from the previous
@@ -97,6 +99,7 @@
     ; And return a run-systems-every-tick function.
     (fn [state]
       ; feels like there must be a simpler way to express this loop statement, but i haven't found one
+      ; TODO consider reduce, reduce always solves loops
       (loop [state state
              tick-functions (map system-to-tick-fn
                                  (filter :every-tick systems))]

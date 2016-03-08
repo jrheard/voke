@@ -33,7 +33,10 @@
   (let [collidable-entities (filter (fn [another-entity]
                                       (and
                                         (contains? entity :collision)
-                                        (not= (entity :id) (another-entity :id))))
+                                        (not= (entity :id) (another-entity :id))
+                                        (not= (another-entity :collision)
+                                              :projectile) ; TODO TODO TODO XXXX HACK
+                                        (not= (entity :owner-id) (another-entity :id))))
                                     all-entities)]
     (first (filter #(shapes-collide? (% :shape) (entity :shape))
                    collidable-entities))))
