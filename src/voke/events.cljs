@@ -1,13 +1,11 @@
 (ns voke.events
-  "A super-simple pub/sub system."
+  "A super-simple synchronous pub/sub system."
   (:require [voke.schemas :refer [EventType]])
   (:require-macros [schema.core :as sm]))
 
 (def ^:private registry (atom {}))
 
 (sm/defn publish-event [event]
-  ;(js/console.log (clj->js (event :event-type)))
-  ;(js/console.log (clj->js event))
   (doseq [handler (@registry (event :event-type))]
     (handler event)))
 

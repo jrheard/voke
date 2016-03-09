@@ -47,5 +47,5 @@
                                (apply render-system-tick renderer stage objects-by-entity-id args))}
      :event-handlers [{:event-type :movement
                        :fn         (partial handle-movement-event stage objects-by-entity-id)}
-                      {:event-type :remove-entity
+                      {:event-type :entity-removed
                        :fn         (partial handle-remove-entity-event stage objects-by-entity-id)}]}))

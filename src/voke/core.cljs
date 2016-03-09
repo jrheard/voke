@@ -1,15 +1,8 @@
 (ns voke.core
   (:require [voke.entity :as e]
             [voke.events]
-            [voke.schemas :refer [Entity GameState]]
-            [voke.system.core :refer [make-system-runner]])
-  (:require-macros [schema.core :as sm]))
-
-(sm/defn make-game-state :- GameState
-  [entities :- [Entity]]
-  {:entities (into {}
-                   (map (juxt :id identity)
-                        entities))})
+            [voke.state :refer [make-game-state]]
+            [voke.system.core :refer [make-system-runner]]))
 
 (defonce player (e/player 500 300))
 
@@ -31,14 +24,14 @@
   (js/window.cancelAnimationFrame @animation-frame-request-id)
   (voke.events/unsub-all!)
 
-  (let [run-systems-fn (make-system-runner game-state (player :id))]
+  (let [run-systems-fn (make-system-runner (player :id))]
 
     (js/window.requestAnimationFrame (fn process-frame [ts]
-                                       ; i think the output of run-systems-fn is clobbering
-                                       ; the applied update-entity events
-                                       ; should we queue processing of update-entity events until after
-                                       ; this swap! is over?
                                        (swap! game-state run-systems-fn)
+
+                                       (let [apply-state-modifications (voke.state/flush!)]
+                                         (swap! game-state apply-state-modifications))
+
                                        (reset! animation-frame-request-id
                                                (js/window.requestAnimationFrame process-frame))))))
 

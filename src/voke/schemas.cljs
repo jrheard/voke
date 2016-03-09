@@ -7,6 +7,8 @@
 (sm/defschema Direction (s/enum :up :right :down :left))
 (sm/defschema IntendedDirection #{Direction})
 
+; TODO - split x/y out of Shape and into a Position
+; so that rendering-shapes can look different from collision shapes without duplicating x/y info
 (sm/defschema Shape {:x           s/Num
                      :y           s/Num
                      :type        (s/enum :rectangle :circle)
@@ -54,7 +56,7 @@
 
 (sm/defschema GameState {:entities {:s/Int Entity}})
 
-(sm/defschema EventType (s/enum :movement :remove-entity :update-entity :intended-movement))
+(sm/defschema EventType (s/enum :movement :entity-removed :intended-movement))
 
 ; TODO not well defined
 ; maybe best thing to do would be to schematize each individual event and then say an Event is any of 'em

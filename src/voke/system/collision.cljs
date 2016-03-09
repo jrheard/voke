@@ -2,7 +2,8 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity Event System]])
+            [voke.schemas :refer [Entity Event System]]
+            [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
 
 (defn left-edge-x [rect] (- (rect :x)
@@ -83,25 +84,23 @@
    new-velocity :- s/Num]
   "Fires events to notify the world that a particular entity should have a new position+velocity."
   (let [update-entity-fn (fn [entity]
-                           ; XXX HACK - THIS CODE SHOULD NEVER RUN IF ENTITY DOES NOT EXIST
-                           (when entity
-                             (-> entity
-                                 (assoc-in [:shape axis] new-position)
-                                 (assoc-in [:motion :velocity axis] new-velocity))))]
-    (publish-event {:event-type :update-entity
-                                 :origin     :collision-system
-                                 :entity-id  (entity :id)
-                                 :fn         update-entity-fn})
+                           (assert entity)
+                           (-> entity
+                               (assoc-in [:shape axis] new-position)
+                               (assoc-in [:motion :velocity axis] new-velocity)))]
+    (update-entity! (entity :id) :collision-system update-entity-fn)
     (publish-event {:event-type :movement
-                                 :entity     (update-entity-fn entity)})))
+                    :entity     (update-entity-fn entity)})))
 
 (sm/defn handle-contact
   [event :- Event
    contacted-entity :- Entity]
   (if (get-in event [:entity :collision :destroyed-on-contact])
-    (publish-event {:event-type :remove-entity
-                                 :origin     :collision-system
-                                 :entity-id  (safe-get-in event [:entity :id])})
+
+    (let [entity-id (safe-get-in event [:entity :id])]
+      (remove-entity! entity-id :collision-system)
+      (publish-event {:event-type :entity-removed
+                      :entity-id  entity-id}))
 
     (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
       ; Great, we found a clear spot! Move there and stand still.
@@ -111,16 +110,15 @@
                       0)
 
       ; Couldn't find a clear spot; slow him down, he can try moving again next tick.
-      (publish-event {:event-type :update-entity
-                                   :origin     :collision-system
-                                   :entity-id  (safe-get-in event [:entity :id])
-                                   :fn         (fn [old-entity]
-                                                 (update-in old-entity
-                                                            [:motion :velocity (event :axis)]
-                                                            #(* % 0.7)))})))
+      (update-entity! (safe-get-in event [:entity :id])
+                      :collision-system
+                      (fn [old-entity]
+                        (update-in old-entity
+                                   [:motion :velocity (event :axis)]
+                                   #(* % 0.7))))))
 
   (publish-event {:event-type :contact
-                               :entities   [(event :entity) contacted-entity]}))
+                  :entities   [(event :entity) contacted-entity]}))
 
 (sm/defn handle-intended-movement
   [event :- Event]

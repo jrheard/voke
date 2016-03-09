@@ -1891,3 +1891,27 @@ the game.
 
 that could work. gonna sleep on it.
 
+======
+
+3/9/16
+
+re: "i have no idea how any of this ever worked"
+
+here's what's happening now, re: clobbering:
+cljs.user=> (def foo (atom {}))
+#'cljs.user/foo
+cljs.user=> (swap! foo (fn [thing]
+             (swap! foo assoc :blat :blot)
+             (assoc thing 1 2)))
+cljs.user=> @foo
+{1 2}
+
+and so of course the current event system's update-entity situation is getting clobbered, because it's all
+happening inside of a swap!.
+
+the way that things used to work was that the requestAnimationFrame loop swap!'d the main atom once per frame,
+and as part of that swap! it'd fire a bunch of update-entity events. and *those events* would be consumed
+by go-blocks and trigger swap!s that happened *outside* of the rAF swap!. and so that's how things actually worked.
+
+anyway i still like the update-entity! and remove-entity! ideas from the end of yesterday's notes,
+will probably put 'em in voke.state or something.
