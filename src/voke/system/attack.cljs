@@ -1,10 +1,16 @@
 (ns voke.system.attack
-  (:require [schema.core :as s]
+  (:require [plumbing.core :refer [safe-get-in]]
+            [schema.core :as s]
             [voke.entity :refer [projectile]]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Entity System]]
             [voke.util :refer [now]])
   (:require-macros [schema.core :as sm]))
+
+(def directions-to-velocity-multipliers {:down  {:y 1}
+                                         :up    {:y -1}
+                                         :left  {:x -1}
+                                         :right {:x 1}})
 
 (sm/defn can-attack? :- s/Bool
   [entity :- Entity]
@@ -21,30 +27,26 @@
    _]
   (flatten
     (for [entity (filter can-attack? entities)]
-      ; for each entity that can attack
-
-      ; update the entity's weapon's last-attack-timestamp
-
-      ; return a projectile moving in the right direction (based on :intended-fire-direction)
-
-      ; ok so really we just want to build up a list of updated entities and new projectiles, and return them
-
-
-
-
-      ; TODO - consider having projectiles start right at the border of their parent entity, instead of inside
-
-      [(assoc-in entity
+      (let [direction (last (safe-get-in entity [:brain :intended-fire-direction]))
+            multiplier (directions-to-velocity-multipliers direction)
+            x-velocity (+ (safe-get-in entity [:motion :velocity :x])
+                          (get multiplier :x 0))
+            y-velocity (+ (safe-get-in entity [:motion :velocity :y])
+                          (get multiplier :y 0))]
+        ; TODO - consider having projectiles start right at the border of their parent entity, instead of inside
+        [(assoc-in entity
                    [:weapon :last-attack-timestamp]
                    (now))
+         ; TODO update these values
          (projectile (entity :id)
                      (get-in entity [:shape :x])
                      (get-in entity [:shape :y])
                      (get-in entity [:shape :orientation])
                      10
                      10
-                     1
-                     1)])))
+                     ; TODO jesus christ cap velocity
+                     x-velocity
+                     y-velocity)]))))
 
 ;; System definition
 

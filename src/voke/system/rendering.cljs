@@ -32,7 +32,8 @@
 
 (defn handle-remove-entity-event [stage objects-by-entity-id event publish-chan]
   (remove-from-stage! stage
-                      (@objects-by-entity-id (safe-get-in event [:entity-id]))))
+                      (@objects-by-entity-id (event :entity-id)))
+  (swap! objects-by-entity-id dissoc (event :entity-id)))
 
 ;; System definition
 

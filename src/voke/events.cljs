@@ -16,6 +16,7 @@
      :publication (pub publish-chan :event-type)}))
 
 (sm/defn publish-event [publish-chan event]
+  (js/console.log (clj->js event))
   (put! publish-chan event))
 
 (sm/defn subscribe-to-event
