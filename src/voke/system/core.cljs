@@ -34,8 +34,8 @@
   (sm/fn [state :- GameState]
     (let [tick-specification (system :every-tick)
           filter-fn (if (contains? tick-specification :reads)
-                      identity
-                      #(has-relevant-fields? % (tick-specification :reads)))
+                      #(has-relevant-fields? % (tick-specification :reads))
+                      identity)
           relevant-entities (filter filter-fn (vals (state :entities)))
           processed-entities ((tick-specification :fn) relevant-entities)]
 
