@@ -1915,3 +1915,21 @@ by go-blocks and trigger swap!s that happened *outside* of the rAF swap!. and so
 
 anyway i still like the update-entity! and remove-entity! ideas from the end of yesterday's notes,
 will probably put 'em in voke.state or something.
+
+ok, cool, that totally worked the first time. nice.
+
+running into an issue with the rendering system having trouble removing bullets. the behavior looks like this:
+1) on frame N, the collision system detects that a bullet (entity with id E) has hit a wall
+2) the collision system calls remove-entity! to queue entity E's removal from the game-state atom's :entities list
+3) the collision system fires an :entity-removed event
+4) the rendering system's :entity-removed handler fires, removes entity E from the stage and the objects-by-entity-id atom
+5) the rendering system's tick function runs. it's given a list of the game-state map's entities.
+  *this list contains entity E*, because the game-state atom hasn't yet been updated with the queued removal from step 2*
+6) the rendering system detects an entity that isn't currently being drawn, and draws it on the screen.
+
+an idea i've been toying with is pulling the rendering system's tick function out of the System infrastructure
+and calling it directly right before the end of every rAF tick. i think i'm going to try this.
+
+ok, that seems to have improved things.
+except now, entities that collide with the left or right wall don't get removed, but ones that collide with the
+top or bottom one are removed just fine. what gives?

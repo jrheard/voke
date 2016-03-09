@@ -2,7 +2,8 @@
   (:require [voke.entity :as e]
             [voke.events]
             [voke.state :refer [make-game-state]]
-            [voke.system.core :refer [make-system-runner]]))
+            [voke.system.core :refer [make-system-runner]]
+            [voke.system.rendering :refer [render-tick]]))
 
 (defonce player (e/player 500 300))
 
@@ -31,6 +32,8 @@
 
                                        (let [apply-state-modifications (voke.state/flush!)]
                                          (swap! game-state apply-state-modifications))
+
+                                       (render-tick @game-state)
 
                                        (reset! animation-frame-request-id
                                                (js/window.requestAnimationFrame process-frame))))))
