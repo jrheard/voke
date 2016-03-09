@@ -1862,3 +1862,32 @@ an entity, then system.collision/apply-movement assoces a :shape and a :motion o
 and so we end up with badly formed entities.
 
 ugh so anyway make it synchronous tomorrow
+
+lol all right i started on that and realized that i have no idea how any of this ever worked
+
+events are synchronous now, but the updates they make are clobbered every frame by the swap! call in voke.core
+will need to do some thinking about the best way of architecting this system.
+
+how do systems communicate with one another? -> events seems to be the clear answer
+
+how do events cause updates to the state of the game?
+answer to this is less clear.
+
+should there be a queue that takes in side-effecting events like :update-entity and :remove-entity,
+and at the end of every frame the queue is flushed?
+is this a good idea or a dumb idea?
+
+i guess at that point there's not really much of a reason to use the event system - or is there?
+the rendering system listens to :remove-entity events, after all
+
+but yeah even so, maybe there should be some sort of (update-entity! entity-id a-fn) function that
+the core game engine exposes, and a (remove-entity! entity-id) function too, and they're buffered
+behind the scenes and don't use the event system at all to actually do their work
+but somewhere along the line an :entity-removed event is fired so that the renderer system knows what's up.
+
+so the voke.event system ends up being specifically for inter-system communication and non-game-state-related
+side effects, and the core update-entity! and remove-entity! functions are for actually updating the state of
+the game.
+
+that could work. gonna sleep on it.
+

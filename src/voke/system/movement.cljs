@@ -126,7 +126,7 @@
 (sm/def move-system :- System
   {:every-tick {:fn (fn move-system-tick [entities]
                       (doseq [entity (filter relevant-to-movement-system? entities)]
-                        (js/console.log (clj->js (entity :shape)))
+                        ;(js/console.log (clj->js (entity :shape)))
                         (let [moved-entity (-> entity
                                                update-orientation
                                                update-velocity

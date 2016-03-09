@@ -93,7 +93,7 @@
                           ; TODO consider batching this if it becomes a perf bottleneck
                           (swap! game-state-atom apply-update-entity-event event)
                           (js/console.log (clj->js (event :origin)))
-                          (js/console.log (clj->js (get-in @game-state-atom [:entities])))
+                          (js/console.log (clj->js (get-in @game-state-atom [:entities 0 :shape])))
                           ))
 
     ; Handle :remove-entity events.
@@ -105,7 +105,6 @@
     (fn [state]
       ; feels like there must be a simpler way to express this loop statement, but i haven't found one
       ; TODO consider reduce, reduce always solves loops
-      ;(js/console.log (clj->js (get-in @game-state-atom [:entities 0 :shape])))
       (loop [state state
              tick-functions (map system-to-tick-fn
                                  (filter :every-tick systems))]

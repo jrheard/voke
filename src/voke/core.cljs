@@ -34,6 +34,10 @@
   (let [run-systems-fn (make-system-runner game-state (player :id))]
 
     (js/window.requestAnimationFrame (fn process-frame [ts]
+                                       ; i think the output of run-systems-fn is clobbering
+                                       ; the applied update-entity events
+                                       ; should we queue processing of update-entity events until after
+                                       ; this swap! is over?
                                        (swap! game-state run-systems-fn)
                                        (reset! animation-frame-request-id
                                                (js/window.requestAnimationFrame process-frame))))))
