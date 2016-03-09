@@ -96,12 +96,10 @@
   [event :- Event
    contacted-entity :- Entity]
   (if (get-in event [:entity :collision :destroyed-on-contact])
+    ; This entity should be destroyed on contact, and we're handling a contact. Destroy it!
+    (remove-entity! (safe-get-in event [:entity :id]) :collision-system)
 
-    (let [entity-id (safe-get-in event [:entity :id])]
-      (remove-entity! entity-id :collision-system)
-      (publish-event {:event-type :entity-removed
-                      :entity-id  entity-id}))
-
+    ; This entity doesn't need to be destroyed on contact. Let it live.
     (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
       ; Great, we found a clear spot! Move there and stand still.
       (apply-movement (event :entity)
