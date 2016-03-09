@@ -16,7 +16,7 @@
       (add-to-stage! stage obj)
       (swap! objects-by-entity-id assoc (:id entity) obj))))
 
-(sm/defn render-system-tick [renderer stage objects-by-entity-id entities publish-chan]
+(sm/defn render-system-tick [renderer stage objects-by-entity-id entities]
   (let [unknown-entities (filter #(not (contains? @objects-by-entity-id
                                                   (:id %)))
                                  entities)]
@@ -25,12 +25,12 @@
   (render! renderer stage)
   entities)
 
-(defn handle-movement-event [stage objects-by-entity-id event publish-chan]
+(defn handle-movement-event [stage objects-by-entity-id event]
   (if-let [obj (@objects-by-entity-id (-> event :entity :id))]
     (update-obj-position! obj (-> event :entity :shape))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
-(defn handle-remove-entity-event [stage objects-by-entity-id event publish-chan]
+(defn handle-remove-entity-event [stage objects-by-entity-id event]
   (remove-from-stage! stage
                       (@objects-by-entity-id (event :entity-id)))
   (swap! objects-by-entity-id dissoc (event :entity-id)))

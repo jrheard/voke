@@ -2,7 +2,6 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.entity :refer [projectile]]
-            [voke.events :refer [publish-event]]
             [voke.schemas :refer [Entity System]]
             [voke.util :refer [now]])
   (:require-macros [schema.core :as sm]))

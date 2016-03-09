@@ -1,5 +1,6 @@
 (ns voke.core
   (:require [voke.entity :as e]
+            [voke.events]
             [voke.schemas :refer [Entity GameState]]
             [voke.system.core :refer [make-system-runner]])
   (:require-macros [schema.core :as sm]))
@@ -28,9 +29,7 @@
 
 (defn ^:export main []
   (js/window.cancelAnimationFrame @animation-frame-request-id)
-
-  ;(.profile js/console "hello")
-  ;(js/window.setTimeout #(.profileEnd js/console "hello") 5000)
+  (voke.events/unsub-all!)
 
   (let [run-systems-fn (make-system-runner game-state (player :id))]
 

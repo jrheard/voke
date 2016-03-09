@@ -80,8 +80,7 @@
   [entity :- Entity
    axis :- (s/enum :x :y)
    new-position :- s/Num
-   new-velocity :- s/Num
-   publish-chan]
+   new-velocity :- s/Num]
   "Fires events to notify the world that a particular entity should have a new position+velocity."
   (let [update-entity-fn (fn [entity]
                            ; XXX HACK - THIS CODE SHOULD NEVER RUN IF ENTITY DOES NOT EXIST
@@ -89,19 +88,18 @@
                              (-> entity
                                  (assoc-in [:shape axis] new-position)
                                  (assoc-in [:motion :velocity axis] new-velocity))))]
-    (publish-event publish-chan {:event-type :update-entity
+    (publish-event {:event-type :update-entity
                                  :origin     :collision-system
                                  :entity-id  (entity :id)
                                  :fn         update-entity-fn})
-    (publish-event publish-chan {:event-type :movement
+    (publish-event {:event-type :movement
                                  :entity     (update-entity-fn entity)})))
 
 (sm/defn handle-contact
   [event :- Event
-   contacted-entity :- Entity
-   publish-chan]
+   contacted-entity :- Entity]
   (if (get-in event [:entity :collision :destroyed-on-contact])
-    (publish-event publish-chan {:event-type :remove-entity
+    (publish-event {:event-type :remove-entity
                                  :origin     :collision-system
                                  :entity-id  (safe-get-in event [:entity :id])})
 
@@ -110,11 +108,10 @@
       (apply-movement (event :entity)
                       (event :axis)
                       closest-clear-spot
-                      0
-                      publish-chan)
+                      0)
 
       ; Couldn't find a clear spot; slow him down, he can try moving again next tick.
-      (publish-event publish-chan {:event-type :update-entity
+      (publish-event {:event-type :update-entity
                                    :origin     :collision-system
                                    :entity-id  (safe-get-in event [:entity :id])
                                    :fn         (fn [old-entity]
@@ -122,24 +119,22 @@
                                                             [:motion :velocity (event :axis)]
                                                             #(* % 0.7)))})))
 
-  (publish-event publish-chan {:event-type :contact
+  (publish-event {:event-type :contact
                                :entities   [(event :entity) contacted-entity]}))
 
 (sm/defn handle-intended-movement
-  [event :- Event
-   publish-chan]
+  [event :- Event]
   (let [entity (event :entity)
         moved-entity (assoc-in entity
                                [:shape (event :axis)]
                                (event :new-position))]
 
     (if-let [contacted-entity (find-contacting-entity moved-entity (event :all-entities))]
-      (handle-contact event contacted-entity publish-chan)
+      (handle-contact event contacted-entity)
       (apply-movement entity
                       (event :axis)
                       (event :new-position)
-                      (event :new-velocity)
-                      publish-chan))))
+                      (event :new-velocity)))))
 
 ;; System definition
 

@@ -38,7 +38,7 @@
 
 ;;; Public
 
-(defn handle-keyboard-events [publish-chan player-id]
+(defn handle-keyboard-events [player-id]
   "Listens to keyboard events, and publishes :update-entity events to `publish-chan` for the `player-id` entity
   whenever a move key or fire key is pressed/raised."
   (let [event-chan (chan)]
@@ -60,9 +60,9 @@
                                                (fn [fire-directions]
                                                  (filterv #(not= direction %) fire-directions))])]
 
-        (publish-event publish-chan {:event-type :update-entity
-                                     :origin     :keyboard-input
-                                     :entity-id  player-id
-                                     :fn         (fn [entity]
-                                                   (apply update-in entity update-entity-args))})
+        (publish-event {:event-type :update-entity
+                        :origin     :keyboard-input
+                        :entity-id  player-id
+                        :fn         (fn [entity]
+                                      (apply update-in entity update-entity-args))})
         (recur)))))
