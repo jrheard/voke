@@ -49,9 +49,12 @@
 
 (sm/defn apply-update-entity-event [state :- GameState
                                     event :- Event]
-  (update-in state
-             [:entities (event :entity-id)]
-             (event :fn)))
+  (if (contains? (state :entities)
+                 (event :entity-id))
+    (update-in state
+               [:entities (event :entity-id)]
+               (event :fn))
+    state))
 
 (sm/defn make-system-runner
   "Returns a function from game-state -> game-state, which you can call to make a unit

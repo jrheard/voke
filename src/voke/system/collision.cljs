@@ -84,9 +84,11 @@
    publish-chan]
   "Fires events to notify the world that a particular entity should have a new position+velocity."
   (let [update-entity-fn (fn [entity]
-                           (-> entity
-                               (assoc-in [:shape axis] new-position)
-                               (assoc-in [:motion :velocity axis] new-velocity)))]
+                           ; XXX HACK - THIS CODE SHOULD NEVER RUN IF ENTITY DOES NOT EXIST
+                           (when entity
+                             (-> entity
+                                 (assoc-in [:shape axis] new-position)
+                                 (assoc-in [:motion :velocity axis] new-velocity))))]
     (publish-event publish-chan {:event-type :update-entity
                                  :origin     :collision-system
                                  :entity-id  (entity :id)

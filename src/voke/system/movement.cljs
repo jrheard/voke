@@ -66,30 +66,33 @@
           (not= (safe-get-in entity [:motion :velocity :x]) 0)
           (not= (safe-get-in entity [:motion :velocity :y]) 0)))))
 
+(sm/defn ^:private -update-axis-velocity :- Entity
+  [entity :- Entity
+   axis :- (s/enum :x :y)
+   trig-fn]
+  (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
+                       (safe-get-in entity [:motion :max-acceleration])
+                       0)
+        axis-velocity (safe-get-in entity [:motion :velocity axis])
+        new-velocity (+ axis-velocity
+                        (* acceleration
+                           (trig-fn (safe-get-in entity [:shape :orientation]))))
+        max-speed (safe-get-in entity [:motion :max-speed])
+        new-velocity (if (pos? new-velocity)
+                       (min max-speed new-velocity)
+                       (max (- max-speed) new-velocity))]
+    (if (> (Math/abs new-velocity) min-velocity)
+      (assoc-in entity [:motion :velocity axis] new-velocity)
+      (assoc-in entity [:motion :velocity axis] 0))))
+
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
   ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters
-  (if-not (should-update-velocity? entity)
-    entity
-    (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
-                         (safe-get-in entity [:motion :max-acceleration])
-                         0)
-          orientation (safe-get-in entity [:shape :orientation])
-          update-axis-velocity (fn [axis-velocity trig-fn]
-                                 ; TODO - is min the right thing to use here?
-                                 ; what about velocities in negative directions?
-                                 (js/console.log axis-velocity)
-                                 (let [new-velocity (min (safe-get-in entity [:motion :max-speed])
-                                                         (+ axis-velocity
-                                                            (* acceleration
-                                                               (trig-fn orientation))))]
-                                   (js/console.log new-velocity)
-                                   (if (> (Math/abs new-velocity) min-velocity)
-                                     new-velocity
-                                     0)))]
-      (-> entity
-          (update-in [:motion :velocity :x] update-axis-velocity Math/cos)
-          (update-in [:motion :velocity :y] update-axis-velocity Math/sin)))))
+  (if (should-update-velocity? entity)
+    (-> entity
+        (-update-axis-velocity :x Math/cos)
+        (-update-axis-velocity :y Math/sin))
+    entity))
 
 (sm/defn apply-friction :- Entity
   [entity :- Entity]

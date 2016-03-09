@@ -1853,3 +1853,12 @@ profiling indicates that all of our time is spent in handle-intended-movement.
 i'd like to start by replacing the event system with a synchronous one, then seeing how perf goes
 if perf is still bad, profile handle-intended-movement
 
+some weird shit happens when a projectile hits a wall, we get a million duplicate :intended-movement events
+
+ok, i think i see what's going on here.
+
+because the event system is currently asynchronous, we're ending up in a situation where system.core removes
+an entity, then system.collision/apply-movement assoces a :shape and a :motion onto the now-nil entity,
+and so we end up with badly formed entities.
+
+ugh so anyway make it synchronous tomorrow
