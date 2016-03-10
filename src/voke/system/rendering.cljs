@@ -18,7 +18,7 @@
 
 (defn handle-movement-event [stage objects-by-entity-id event]
   (if-let [obj (@objects-by-entity-id (-> event :entity :id))]
-    (update-obj-position! obj (-> event :entity :shape))
+    (update-obj-position! obj (-> event :entity :position))
     (handle-unknown-entities! stage objects-by-entity-id [(event :entity)])))
 
 (defn handle-remove-entity-event [stage objects-by-entity-id event]

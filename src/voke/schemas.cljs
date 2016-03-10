@@ -9,13 +9,14 @@
 
 (sm/defschema Axis (s/enum :x :y))
 
-; TODO - split x/y out of Shape and into a Position
-; so that rendering-shapes can look different from collision shapes without duplicating x/y info
-(sm/defschema Shape {:x           s/Num
-                     :y           s/Num
-                     :type        (s/enum :rectangle :circle)
+(sm/defschema Position {:x s/Num
+                        :y s/Num})
+
+(sm/defschema Shape {:type        (s/enum :rectangle :circle)
                      :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
+
+(sm/defschema ProjectileShape (dissoc Shape :orientation))
 
 (sm/defschema Motion {:velocity             {:x s/Num
                                              :y s/Num}
@@ -23,7 +24,8 @@
                       :max-speed            s/Num
                       :max-acceleration     s/Num})
 
-(sm/defschema Weapon {:last-attack-timestamp s/Int})
+(sm/defschema Weapon {:last-attack-timestamp s/Int
+                      :projectile-shape ProjectileShape})
 
 (sm/defschema Brain {:type                    (s/enum :player :skeleton :projectile)
                      ; TODO - these will be *angles* for non-player entities, not sets!!!!!
@@ -46,8 +48,8 @@
                          (s/optional-key :destroyed-on-contact) s/Bool})
 
 (sm/defschema Entity {:id                          EntityID
-                      ; TODO - give me a single example of an entity that doesn't have a shape
-                      (s/optional-key :shape)      Shape
+                      :shape                       Shape
+                      :position                    Position
                       (s/optional-key :motion)     Motion
                       ; If it doesn't have a :collision, the entity isn't collidable.
                       (s/optional-key :collision)  Collision

@@ -47,14 +47,10 @@
         [(assoc-in entity
                    [:weapon :last-attack-timestamp]
                    (now))
-         ; TODO update these values
          (projectile (entity :id)
-                     (get-in entity [:shape :x])
-                     (get-in entity [:shape :y])
-                     (get-in entity [:shape :orientation])
-                     10
-                     10
-                     ; TODO jesus christ cap velocity
+                     (entity :position)
+                     (safe-get-in entity [:weapon :projectile-shape])
+                     (safe-get-in entity [:shape :orientation])
                      x-velocity
                      y-velocity)]))))
 

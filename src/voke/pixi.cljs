@@ -15,8 +15,8 @@
   ; FIXME only supports rectangles atm, doesn't look to see if you've got other shapes
   [entity :- Entity]
   (rectangle (js/PIXI.Graphics.)
-             (-> entity :shape :x)
-             (-> entity :shape :y)
+             (-> entity :position :x)
+             (-> entity :position :y)
              (-> entity :shape :width)
              (-> entity :shape :height)
              0x333333))

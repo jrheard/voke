@@ -21,14 +21,18 @@
 
 (sm/defn make-weapon :- Weapon
   []
-  {:last-attack-timestamp 0})
+  {:last-attack-timestamp 0
+   :projectile-shape {:type :rectangle
+                      :width 10
+                      :height 10}})
 
 ;; Public
 
 (sm/defn player :- Entity
   [x y]
   (make-entity
-    {:shape      {:x x :y y :width 25 :height 25 :type :rectangle :orientation 0}
+    {:position   {:x x :y y}
+     :shape      {:width 25 :height 25 :type :rectangle :orientation 0}
      :motion     {:velocity             {:x 0 :y 0}
                   :affected-by-friction true
                   :max-acceleration     2.0
@@ -41,22 +45,24 @@
 (sm/defn wall :- Entity
   [x y width height]
   (make-entity
-    {:shape      {:x x :y y :width width :height height :type :rectangle :orientation 0}
+    {:position   {:x x :y y}
+     :shape      {:width width :height height :type :rectangle :orientation 0}
      :collision  {:type :obstacle}
      :renderable true}))
 
 (sm/defn projectile :- Entity
-  [owner-id x y orientation width height x-velocity y-velocity]
+  [owner-id position projectile-shape orientation x-velocity y-velocity]
   (make-entity
-    {:shape      {:x x :y y :width width :height height :orientation orientation}
+    {:position   position
+     :shape      (assoc projectile-shape :orientation orientation)
      :owner-id   owner-id
-     :collision  {:type :projectile
+     :collision  {:type                 :projectile
                   ; XXXX TODO parameterize good/bad guy based on projectile owner
-                  :collides-with #{:bad-guy :obstacle :item}
+                  :collides-with        #{:bad-guy :obstacle :item}
                   :destroyed-on-contact true}
      :renderable true
-     :motion     {:velocity         {:x x-velocity
-                                     :y y-velocity}
+     :motion     {:velocity             {:x x-velocity
+                                         :y y-velocity}
                   :affected-by-friction false
-                  :max-speed        (max x-velocity y-velocity)
-                  :max-acceleration 0}}))
+                  :max-speed            (max x-velocity y-velocity)
+                  :max-acceleration     0}}))

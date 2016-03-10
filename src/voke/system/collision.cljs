@@ -2,7 +2,7 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Axis Entity Event System]]
+            [voke.schemas :refer [Axis Entity Event Position Shape System]]
             [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
 
@@ -18,8 +18,15 @@
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
 
+(sm/defschema PositionedShape (merge Shape Position))
+
+(sm/defn get-positioned-shape :- PositionedShape
+  [entity :- Entity]
+  (merge (entity :shape) (entity :position)))
+
 (sm/defn shapes-collide? :- s/Bool
-  [shape1 shape2]
+  [shape1 :- PositionedShape
+   shape2 :- PositionedShape]
   ; right now everything's just aabbs
   ; when that changes, this function will need to get smarter
   (not-any? identity
@@ -55,7 +62,7 @@
    all-entities :- [Entity]]
   (let [collidable-entities (filter (partial entities-can-collide? entity)
                                     all-entities)]
-    (first (filter #(shapes-collide? (% :shape) (entity :shape))
+    (first (filter #(shapes-collide? (get-positioned-shape %) (get-positioned-shape entity))
                    collidable-entities))))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
@@ -66,8 +73,8 @@
   that entity A can occupy without contacting entity B and returns it if entity A fits there, or returns nil
   if no open spot exists."
   ; TODO - only supports rectangles
-  (let [shape1 (safe-get-in event [:entity :shape])
-        shape2 (contacted-entity :shape)
+  (let [shape1 (get-positioned-shape (event :entity))
+        shape2 (get-positioned-shape contacted-entity)
         arithmetic-fn (if (pos? (event :new-velocity)) - +)
         field (if (= (event :axis) :x) :width :height)
         axis-value-to-try (arithmetic-fn (shape2 (event :axis))
@@ -75,7 +82,7 @@
                                          (/ (shape1 field) 2)
                                          0.01)]
     (when-not (find-contacting-entity (assoc-in (event :entity)
-                                                [:shape (event :axis)]
+                                                [:position (event :axis)]
                                                 axis-value-to-try)
                                       (event :all-entities))
       axis-value-to-try)))
@@ -89,7 +96,7 @@
   (let [update-entity-fn (fn [entity]
                            (assert entity)
                            (-> entity
-                               (assoc-in [:shape axis] new-position)
+                               (assoc-in [:position axis] new-position)
                                (assoc-in [:motion :velocity axis] new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
     (publish-event {:event-type :movement
@@ -125,7 +132,7 @@
   [event :- Event]
   (let [entity (event :entity)
         moved-entity (assoc-in entity
-                               [:shape (event :axis)]
+                               [:position (event :axis)]
                                (event :new-position))]
 
     (if-let [contacted-entity (find-contacting-entity moved-entity (event :all-entities))]

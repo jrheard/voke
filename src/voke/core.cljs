@@ -24,6 +24,7 @@
 (defn ^:export main []
   (js/window.cancelAnimationFrame @animation-frame-request-id)
   (voke.events/unsub-all!)
+  (voke.state/flush!)
 
   (let [run-systems-fn (make-system-runner (player :id))]
 
