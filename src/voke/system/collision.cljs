@@ -2,7 +2,8 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity Event System]])
+            [voke.schemas :refer [Axis Entity Event System]]
+            [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
 
 (defn left-edge-x [rect] (- (rect :x)
@@ -14,6 +15,9 @@
 (defn bottom-edge-y [rect] (+ (rect :y)
                               (/ (rect :height) 2)))
 
+; TODO - obstacles shouldn't be able to collide with each other
+; will simplify world generation / wall placement
+
 (sm/defn shapes-collide? :- s/Bool
   [shape1 shape2]
   ; right now everything's just aabbs
@@ -24,16 +28,32 @@
              (> (left-edge-x shape1) (right-edge-x shape2))
              (< (right-edge-x shape1) (left-edge-x shape2))]))
 
+(sm/defn entities-can-collide? :- s/Bool
+  "Returns true if two entities are *able* to collide with one another, false otherwise.
+
+  Does *not* check to see if the two entities are *actually* colliding!!!!"
+  [entity :- Entity
+   another-entity :- Entity]
+  (let [one-way-collision-check (sm/fn :- s/Bool
+                                  [a :- Entity
+                                   b :- Entity]
+                                  (and
+                                    (contains? a :collision)
+                                    (not= (a :id) (b :id))
+                                    (if (contains? (a :collision) :collides-with)
+                                      (contains? (safe-get-in a [:collision :collides-with])
+                                                 (safe-get-in b [:collision :type]))
+                                      true)))]
+    (and (one-way-collision-check entity another-entity)
+         (one-way-collision-check another-entity entity))))
+
 (sm/defn find-contacting-entity :- (s/maybe Entity)
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
   Entities in the game. Returns another Entity if the space `entity` is trying to occupy is already filled,
   nil if the space `entity` is trying to occupy is empty."
   [entity :- Entity
    all-entities :- [Entity]]
-  (let [collidable-entities (filter (fn [another-entity]
-                                      (and
-                                        (contains? entity :collision)
-                                        (not= (entity :id) (another-entity :id))))
+  (let [collidable-entities (filter (partial entities-can-collide? entity)
                                     all-entities)]
     (first (filter #(shapes-collide? (% :shape) (entity :shape))
                    collidable-entities))))
@@ -62,61 +82,58 @@
 
 (sm/defn apply-movement
   [entity :- Entity
-   axis :- (s/enum :x :y)
+   axis :- Axis
    new-position :- s/Num
-   new-velocity :- s/Num
-   publish-chan]
+   new-velocity :- s/Num]
   "Fires events to notify the world that a particular entity should have a new position+velocity."
   (let [update-entity-fn (fn [entity]
+                           (assert entity)
                            (-> entity
                                (assoc-in [:shape axis] new-position)
                                (assoc-in [:motion :velocity axis] new-velocity)))]
-    (publish-event publish-chan {:event-type :update-entity
-                                 :origin     :collision-system
-                                 :entity-id  (entity :id)
-                                 :fn         update-entity-fn})
-    (publish-event publish-chan {:event-type :movement
-                                 :entity     (update-entity-fn entity)})))
+    (update-entity! (entity :id) :collision-system update-entity-fn)
+    (publish-event {:event-type :movement
+                    :entity     (update-entity-fn entity)})))
 
 (sm/defn handle-contact
   [event :- Event
-   contacted-entity :- Entity
-   publish-chan]
-  (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
-    ; Great, we found a clear spot! Move there and stand still.
-    (apply-movement (event :entity)
-                    (event :axis)
-                    closest-clear-spot
-                    0
-                    publish-chan)
+   contacted-entity :- Entity]
+  (if (get-in event [:entity :collision :destroyed-on-contact])
+    ; This entity should be destroyed on contact, and we're handling a contact. Destroy it!
+    (remove-entity! (safe-get-in event [:entity :id]) :collision-system)
 
-    ; Couldn't find a clear spot; slow him down, he can try moving again next tick.
-    (publish-event publish-chan {:event-type :update-entity
-                                 :origin     :collision-system
-                                 :entity-id  ((event :entity) :id)
-                                 :fn         (fn [old-entity]
-                                               (update-in old-entity
-                                                          [:motion :velocity (event :axis)]
-                                                          #(* % 0.7)))}))
+    ; This entity doesn't need to be destroyed on contact. Let it live.
+    (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
+      ; Great, we found a clear spot nearby! Move there and stand still.
+      (apply-movement (event :entity)
+                      (event :axis)
+                      closest-clear-spot
+                      0)
 
-  (publish-event publish-chan {:event-type :contact
-                               :entities   [(event :entity) contacted-entity]}))
+      ; Couldn't find a clear spot; slow the entity down, it can try moving again next tick.
+      (update-entity! (safe-get-in event [:entity :id])
+                      :collision-system
+                      (fn [old-entity]
+                        (update-in old-entity
+                                   [:motion :velocity (event :axis)]
+                                   #(* % 0.7))))))
+
+  (publish-event {:event-type :contact
+                  :entities   [(event :entity) contacted-entity]}))
 
 (sm/defn handle-intended-movement
-  [event :- Event
-   publish-chan]
+  [event :- Event]
   (let [entity (event :entity)
         moved-entity (assoc-in entity
                                [:shape (event :axis)]
                                (event :new-position))]
 
     (if-let [contacted-entity (find-contacting-entity moved-entity (event :all-entities))]
-      (handle-contact event contacted-entity publish-chan)
+      (handle-contact event contacted-entity)
       (apply-movement entity
                       (event :axis)
                       (event :new-position)
-                      (event :new-velocity)
-                      publish-chan))))
+                      (event :new-velocity)))))
 
 ;; System definition
 

@@ -1,8 +1,10 @@
 (ns voke.system.movement
   (:require [clojure.set :refer [intersection difference]]
             [plumbing.core :refer [safe-get-in]]
+            [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Direction Entity GameState System]])
+            [voke.schemas :refer [Axis Direction Entity GameState System]]
+            [voke.util :refer [bound-between]])
   (:require-macros [schema.core :as sm]))
 
 ; A dumb-as-rocks velocity/acceleration system.
@@ -38,77 +40,112 @@
   [entity :- Entity]
   (remove-conflicting-directions (safe-get-in entity [:brain :intended-move-direction])))
 
+(sm/defn should-update-orientation? :- s/Bool
+  [entity :- Entity]
+  (and
+    ; TODO - support monsters
+    (get-in entity [:brain :intended-move-direction])
+    (not-empty (human-controlled-entity-movement-directions entity))))
+
 (sm/defn update-orientation :- Entity
   [entity :- Entity]
-  ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters/projectiles
-  (assoc-in entity
-            [:shape :orientation]
-            (let [directions (human-controlled-entity-movement-directions entity)
-                  intended-direction-values (map direction-value-mappings directions)]
-              (Math/atan2 (apply + (map Math/sin intended-direction-values))
-                          (apply + (map Math/cos intended-direction-values))))))
+  ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters
+  (if (should-update-orientation? entity)
+    (assoc-in entity
+              [:shape :orientation]
+              (let [directions (human-controlled-entity-movement-directions entity)
+                    intended-direction-values (map direction-value-mappings directions)]
+                (Math/atan2 (apply + (map Math/sin intended-direction-values))
+                            (apply + (map Math/cos intended-direction-values)))))
+    entity))
+
+(sm/defn should-update-velocity? :- s/Bool
+  [entity :- Entity]
+  (or (should-update-orientation? entity)
+      (and
+        (safe-get-in entity [:motion :affected-by-friction])
+        (or
+          (not= (safe-get-in entity [:motion :velocity :x]) 0)
+          (not= (safe-get-in entity [:motion :velocity :y]) 0)))))
+
+(sm/defn get-acceleration :- s/Num
+  [entity :- Entity]
+  ; TODO - support monsters
+  (if (not-empty (human-controlled-entity-movement-directions entity))
+    (safe-get-in entity [:motion :max-acceleration])
+    0))
+
+(sm/defn ^:private -update-axis-velocity :- Entity
+  [entity :- Entity
+   axis :- Axis
+   trig-fn :- (s/enum Math/cos Math/sin)]
+  (let [axis-velocity (safe-get-in entity [:motion :velocity axis])
+        new-velocity (+ axis-velocity
+                        (* (get-acceleration entity)
+                           (trig-fn (safe-get-in entity [:shape :orientation]))))
+        max-speed (safe-get-in entity [:motion :max-speed])
+        capped-velocity (bound-between new-velocity (- max-speed) max-speed)]
+    (if (> (Math/abs capped-velocity) min-velocity)
+      (assoc-in entity [:motion :velocity axis] capped-velocity)
+      (assoc-in entity [:motion :velocity axis] 0))))
 
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
-  ; TODO - acceleration will be computed differently for AI-controlled monsters
-  (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
-                       (safe-get-in entity [:motion :max-acceleration])
-                       0)]
-    (if (or (> acceleration 0)
-            (> (or (safe-get-in entity [:motion :velocity :x] 0)
-                   (safe-get-in entity [:motion :velocity :y] 0))))
-      (let [orientation (safe-get-in entity [:shape :orientation])
-            update-axis-velocity (fn [trig-fn axis-velocity]
-                                   (let [new-velocity (min (safe-get-in entity [:motion :max-speed])
-                                                           (+ axis-velocity
-                                                              (* acceleration
-                                                                 (trig-fn orientation))))]
-                                     (if (> (Math/abs new-velocity) min-velocity)
-                                       new-velocity
-                                       0)))]
-        (-> entity
-            (update-in [:motion :velocity :x]
-                       (partial update-axis-velocity Math/cos))
-            (update-in [:motion :velocity :y]
-                       (partial update-axis-velocity Math/sin))))
-      entity)))
+  (if (should-update-velocity? entity)
+    (-> entity
+        (-update-axis-velocity :x Math/cos)
+        (-update-axis-velocity :y Math/sin))
+    entity))
 
 (sm/defn apply-friction :- Entity
   [entity :- Entity]
-  (reduce
-    (fn [entity axis]
-      (update-in entity [:motion :velocity axis] #(* % friction-value)))
-    entity
-    [:x :y]))
+  (if (safe-get-in entity [:motion :affected-by-friction])
+    (reduce
+      (fn [entity axis]
+        (update-in entity [:motion :velocity axis] #(* % friction-value)))
+      entity
+      [:x :y])
+    entity))
 
 (sm/defn update-position :- Entity
   [entity :- Entity]
-  (-> entity
-      (update-in [:shape :x]
-                 (fn [x]
-                   (+ x (safe-get-in entity [:motion :velocity :x]))))
-      (update-in [:shape :y]
-                 (fn [y]
-                   (+ y (safe-get-in entity [:motion :velocity :y]))))))
+  (reduce
+    (fn [entity axis]
+      (update-in entity
+                 [:shape axis]
+                 #(+ % (safe-get-in entity [:motion :velocity axis]))))
+    entity
+    [:x :y]))
+
+(sm/defn relevant-to-movement-system? :- s/Bool
+  [entity :- Entity]
+  (or
+    (seq (get-in entity [:brain :intended-move-direction]))
+    (not= (get-in entity [:motion :velocity :x] 0) 0)
+    (not= (get-in entity [:motion :velocity :y] 0) 0)))
 
 ;; System definition
 
 (sm/def move-system :- System
-  {:every-tick {:fn (fn move-system-tick [entities publish-chan]
-                      (doseq [entity (filter #(get-in % [:brain :intended-move-direction]) entities)]
-                        (let [moved-entity (-> entity
-                                               update-orientation
-                                               update-velocity
-                                               apply-friction
-                                               update-position)]
+  {:tick-fn (fn move-system-tick [entities]
+              (doseq [entity (filter relevant-to-movement-system? entities)]
+                (let [moved-entity (-> entity
+                                       update-orientation
+                                       update-velocity
+                                       apply-friction
+                                       update-position)]
 
-                          (when (not= moved-entity entity)
-                            (doseq [axis [:x :y]]
-                              (publish-event publish-chan {:event-type   :intended-movement
-                                                           :entity       entity
-                                                           :axis         axis
-                                                           :new-position (safe-get-in moved-entity
-                                                                                      [:shape axis])
-                                                           :new-velocity (safe-get-in moved-entity
-                                                                                      [:motion :velocity axis])
-                                                           :all-entities entities}))))))}})
+                  (when (not= moved-entity entity)
+                    (doseq [axis [:x :y]]
+                      (publish-event {:event-type   :intended-movement
+                                      :entity       entity
+                                      :axis         axis
+                                      :new-position (safe-get-in moved-entity
+                                                                 [:shape axis])
+                                      :new-velocity (safe-get-in moved-entity
+                                                                 [:motion :velocity axis])
+                                      ; XXXX does this system actually work at all?
+                                      ; what happens if two entities try to move to the
+                                      ; same spot in the same tick?
+                                      ; does collision system not notice?
+                                      :all-entities entities}))))))})

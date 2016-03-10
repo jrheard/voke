@@ -1746,3 +1746,224 @@ that i build myself. it'll have some simple state, just a map like {:event-name 
 
 so when i get around to it, i'll change the event system to be implemented in that way, and i will be able
 to sleep way better.
+
+ok, now i'm puzzling about projectiles. how will they work?
+
+they don't have a :brain - they *do* have a shape, a motion, and an owner
+
+they inherit their owner's velocity (dx and dy)
+added to that is a single dx or dy number based on :intended-fire-direction
+
+EVENTUALLY there will be a range stat that controls how far projectiles go
+
+entities also have an associated :last-fire-timestamp. does that live on some preexisting component?
+can several related components be combined together into one?
+
+ok so entities can have a :weapon, which contains information that controls the creation of projectiles
+
+ok, gonna take a break from implementing projectiles for a bit.
+
+systems that still need to be massively updated to account for projectiles:
+
+* movement
+  * don't only move player-based entities
+  * don't only move entities with acceleration
+  * don't apply friction to projectiles
+* collision
+  * TODO figure out what should be updated here
+* grim-reaper
+  * TODO add this system at all
+
+one thing i've been struggling with is the notion of entity "types".
+
+several times now, i've found myself wanting to add a :type key to a component (collision, movement, brain, etc)
+to indicate that a particular entity is a :monster, or a :player, or an :obstacle, or a :projectile.
+
+an example: certain entities are projectiles, and thye shouldn't be subject to friction,
+and they can't collide with other projectiles
+
+maybe a better way of doing things would be to add an :affected-by-friction s/Bool k/v pair to :motion
+and a :doesnt-collide-with #{:foo} k/v pair to :collision
+
+that's a more direct way of expressing what i'm trying to express, i think i like it
+
+ok taking a break for today.
+
+tomorrow:
+look into collision system
+start grim-reaper system if it seems sane
+refactor all this new projectile-related code
+
+later this week:
+sit down and really tighten up schema definitions, particularly around events
+make events system synchronous
+
+====
+
+3/8/16
+
+transcribing notes taken down on paper this morning, continuing thoughts on "type" fields in component schemas:
+
+be wary of :type fields in component schemas. they're alluring because of course i know that a :projectile
+should behave like X and Y, but that's _implicit_. the _explicit_ approach is better. see below:
+
+:collision components should look like
+
+{:type (s/enum :good-guy :bad-guy :projectile :obstacle :trap :projectile :gold :item :explosion)
+ (s/optional-key :collides-with) #{CollisionType}
+ (s/optional-key :destroyed-on-contact) s/Bool}
+
+type :type field here is just used as a marker - it doesn't have any implicit behavior tied up in it.
+the collision system doesn't have code in it that goes "ok if one of these entities is a projectile,
+it should behave like thus and so". instead, the other two fields control special behavior.
+
+the :collides-with k/v pair is optional.
+if unspecified, it means that the given entity collides with everything.
+if specified, it's a set that's a _whitelist_ of the things that the entity will collide with.
+only entities that can move should have this field. it feels weird to specify that constraint, but it keeps
+the system easier to reason about.
+
+good guys collide with everything except projectiles owned by good guys
+bad guys don't collide with gold and projectiles owned by bad guys
+
+if i wanted to implement ghosts, i could just have them not collide with obstacles
+
+for entities like projectiles, items, and gold, there's an optional :destroyed-on-contact k/v pair.
+if this is true, when the collision system goes to fire a :contact event involving one of these entities,
+
+the collision system is responsible for removing entities with :destroyed-on-contact true;
+the grim reaper system is responsible for removing damaged/killed good/bad guys
+
+when projectiles are created by good guys, they have a :collides-with that's like {:bad-guy :obstacle :item}
+when they're created by bad guys, they get {:good-guy :obstacle :item}
+
+projectiles will also have an :owner-id field (not on :collision, just a standalone component)
+this is mainly for stuff like lifesteal, etc; collision system doesn't know/care about it
+
+ok, now projectiles don't collide with their owner, and they're removed from the game+screen when they collide
+with obstacles.
+
+next up:
+* projectiles should be fired in the direction specified by :intended-fire-direction
+* projectiles should inherit their owner's dx/dy
+* refactor all this
+
+i'm seeing some perf slowdown when 30 projectiles are on the screen at once.
+profiling indicates that all of our time is spent in handle-intended-movement.
+i'd like to start by replacing the event system with a synchronous one, then seeing how perf goes
+if perf is still bad, profile handle-intended-movement
+
+some weird shit happens when a projectile hits a wall, we get a million duplicate :intended-movement events
+
+ok, i think i see what's going on here.
+
+because the event system is currently asynchronous, we're ending up in a situation where system.core removes
+an entity, then system.collision/apply-movement assoces a :shape and a :motion onto the now-nil entity,
+and so we end up with badly formed entities.
+
+ugh so anyway make it synchronous tomorrow
+
+lol all right i started on that and realized that i have no idea how any of this ever worked
+
+events are synchronous now, but the updates they make are clobbered every frame by the swap! call in voke.core
+will need to do some thinking about the best way of architecting this system.
+
+how do systems communicate with one another? -> events seems to be the clear answer
+
+how do events cause updates to the state of the game?
+answer to this is less clear.
+
+should there be a queue that takes in side-effecting events like :update-entity and :remove-entity,
+and at the end of every frame the queue is flushed?
+is this a good idea or a dumb idea?
+
+i guess at that point there's not really much of a reason to use the event system - or is there?
+the rendering system listens to :remove-entity events, after all
+
+but yeah even so, maybe there should be some sort of (update-entity! entity-id a-fn) function that
+the core game engine exposes, and a (remove-entity! entity-id) function too, and they're buffered
+behind the scenes and don't use the event system at all to actually do their work
+but somewhere along the line an :entity-removed event is fired so that the renderer system knows what's up.
+
+so the voke.event system ends up being specifically for inter-system communication and non-game-state-related
+side effects, and the core update-entity! and remove-entity! functions are for actually updating the state of
+the game.
+
+that could work. gonna sleep on it.
+
+======
+
+3/9/16
+
+re: "i have no idea how any of this ever worked"
+
+here's what's happening now, re: clobbering:
+cljs.user=> (def foo (atom {}))
+#'cljs.user/foo
+cljs.user=> (swap! foo (fn [thing]
+             (swap! foo assoc :blat :blot)
+             (assoc thing 1 2)))
+cljs.user=> @foo
+{1 2}
+
+and so of course the current event system's update-entity situation is getting clobbered, because it's all
+happening inside of a swap!.
+
+the way that things used to work was that the requestAnimationFrame loop swap!'d the main atom once per frame,
+and as part of that swap! it'd fire a bunch of update-entity events. and *those events* would be consumed
+by go-blocks and trigger swap!s that happened *outside* of the rAF swap!. and so that's how things actually worked.
+
+anyway i still like the update-entity! and remove-entity! ideas from the end of yesterday's notes,
+will probably put 'em in voke.state or something.
+
+ok, cool, that totally worked the first time. nice.
+
+running into an issue with the rendering system having trouble removing bullets. the behavior looks like this:
+1) on frame N, the collision system detects that a bullet (entity with id E) has hit a wall
+2) the collision system calls remove-entity! to queue entity E's removal from the game-state atom's :entities list
+3) the collision system fires an :entity-removed event
+4) the rendering system's :entity-removed handler fires, removes entity E from the stage and the objects-by-entity-id atom
+5) the rendering system's tick function runs. it's given a list of the game-state map's entities.
+  *this list contains entity E*, because the game-state atom hasn't yet been updated with the queued removal from step 2*
+6) the rendering system detects an entity that isn't currently being drawn, and draws it on the screen.
+
+an idea i've been toying with is pulling the rendering system's tick function out of the System infrastructure
+and calling it directly right before the end of every rAF tick. i think i'm going to try this.
+
+ok, that seems to have improved things.
+except now, entities that collide with the left or right wall don't get removed, but ones that collide with the
+top or bottom one are removed just fine. what gives?
+
+fixed it by changing the place where :entity-removed events are emitted.
+
+perf is okay, but suffers when there are ~30-40 projectiles on the screen at once.
+i tried putting entities-can-collide behind a cache, but it's still called so many times per second that even the overhead
+of looking in the cache n^2 times per tick is too expensive to keep up to realtime.
+implementing quadtrees should likely fix this.
+
+=====
+
+3/10/16
+
+notes from paper, mainly about priorities / next things to work on:
+
+1) document/refactor attack branch
+2) everything should have a :position and a :shape; split :x and :y out of :shape and put 'em in :position
+   main use case for this right now is so that weapons can have a :projectile-shape that's a Shape
+3) add a debug view, use reagent
+   mainly thinking about having a slider and arrows, both of which let you revisit previous frames of history
+   i guess you'll need to hit pause first or something? so there'll be a pause/play button
+   use sliding window of history if memory usage becomes an issue
+   the rendering system will have to handle disappearing/reappearing entities (so maybe the :entity-removed event
+   goes away, and there's just an :entity-killed event that eg the loot/xp/etc systems listen to)
+4) figure out what to do about this bullet collision rendering issue - right now, it looks to the player like
+   bullets disappear before actually touching obstacles. this must be a common issue in games
+   ideas:
+   * if a bullet's moving fast and crosses 6 pixels of empty space in 1 frame before touching a wall/enemy, reposition
+     it so that it's right next to its point of contact for 1 frame? don't like this idea.
+   * spawn some sort of "ghost" bullet (decal?) at the bullet's contact site right after it dies, have it
+     live for 1-2 frames (maybe this idea has potential)
+5) get source maps to actually work so that i can debug this perf issue more easily
+6) go through codebase and resolve any obvious TODOs worth immediately resolving
+7) camera
+

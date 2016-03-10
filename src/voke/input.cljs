@@ -1,9 +1,8 @@
 (ns voke.input
   (:require [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
-            [voke.events :refer [publish-event]]
-            [voke.util :refer [in?]]
-            [voke.schemas :refer [Entity GameState System]])
+            [voke.state :refer [update-entity!]]
+            [voke.util :refer [in?]])
   (:import [goog.events KeyCodes])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 
@@ -38,8 +37,8 @@
 
 ;;; Public
 
-(defn handle-keyboard-events [publish-chan player-id]
-  "Listens to keyboard events, and publishes :update-entity events to `publish-chan` for the `player-id` entity
+(defn handle-keyboard-events [player-id]
+  "Listens to keyboard events, and queues modifications to the `player-id` entity
   whenever a move key or fire key is pressed/raised."
   (let [event-chan (chan)]
     (listen-to-keyboard-inputs event-chan)
@@ -60,9 +59,6 @@
                                                (fn [fire-directions]
                                                  (filterv #(not= direction %) fire-directions))])]
 
-        (publish-event publish-chan {:event-type :update-entity
-                                     :origin     :keyboard-input
-                                     :entity-id  player-id
-                                     :fn         (fn [entity]
-                                                   (apply update-in entity update-entity-args))})
+        (update-entity! player-id :keyboard-input (fn [entity]
+                                                    (apply update-in entity update-entity-args)))
         (recur)))))

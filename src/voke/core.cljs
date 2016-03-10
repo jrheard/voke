@@ -1,14 +1,9 @@
 (ns voke.core
   (:require [voke.entity :as e]
-            [voke.schemas :refer [Entity GameState]]
-            [voke.system.core :refer [make-system-runner]])
-  (:require-macros [schema.core :as sm]))
-
-(sm/defn make-game-state :- GameState
-  [entities :- [Entity]]
-  {:entities (into {}
-                   (map (juxt :id identity)
-                        entities))})
+            [voke.events]
+            [voke.state :refer [make-game-state]]
+            [voke.system.core :refer [make-system-runner]]
+            [voke.system.rendering :refer [render-tick]]))
 
 (defonce player (e/player 500 300))
 
@@ -28,14 +23,18 @@
 
 (defn ^:export main []
   (js/window.cancelAnimationFrame @animation-frame-request-id)
+  (voke.events/unsub-all!)
 
-  ;(.profile js/console "hello")
-  ;(js/window.setTimeout #(.profileEnd js/console "hello") 5000)
-
-  (let [run-systems-fn (make-system-runner game-state (player :id))]
+  (let [run-systems-fn (make-system-runner (player :id))]
 
     (js/window.requestAnimationFrame (fn process-frame [ts]
                                        (swap! game-state run-systems-fn)
+
+                                       (let [apply-state-modifications (voke.state/flush!)]
+                                         (swap! game-state apply-state-modifications))
+
+                                       (render-tick @game-state)
+
                                        (reset! animation-frame-request-id
                                                (js/window.requestAnimationFrame process-frame))))))
 

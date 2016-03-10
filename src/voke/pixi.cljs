@@ -44,5 +44,8 @@
 (defn add-to-stage! [stage obj]
   (.addChild stage obj))
 
+(defn remove-from-stage! [stage obj]
+  (.removeChild stage obj))
+
 (defn render! [renderer stage]
   (.render renderer stage))
