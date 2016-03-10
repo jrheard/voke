@@ -15,6 +15,9 @@
 (defn bottom-edge-y [rect] (+ (rect :y)
                               (/ (rect :height) 2)))
 
+; TODO - obstacles shouldn't be able to collide with each other
+; will simplify world generation / wall placement
+
 (sm/defn shapes-collide? :- s/Bool
   [shape1 shape2]
   ; right now everything's just aabbs
