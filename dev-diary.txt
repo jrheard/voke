@@ -1941,3 +1941,28 @@ i tried putting entities-can-collide behind a cache, but it's still called so ma
 of looking in the cache n^2 times per tick is too expensive to keep up to realtime.
 implementing quadtrees should likely fix this.
 
+=====
+
+3/10/16
+
+notes from paper, mainly about priorities / next things to work on:
+
+1) document/refactor attack branch
+2) everything should have a :position and a :shape; split :x and :y out of :shape and put 'em in :position
+   main use case for this right now is so that weapons can have a :projectile-shape that's a Shape
+3) add a debug view, use reagent
+   mainly thinking about having a slider and arrows, both of which let you revisit previous frames of history
+   i guess you'll need to hit pause first or something? so there'll be a pause/play button
+   use sliding window of history if memory usage becomes an issue
+   the rendering system will have to handle disappearing/reappearing entities (so maybe the :entity-removed event
+   goes away, and there's just an :entity-killed event that eg the loot/xp/etc systems listen to)
+4) figure out what to do about this bullet collision rendering issue - right now, it looks to the player like
+   bullets disappear before actually touching obstacles. this must be a common issue in games
+   ideas:
+   * if a bullet's moving fast and crosses 6 pixels of empty space in 1 frame before touching a wall/enemy, reposition
+     it so that it's right next to its point of contact for 1 frame? don't like this idea.
+   * spawn some sort of "ghost" bullet (decal?) at the bullet's contact site right after it dies, have it
+     live for 1-2 frames (maybe this idea has potential)
+5) get source maps to actually work so that i can debug this perf issue more easily
+
+
