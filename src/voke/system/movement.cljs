@@ -127,25 +127,25 @@
 ;; System definition
 
 (sm/def move-system :- System
-  {:every-tick {:fn (fn move-system-tick [entities]
-                      (doseq [entity (filter relevant-to-movement-system? entities)]
-                        (let [moved-entity (-> entity
-                                               update-orientation
-                                               update-velocity
-                                               apply-friction
-                                               update-position)]
+  {:tick-fn (fn move-system-tick [entities]
+              (doseq [entity (filter relevant-to-movement-system? entities)]
+                (let [moved-entity (-> entity
+                                       update-orientation
+                                       update-velocity
+                                       apply-friction
+                                       update-position)]
 
-                          (when (not= moved-entity entity)
-                            (doseq [axis [:x :y]]
-                              (publish-event {:event-type   :intended-movement
-                                              :entity       entity
-                                              :axis         axis
-                                              :new-position (safe-get-in moved-entity
-                                                                         [:shape axis])
-                                              :new-velocity (safe-get-in moved-entity
-                                                                         [:motion :velocity axis])
-                                              ; XXXX does this system actually work at all?
-                                              ; what happens if two entities try to move to the
-                                              ; same spot in the same tick?
-                                              ; does collision system not notice?
-                                              :all-entities entities}))))))}})
+                  (when (not= moved-entity entity)
+                    (doseq [axis [:x :y]]
+                      (publish-event {:event-type   :intended-movement
+                                      :entity       entity
+                                      :axis         axis
+                                      :new-position (safe-get-in moved-entity
+                                                                 [:shape axis])
+                                      :new-velocity (safe-get-in moved-entity
+                                                                 [:motion :velocity axis])
+                                      ; XXXX does this system actually work at all?
+                                      ; what happens if two entities try to move to the
+                                      ; same spot in the same tick?
+                                      ; does collision system not notice?
+                                      :all-entities entities}))))))})

@@ -59,4 +59,4 @@
 ;; System definition
 
 (sm/def attack-system :- System
-  {:every-tick {:fn process-firing-entities}})
+  {:tick-fn process-firing-entities})

@@ -65,8 +65,6 @@
 (sm/defschema Event {:event-type EventType
                      s/Any       s/Any})
 
-; TODO i reallly think i should kill this :reads field
-(sm/defschema System {(s/optional-key :every-tick)     {(s/optional-key :reads) #{s/Keyword}
-                                                        :fn                     s/Any}
+(sm/defschema System {(s/optional-key :tick-fn)        s/Any
                       (s/optional-key :event-handlers) [{:event-type EventType
                                                          :fn         s/Any}]})
