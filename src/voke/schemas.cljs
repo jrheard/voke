@@ -7,6 +7,8 @@
 (sm/defschema Direction (s/enum :up :right :down :left))
 (sm/defschema IntendedDirection #{Direction})
 
+(sm/defschema Axis (s/enum :x :y))
+
 ; TODO - split x/y out of Shape and into a Position
 ; so that rendering-shapes can look different from collision shapes without duplicating x/y info
 (sm/defschema Shape {:x           s/Num

@@ -2,7 +2,7 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity Event System]]
+            [voke.schemas :refer [Axis Entity Event System]]
             [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
 
@@ -82,7 +82,7 @@
 
 (sm/defn apply-movement
   [entity :- Entity
-   axis :- (s/enum :x :y)
+   axis :- Axis
    new-position :- s/Num
    new-velocity :- s/Num]
   "Fires events to notify the world that a particular entity should have a new position+velocity."

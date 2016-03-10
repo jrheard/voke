@@ -3,7 +3,7 @@
             [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Direction Entity GameState System]])
+            [voke.schemas :refer [Axis Direction Entity GameState System]])
   (:require-macros [schema.core :as sm]))
 
 ; A dumb-as-rocks velocity/acceleration system.
@@ -68,7 +68,7 @@
 
 (sm/defn ^:private -update-axis-velocity :- Entity
   [entity :- Entity
-   axis :- (s/enum :x :y)
+   axis :- Axis
    trig-fn]
   (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
                        (safe-get-in entity [:motion :max-acceleration])

@@ -2,7 +2,7 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.entity :refer [projectile]]
-            [voke.schemas :refer [Entity System]]
+            [voke.schemas :refer [Axis Entity System]]
             [voke.util :refer [now]])
   (:require-macros [schema.core :as sm]))
 
@@ -25,8 +25,7 @@
 
 (sm/defn entity-velocity-contribution
   [entity :- Entity
-   ; TODO make an Axis schema
-   axis :- (s/enum :x :y)]
+   axis :- Axis]
   (let [axis-velocity (safe-get-in entity [:motion :velocity axis])]
     (if (pos? axis-velocity)
       (min maximum-entity-velocity-shot-speed-contribution axis-velocity)
