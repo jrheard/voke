@@ -3,6 +3,7 @@
   (:require [voke.schemas :refer [EventType]])
   (:require-macros [schema.core :as sm]))
 
+; A map of {event-name -> [event-handler-fn]}.
 (def ^:private registry (atom {}))
 
 (sm/defn publish-event [event]

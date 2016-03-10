@@ -1,8 +1,6 @@
 (ns voke.input
   (:require [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
-            [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Entity GameState System]]
             [voke.state :refer [update-entity!]]
             [voke.util :refer [in?]])
   (:import [goog.events KeyCodes])

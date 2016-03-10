@@ -13,6 +13,8 @@
 
 (def maximum-entity-velocity-shot-speed-contribution 2)
 
+;; everything in here is gross and that is ok for now
+
 (sm/defn can-attack? :- s/Bool
   [entity :- Entity]
   ; TODO support monsters
