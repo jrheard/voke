@@ -3,7 +3,8 @@
             [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Axis Direction Entity GameState System]])
+            [voke.schemas :refer [Axis Direction Entity GameState System]]
+            [voke.util :refer [bound-between]])
   (:require-macros [schema.core :as sm]))
 
 ; A dumb-as-rocks velocity/acceleration system.
@@ -42,6 +43,7 @@
 (sm/defn should-update-orientation? :- s/Bool
   [entity :- Entity]
   (and
+    ; TODO - support monsters
     (get-in entity [:brain :intended-move-direction])
     (not-empty (human-controlled-entity-movement-directions entity))))
 
@@ -66,28 +68,29 @@
           (not= (safe-get-in entity [:motion :velocity :x]) 0)
           (not= (safe-get-in entity [:motion :velocity :y]) 0)))))
 
+(sm/defn get-acceleration :- s/Num
+  [entity :- Entity]
+  ; TODO - support monsters
+  (if (not-empty (human-controlled-entity-movement-directions entity))
+    (safe-get-in entity [:motion :max-acceleration])
+    0))
+
 (sm/defn ^:private -update-axis-velocity :- Entity
   [entity :- Entity
    axis :- Axis
-   trig-fn]
-  (let [acceleration (if (not-empty (human-controlled-entity-movement-directions entity))
-                       (safe-get-in entity [:motion :max-acceleration])
-                       0)
-        axis-velocity (safe-get-in entity [:motion :velocity axis])
+   trig-fn :- (s/enum Math/cos Math/sin)]
+  (let [axis-velocity (safe-get-in entity [:motion :velocity axis])
         new-velocity (+ axis-velocity
-                        (* acceleration
+                        (* (get-acceleration entity)
                            (trig-fn (safe-get-in entity [:shape :orientation]))))
         max-speed (safe-get-in entity [:motion :max-speed])
-        new-velocity (if (pos? new-velocity)
-                       (min max-speed new-velocity)
-                       (max (- max-speed) new-velocity))]
-    (if (> (Math/abs new-velocity) min-velocity)
-      (assoc-in entity [:motion :velocity axis] new-velocity)
+        capped-velocity (bound-between new-velocity (- max-speed) max-speed)]
+    (if (> (Math/abs capped-velocity) min-velocity)
+      (assoc-in entity [:motion :velocity axis] capped-velocity)
       (assoc-in entity [:motion :velocity axis] 0))))
 
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
-  ; TODO - currently only implemented for player-controlled entities, doesn't handle monsters
   (if (should-update-velocity? entity)
     (-> entity
         (-update-axis-velocity :x Math/cos)

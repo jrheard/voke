@@ -8,3 +8,10 @@
 (defn now
   []
   (.getTime (js/Date.)))
+
+(defn bound-between
+  [num lower upper]
+  (cond
+    (< num lower) lower
+    (> num upper) upper
+    :else num))

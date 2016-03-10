@@ -1964,5 +1964,6 @@ notes from paper, mainly about priorities / next things to work on:
    * spawn some sort of "ghost" bullet (decal?) at the bullet's contact site right after it dies, have it
      live for 1-2 frames (maybe this idea has potential)
 5) get source maps to actually work so that i can debug this perf issue more easily
-
+6) go through codebase and resolve any obvious TODOs worth immediately resolving
+7) camera
 

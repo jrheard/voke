@@ -3,7 +3,7 @@
             [schema.core :as s]
             [voke.entity :refer [projectile]]
             [voke.schemas :refer [Axis Entity System]]
-            [voke.util :refer [now]])
+            [voke.util :refer [bound-between now]])
   (:require-macros [schema.core :as sm]))
 
 (def directions-to-velocity-multipliers {:down  {:y 5}
@@ -26,10 +26,9 @@
 (sm/defn entity-velocity-contribution
   [entity :- Entity
    axis :- Axis]
-  (let [axis-velocity (safe-get-in entity [:motion :velocity axis])]
-    (if (pos? axis-velocity)
-      (min maximum-entity-velocity-shot-speed-contribution axis-velocity)
-      (max (- maximum-entity-velocity-shot-speed-contribution) axis-velocity))))
+  (bound-between (safe-get-in entity [:motion :velocity axis])
+                 (- maximum-entity-velocity-shot-speed-contribution)
+                 maximum-entity-velocity-shot-speed-contribution))
 
 (sm/defn process-firing-entities :- [Entity]
   [entities :- [Entity]]

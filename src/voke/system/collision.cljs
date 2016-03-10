@@ -104,13 +104,13 @@
 
     ; This entity doesn't need to be destroyed on contact. Let it live.
     (if-let [closest-clear-spot (find-closest-clear-spot event contacted-entity)]
-      ; Great, we found a clear spot! Move there and stand still.
+      ; Great, we found a clear spot nearby! Move there and stand still.
       (apply-movement (event :entity)
                       (event :axis)
                       closest-clear-spot
                       0)
 
-      ; Couldn't find a clear spot; slow him down, he can try moving again next tick.
+      ; Couldn't find a clear spot; slow the entity down, it can try moving again next tick.
       (update-entity! (safe-get-in event [:entity :id])
                       :collision-system
                       (fn [old-entity]
