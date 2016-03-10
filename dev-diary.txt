@@ -1933,3 +1933,11 @@ and calling it directly right before the end of every rAF tick. i think i'm goin
 ok, that seems to have improved things.
 except now, entities that collide with the left or right wall don't get removed, but ones that collide with the
 top or bottom one are removed just fine. what gives?
+
+fixed it by changing the place where :entity-removed events are emitted.
+
+perf is okay, but suffers when there are ~30-40 projectiles on the screen at once.
+i tried putting entities-can-collide behind a cache, but it's still called so many times per second that even the overhead
+of looking in the cache n^2 times per tick is too expensive to keep up to realtime.
+implementing quadtrees should likely fix this.
+
