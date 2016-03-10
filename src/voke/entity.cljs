@@ -51,7 +51,7 @@
     {:shape      {:x x :y y :width width :height height :orientation orientation}
      :owner-id   owner-id
      :collision  {:type :projectile
-                  ; XXXX TODO parameterize good/bad guy
+                  ; XXXX TODO parameterize good/bad guy based on projectile owner
                   :collides-with #{:bad-guy :obstacle :item}
                   :destroyed-on-contact true}
      :renderable true

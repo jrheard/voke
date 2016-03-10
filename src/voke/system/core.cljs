@@ -66,14 +66,11 @@
     ; Listen to keyboard input.
     (handle-keyboard-events player-entity-id)
 
+    ; TODO seriously kill :reads
+
     ; Return a run-systems-every-tick function.
     (fn [state]
-      ; feels like there must be a simpler way to express this loop statement, but i haven't found one
-      ; TODO consider reduce, reduce always solves loops
-      (loop [state state
-             tick-functions (map system-to-tick-fn
-                                 (filter :every-tick systems))]
-        (if (seq tick-functions)
-          (recur ((first tick-functions) state)
-                 (rest tick-functions))
-          state)))))
+      (reduce (fn [state tick-function]
+               (tick-function state))
+             state
+             (map system-to-tick-fn (filter :every-tick systems))))))
