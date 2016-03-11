@@ -2007,7 +2007,7 @@ i'm pretty fried, i'll deal with it next time
 
 goals for today:
 
-0) revert last commit from yesterday
+[DONE] 0) revert last commit from yesterday
 
 1) rewrite core collision checking logic in vanilla JS, call out to it from cljs
   granger does this vanilla-js interop in https://github.com/ibdknox/ChromaShift
@@ -2015,3 +2015,8 @@ goals for today:
 
 2) remove :intended-movement message, have movement system call out to collision system directly
   give colliison system an attempt-movement function that movement system can use, makes coupling explicit
+
+http://www.bestinclass.dk/blog/brians-brain-optimized-clojurescript-html5 good perf writeup
+
+ok actually before steps 1 or 2, i'm going to get rid of this separate :position field and put it back
+in :shape, in :center like wtimoney does in https://github.com/wrmsr/voke/commit/27e3ab88b1bdc617c7643d64d96c5826c9d9d8b1

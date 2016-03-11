@@ -15,20 +15,19 @@
   ; FIXME only supports rectangles atm, doesn't look to see if you've got other shapes
   [entity :- Entity]
   (rectangle (js/PIXI.Graphics.)
-             (-> entity :position :x)
-             (-> entity :position :y)
+             (-> entity :shape :center :x)
+             (-> entity :shape :center :y)
              (-> entity :shape :width)
              (-> entity :shape :height)
              0x333333))
 
 (sm/defn update-obj-position!
   [obj
-   new-position :- Position
    shape :- Shape]
   ; xxx also only supports rectangles
   (doto obj
-    (aset "x" (- (new-position :x) (/ (shape :width) 2)))
-    (aset "y" (- (new-position :y) (/ (shape :height) 2)))))
+    (aset "x" (- (get-in shape [:center :x]) (/ (shape :width) 2)))
+    (aset "y" (- (get-in shape [:center :y]) (/ (shape :height) 2)))))
 
 (defn make-renderer [width height node]
   (doto (js/PIXI.CanvasRenderer.

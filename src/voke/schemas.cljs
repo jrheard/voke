@@ -13,10 +13,11 @@
                         :y s/Num})
 
 (sm/defschema Shape {:type        (s/enum :rectangle :circle)
+                     :center      Position
                      :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
 
-(sm/defschema ProjectileShape (dissoc Shape :orientation))
+(sm/defschema ProjectileShape (dissoc Shape :orientation :center))
 
 (sm/defschema Motion {:velocity             {:x s/Num
                                              :y s/Num}
@@ -25,7 +26,7 @@
                       :max-acceleration     s/Num})
 
 (sm/defschema Weapon {:last-attack-timestamp s/Int
-                      :projectile-shape ProjectileShape})
+                      :projectile-shape      ProjectileShape})
 
 (sm/defschema Brain {:type                    (s/enum :player :skeleton :projectile)
                      ; TODO - these will be *angles* for non-player entities, not sets!!!!!
@@ -49,7 +50,6 @@
 
 (sm/defschema Entity {:id                          EntityID
                       :shape                       Shape
-                      :position                    Position
                       (s/optional-key :motion)     Motion
                       ; If it doesn't have a :collision, the entity isn't collidable.
                       (s/optional-key :collision)  Collision

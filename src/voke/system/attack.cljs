@@ -48,7 +48,7 @@
                    [:weapon :last-attack-timestamp]
                    (now))
          (projectile (entity :id)
-                     (entity :position)
+                     (safe-get-in entity [:shape :center])
                      (safe-get-in entity [:weapon :projectile-shape])
                      (safe-get-in entity [:shape :orientation])
                      x-velocity

@@ -22,17 +22,20 @@
 (sm/defn make-weapon :- Weapon
   []
   {:last-attack-timestamp 0
-   :projectile-shape {:type :rectangle
-                      :width 10
-                      :height 10}})
+   :projectile-shape      {:type   :rectangle
+                           :width  10
+                           :height 10}})
 
 ;; Public
 
 (sm/defn player :- Entity
   [x y]
   (make-entity
-    {:position   {:x x :y y}
-     :shape      {:width 25 :height 25 :type :rectangle :orientation 0}
+    {:shape      {:width       25
+                  :height      25
+                  :type        :rectangle
+                  :orientation 0
+                  :center      {:x x :y y}}
      :motion     {:velocity             {:x 0 :y 0}
                   :affected-by-friction true
                   :max-acceleration     2.0
@@ -45,16 +48,19 @@
 (sm/defn wall :- Entity
   [x y width height]
   (make-entity
-    {:position   {:x x :y y}
-     :shape      {:width width :height height :type :rectangle :orientation 0}
+    {:shape      {:width       width
+                  :height      height
+                  :type        :rectangle
+                  :orientation 0
+                  :center      {:x x :y y}}
      :collision  {:type :obstacle}
      :renderable true}))
 
 (sm/defn projectile :- Entity
   [owner-id position projectile-shape orientation x-velocity y-velocity]
   (make-entity
-    {:position   position
-     :shape      (assoc projectile-shape :orientation orientation)
+    {:shape      (assoc projectile-shape :orientation orientation
+                                         :center position)
      :owner-id   owner-id
      :collision  {:type                 :projectile
                   ; XXXX TODO parameterize good/bad guy based on projectile owner

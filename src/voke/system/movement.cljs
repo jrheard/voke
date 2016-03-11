@@ -112,7 +112,7 @@
   (reduce
     (fn [entity axis]
       (update-in entity
-                 [:position axis]
+                 [:shape :center axis]
                  #(+ % (safe-get-in entity [:motion :velocity axis]))))
     entity
     [:x :y]))
@@ -141,7 +141,7 @@
                                       :entity       entity
                                       :axis         axis
                                       :new-position (safe-get-in moved-entity
-                                                                 [:position axis])
+                                                                 [:shape :center axis])
                                       :new-velocity (safe-get-in moved-entity
                                                                  [:motion :velocity axis])
                                       ; XXXX does this system actually work at all?

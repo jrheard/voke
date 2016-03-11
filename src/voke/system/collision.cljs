@@ -6,27 +6,21 @@
             [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
 
-(defn left-edge-x [rect] (- (rect :x)
+(defn left-edge-x [rect] (- (-> rect :center :x)
                             (/ (rect :width) 2)))
-(defn right-edge-x [rect] (+ (rect :x)
+(defn right-edge-x [rect] (+ (-> rect :center :x)
                              (/ (rect :width) 2)))
-(defn top-edge-y [rect] (- (rect :y)
+(defn top-edge-y [rect] (- (-> rect :center :y)
                            (/ (rect :height) 2)))
-(defn bottom-edge-y [rect] (+ (rect :y)
+(defn bottom-edge-y [rect] (+ (-> rect :center :y)
                               (/ (rect :height) 2)))
 
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
 
-(sm/defschema PositionedShape (merge Shape Position))
-
-(sm/defn get-positioned-shape :- PositionedShape
-  [entity :- Entity]
-  (merge (entity :shape) (entity :position)))
-
 (sm/defn shapes-collide? :- s/Bool
-  [shape1 :- PositionedShape
-   shape2 :- PositionedShape]
+  [shape1 :- Shape
+   shape2 :- Shape]
   ; right now everything's just aabbs
   ; when that changes, this function will need to get smarter
   (not-any? identity
@@ -66,7 +60,7 @@
    all-entities :- [Entity]]
   (let [collidable-entities (filter (partial entities-can-collide? entity)
                                     all-entities)]
-    (first (filter #(shapes-collide? (get-positioned-shape %) (get-positioned-shape entity))
+    (first (filter #(shapes-collide? (% :shape) (entity :shape))
                    collidable-entities))))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
@@ -77,16 +71,16 @@
   that entity A can occupy without contacting entity B and returns it if entity A fits there, or returns nil
   if no open spot exists."
   ; TODO - only supports rectangles
-  (let [shape1 (get-positioned-shape (event :entity))
-        shape2 (get-positioned-shape contacted-entity)
+  (let [shape1 ((event :entity) :shape)
+        shape2 (contacted-entity :shape)
         arithmetic-fn (if (pos? (event :new-velocity)) - +)
         field (if (= (event :axis) :x) :width :height)
-        axis-value-to-try (arithmetic-fn (shape2 (event :axis))
+        axis-value-to-try (arithmetic-fn (get-in shape2 [:center (event :axis)])
                                          (/ (shape2 field) 2)
                                          (/ (shape1 field) 2)
                                          0.01)]
     (when-not (find-contacting-entity (assoc-in (event :entity)
-                                                [:position (event :axis)]
+                                                [:shape :center (event :axis)]
                                                 axis-value-to-try)
                                       (event :all-entities))
       axis-value-to-try)))
@@ -100,7 +94,7 @@
   (let [update-entity-fn (fn [entity]
                            (assert entity)
                            (-> entity
-                               (assoc-in [:position axis] new-position)
+                               (assoc-in [:shape :center axis] new-position)
                                (assoc-in [:motion :velocity axis] new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
     (publish-event {:event-type :movement
@@ -136,7 +130,7 @@
   [event :- Event]
   (let [entity (event :entity)
         moved-entity (assoc-in entity
-                               [:position (event :axis)]
+                               [:shape :center (event :axis)]
                                (event :new-position))]
 
     (if-let [contacted-entity (find-contacting-entity moved-entity (event :all-entities))]
