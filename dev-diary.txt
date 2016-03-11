@@ -2000,3 +2000,18 @@ lol ok i managed to make collision detection faster but fuck up a bunch of stuff
 walls aren't colliding in the right places (likely due to this afternoon's :position shenanigans)
 and also if the player touches a wall, the game crashes
 i'm pretty fried, i'll deal with it next time
+
+===
+
+3/11/16
+
+goals for today:
+
+0) revert last commit from yesterday
+
+1) rewrite core collision checking logic in vanilla JS, call out to it from cljs
+  granger does this vanilla-js interop in https://github.com/ibdknox/ChromaShift
+  https://github.com/liabru/matter-js/tree/master/src/collision has well-annotated js collision detection code
+
+2) remove :intended-movement message, have movement system call out to collision system directly
+  give colliison system an attempt-movement function that movement system can use, makes coupling explicit
