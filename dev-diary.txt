@@ -1947,8 +1947,8 @@ implementing quadtrees should likely fix this.
 
 notes from paper, mainly about priorities / next things to work on:
 
-1) document/refactor attack branch
-2) everything should have a :position and a :shape; split :x and :y out of :shape and put 'em in :position
+[DONE] 1) document/refactor attack branch
+[DONE] 2) everything should have a :position and a :shape; split :x and :y out of :shape and put 'em in :position
    main use case for this right now is so that weapons can have a :projectile-shape that's a Shape
 3) add a debug view, use reagent
    mainly thinking about having a slider and arrows, both of which let you revisit previous frames of history
@@ -1963,7 +1963,30 @@ notes from paper, mainly about priorities / next things to work on:
      it so that it's right next to its point of contact for 1 frame? don't like this idea.
    * spawn some sort of "ghost" bullet (decal?) at the bullet's contact site right after it dies, have it
      live for 1-2 frames (maybe this idea has potential)
-5) get source maps to actually work so that i can debug this perf issue more easily
+[DONE] 5) get source maps to actually work so that i can debug this perf issue more easily
 6) go through codebase and resolve any obvious TODOs worth immediately resolving
 7) camera
 
+okay, #1 and #2 are done
+
+what do i want to do next?
+
+#5 i guess?
+
+ok, that was a fucking disaster, i burned 2 hours tweaking project.clj settings and in the end all i had
+to do was restart chrome. oh well. source maps work now.
+
+profiling indicates that when a ton of projectiles are on the screen, we spend:
+77% of our time in move-system-tick
+71% of our time in handle-intended-movement
+65% of our time in find-contacting-entity
+45% of our time in entities-can-collide
+***4.5%**** of our time in shapes-collide (actually *checking* for collisions!!!!)
+
+really gettin' familiar with the chrome profiling tools. good stuff. no obvious conclusions yet though
+
+i wonder if it would be helpful to serialize the game's state during peak slowdown (where we're taking ~40ms/frame)
+and then load it up and just run move-system-tick on it once and see what happens
+
+AHA! i was making an instance of this "one-way-collision-check" function every single time two entities
+were being checked for collidability! no wonder that was slow! we got back a *ton* of fps by fixing this.

@@ -35,29 +35,33 @@
              (> (left-edge-x shape1) (right-edge-x shape2))
              (< (right-edge-x shape1) (left-edge-x shape2))]))
 
+(sm/defn -one-way-collidability-check :- s/Bool
+  ; Critical path! Keep fast!
+  [a :- Entity
+   b :- Entity]
+  (and
+    (contains? a :collision)
+    (not= (a :id) (b :id))
+    (if (contains? (a :collision) :collides-with)
+      (contains? (get-in a [:collision :collides-with])
+                 (get-in b [:collision :type]))
+      true)))
+
 (sm/defn entities-can-collide? :- s/Bool
   "Returns true if two entities are *able* to collide with one another, false otherwise.
 
   Does *not* check to see if the two entities are *actually* colliding!!!!"
+  ; Critical path! Keep fast!
   [entity :- Entity
    another-entity :- Entity]
-  (let [one-way-collision-check (sm/fn :- s/Bool
-                                  [a :- Entity
-                                   b :- Entity]
-                                  (and
-                                    (contains? a :collision)
-                                    (not= (a :id) (b :id))
-                                    (if (contains? (a :collision) :collides-with)
-                                      (contains? (safe-get-in a [:collision :collides-with])
-                                                 (safe-get-in b [:collision :type]))
-                                      true)))]
-    (and (one-way-collision-check entity another-entity)
-         (one-way-collision-check another-entity entity))))
+  (and (-one-way-collidability-check entity another-entity)
+       (-one-way-collidability-check another-entity entity)))
 
 (sm/defn find-contacting-entity :- (s/maybe Entity)
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
   Entities in the game. Returns another Entity if the space `entity` is trying to occupy is already filled,
   nil if the space `entity` is trying to occupy is empty."
+  ; Critical path! Keep fast!
   [entity :- Entity
    all-entities :- [Entity]]
   (let [collidable-entities (filter (partial entities-can-collide? entity)
