@@ -1,6 +1,6 @@
 (ns voke.pixi
   (:require [cljsjs.pixi]
-            [voke.schemas :refer [Entity Shape System]])
+            [voke.schemas :refer [Entity Position Shape System]])
   (:require-macros [schema.core :as sm]))
 
 (defn rectangle [graphic x y w h color]
@@ -23,12 +23,12 @@
 
 (sm/defn update-obj-position!
   [obj
-   new-position :- Shape]
+   new-position :- Position
+   shape :- Shape]
   ; xxx also only supports rectangles
-  (let [{:keys [x y width height]} new-position]
-    (doto obj
-      (aset "x" (- x (/ width 2)))
-      (aset "y" (- y (/ height 2))))))
+  (doto obj
+    (aset "x" (- (new-position :x) (/ (shape :width) 2)))
+    (aset "y" (- (new-position :y) (/ (shape :height) 2)))))
 
 (defn make-renderer [width height node]
   (doto (js/PIXI.CanvasRenderer.

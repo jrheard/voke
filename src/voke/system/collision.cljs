@@ -2,7 +2,7 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Axis Entity EntityID Event Position Shape System]]
+            [voke.schemas :refer [Axis Entity Event Position Shape System]]
             [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
 
@@ -38,17 +38,14 @@
 (sm/defn -one-way-collidability-check :- s/Bool
   ; Critical path! Keep fast!
   [a :- Entity
-   a-id :- EntityID
-   b :- Entity
-   b-id :- EntityID]
-  (let [a-collision (a :collision)
-        a-collides-with (a-collision :collides-with)]
-    (and
-      a-collision
-      (not (== a-id b-id))
-      (if a-collides-with
-        (contains? a-collides-with (-> b :collision :type))
-        true))))
+   b :- Entity]
+  (and
+    (contains? a :collision)
+    (not= (a :id) (b :id))
+    (if (contains? (a :collision) :collides-with)
+      (contains? (get-in a [:collision :collides-with])
+                 (get-in b [:collision :type]))
+      true)))
 
 (sm/defn entities-can-collide? :- s/Bool
   "Returns true if two entities are *able* to collide with one another, false otherwise.
@@ -57,10 +54,8 @@
   ; Critical path! Keep fast!
   [entity :- Entity
    another-entity :- Entity]
-  (let [entity-id (entity :id)
-        another-entity-id (another-entity :id)]
-    (and (-one-way-collidability-check entity entity-id another-entity another-entity-id)
-         (-one-way-collidability-check another-entity another-entity-id entity entity-id))))
+  (and (-one-way-collidability-check entity another-entity)
+       (-one-way-collidability-check another-entity entity)))
 
 (sm/defn find-contacting-entity :- (s/maybe Entity)
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
@@ -69,14 +64,10 @@
   ; Critical path! Keep fast!
   [entity :- Entity
    all-entities :- [Entity]]
-  (let [collidable-entity-shapes (keep (fn [another-entity]
-                                         (if (entities-can-collide? entity another-entity)
-                                           (get-positioned-shape another-entity)))
-                                       all-entities)
-        entity-positioned-shape (get-positioned-shape entity)]
-    ; XXXX FUCK
-    (first (filter #(shapes-collide? % entity-positioned-shape)
-                   collidable-entity-shapes))))
+  (let [collidable-entities (filter (partial entities-can-collide? entity)
+                                    all-entities)]
+    (first (filter #(shapes-collide? (get-positioned-shape %) (get-positioned-shape entity))
+                   collidable-entities))))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
   [event :- Event
@@ -86,7 +77,6 @@
   that entity A can occupy without contacting entity B and returns it if entity A fits there, or returns nil
   if no open spot exists."
   ; TODO - only supports rectangles
-  (js/console.log (clj->js contacted-entity))
   (let [shape1 (get-positioned-shape (event :entity))
         shape2 (get-positioned-shape contacted-entity)
         arithmetic-fn (if (pos? (event :new-velocity)) - +)
