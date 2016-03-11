@@ -1995,3 +1995,8 @@ ok, now one-way-collidability-check takes 25% of our time
 6.66% in get-in
 4.23% in not-eq
 
+lol ok i managed to make collision detection faster but fuck up a bunch of stuff in the process
+
+walls aren't colliding in the right places (likely due to this afternoon's :position shenanigans)
+and also if the player touches a wall, the game crashes
+i'm pretty fried, i'll deal with it next time

@@ -74,6 +74,7 @@
                                            (get-positioned-shape another-entity)))
                                        all-entities)
         entity-positioned-shape (get-positioned-shape entity)]
+    ; XXXX FUCK
     (first (filter #(shapes-collide? % entity-positioned-shape)
                    collidable-entity-shapes))))
 
@@ -85,6 +86,7 @@
   that entity A can occupy without contacting entity B and returns it if entity A fits there, or returns nil
   if no open spot exists."
   ; TODO - only supports rectangles
+  (js/console.log (clj->js contacted-entity))
   (let [shape1 (get-positioned-shape (event :entity))
         shape2 (get-positioned-shape contacted-entity)
         arithmetic-fn (if (pos? (event :new-velocity)) - +)
