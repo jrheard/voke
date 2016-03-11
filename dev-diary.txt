@@ -1990,3 +1990,8 @@ and then load it up and just run move-system-tick on it once and see what happen
 
 AHA! i was making an instance of this "one-way-collision-check" function every single time two entities
 were being checked for collidability! no wonder that was slow! we got back a *ton* of fps by fixing this.
+
+ok, now one-way-collidability-check takes 25% of our time
+6.66% in get-in
+4.23% in not-eq
+
