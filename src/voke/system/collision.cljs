@@ -2,54 +2,48 @@
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Axis Entity Event Position Shape System]]
+            [voke.schemas :refer [Axis Entity EntityID Event Position Shape System]]
             [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
-
-(defn left-edge-x [rect] (- (-> rect :center :x)
-                            (/ (rect :width) 2)))
-(defn right-edge-x [rect] (+ (-> rect :center :x)
-                             (/ (rect :width) 2)))
-(defn top-edge-y [rect] (- (-> rect :center :y)
-                           (/ (rect :height) 2)))
-(defn bottom-edge-y [rect] (+ (-> rect :center :y)
-                              (/ (rect :height) 2)))
 
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
 
-(sm/defn shapes-collide? :- s/Bool
-  [shape1 :- Shape
-   shape2 :- Shape]
-  ; right now everything's just aabbs
-  ; when that changes, this function will need to get smarter
-  (not-any? identity
-            [(< (bottom-edge-y shape1) (top-edge-y shape2))
-             (> (top-edge-y shape1) (bottom-edge-y shape2))
-             (> (left-edge-x shape1) (right-edge-x shape2))
-             (< (right-edge-x shape1) (left-edge-x shape2))]))
+(defn to-arr [xs fun]
+  (let [arr (array)]
+    (doseq [x xs]
+      (.push arr (fun x)))
+    arr))
 
-(sm/defn -one-way-collidability-check :- s/Bool
-  ; Critical path! Keep fast!
-  [a :- Entity
-   b :- Entity]
-  (and
-    (contains? a :collision)
-    (not= (a :id) (b :id))
-    (if (contains? (a :collision) :collides-with)
-      (contains? (get-in a [:collision :collides-with])
-                 (get-in b [:collision :type]))
-      true)))
+(sm/defn entity->js-obj
+  [entity :- Entity]
+  (let [collision (get entity :collision {})
+        collides-with (collision :collides-with)
+        collision-obj #js {:type          (name (collision :type))
+                           :collides-with (if collides-with
+                                            (to-arr collides-with name)
+                                            nil)}
+        shape (get entity :shape {})
+        center (get shape :center {})
+        center-obj #js {:x (center :x)
+                        :y (center :y)}
+        shape-obj #js {:center center-obj
+                       :width  (shape :width)
+                       :height (shape :height)}]
 
-(sm/defn entities-can-collide? :- s/Bool
-  "Returns true if two entities are *able* to collide with one another, false otherwise.
+    #js {:id        (entity :id)
+         :collision collision-obj
+         :shape     shape-obj}))
 
-  Does *not* check to see if the two entities are *actually* colliding!!!!"
-  ; Critical path! Keep fast!
-  [entity :- Entity
-   another-entity :- Entity]
-  (and (-one-way-collidability-check entity another-entity)
-       (-one-way-collidability-check another-entity entity)))
+(sm/defn entities->js-objs
+  [entities :- [Entity]]
+  (to-arr entities entity->js-obj))
+
+(sm/defn find-entity-with-id :- Entity
+  [entities :- [Entity]
+   id :- EntityID]
+  (some #(when (== (% :id) id) %)
+        entities))
 
 (sm/defn find-contacting-entity :- (s/maybe Entity)
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
@@ -58,10 +52,9 @@
   ; Critical path! Keep fast!
   [entity :- Entity
    all-entities :- [Entity]]
-  (let [collidable-entities (filter (partial entities-can-collide? entity)
-                                    all-entities)]
-    (first (filter #(shapes-collide? (% :shape) (entity :shape))
-                   collidable-entities))))
+  (when-let [contacting-entity-id (js/Collision.findContactingEntityID (entity->js-obj entity)
+                                                                       (entities->js-objs all-entities))]
+    (find-entity-with-id all-entities contacting-entity-id)))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
   [event :- Event

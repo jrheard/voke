@@ -2020,3 +2020,37 @@ http://www.bestinclass.dk/blog/brians-brain-optimized-clojurescript-html5 good p
 
 ok actually before steps 1 or 2, i'm going to get rid of this separate :position field and put it back
 in :shape, in :center like wtimoney does in https://github.com/wrmsr/voke/commit/27e3ab88b1bdc617c7643d64d96c5826c9d9d8b1
+
+cool that was pretty easy, hopefully i didn't miss anything
+
+on to step 1
+
+ibdknox makes it looks pretty easy. he writes a vanilla js file, game.js:
+https://github.com/ibdknox/ChromaShift/blob/master/js/game.js
+
+which basically just defines a namespace and some functions (it looks like he's doing some sort of mapping
+of entities to components and vice versa), and makes them available on window.Game.
+
+and so to access these plain js functions from cljs, in
+https://github.com/ibdknox/ChromaShift/blob/master/cljs/game/lib/core.cljs
+he just accesses js/Game.a-fn-name
+
+so let's try that.
+
+making some progress on this approach. hilariously, the major bottleneck is converting clj datastructures
+to js objects.
+
+right now, on a profile where we spend 3161ms in process-frame,
+we spend 2120ms converting entities to js objects
+we spend 51ms actually checking for collisions
+
+so if i can optimize the conversion codepath, we should be groovy.
+
+ok continuing to work on optimizing conversions, but i'm seeing all sorts of weird perf behavior
+(and btw there are some bugs in the vanilla js collision code, collisions don't seem to be happening at all)
+
+so we spend 80% of our time in entities->js-objs
+
+oh right uh maybe the reason that things get worse over time is that COLLISION DETECTION ISN'T WORKING
+SO NO BULLETS EVER GET REMOVED
+DUH
