@@ -3,6 +3,16 @@
 var entitiesByID = {};
 
 var Collision = {
+    shallowCopy: function(obj) {
+        var newObj = {};
+        for(var i in obj) {
+            if(obj.hasOwnProperty(i)) {
+                newObj[i] = obj[i];
+            }
+        }
+        return newObj;
+    },
+
     addEntity: function(entity) {
         entitiesByID[entity.id] = entity;
     },
@@ -15,6 +25,8 @@ var Collision = {
         delete entitiesByID[entityID];
     },
 
+    // NOTE: MAKE SURE COLLISION SYSTEM IS NOTIFIED WHENEVER THE VALUES OF ANY OF THESE FIELDS CHANGE
+    // (e.g. if somehow an entity's collides-with list changes mid-game, that's important to know!)
     oneWayCollidabilityCheck: function(a, b) {
         if (!a.collision || !b.collision) {
             return false;
@@ -60,18 +72,27 @@ var Collision = {
         );
     },
 
-    findContactingEntityID: function(entity) {
+    findContactingEntityID: function(entityID, axis, new_position) {
+        var movingEntity = entitiesByID[entityID];
+
         var allEntities = [];
-        for (var entityID in entitiesByID) {
-            allEntities.push(entitiesByID[entityID]);
+        for (var id in entitiesByID) {
+            allEntities.push(entitiesByID[id]);
         }
 
         var collidableEntities = allEntities.filter(function(anotherEntity) {
-            return this.entitiesCanCollide(entity, anotherEntity);
+            return this.entitiesCanCollide(movingEntity, anotherEntity);
         }.bind(this));
 
+        var newShape = this.shallowCopy(movingEntity.shape);
+        newShape.center = {
+            x: movingEntity.shape.center.x,
+            y: movingEntity.shape.center.y
+        };
+        newShape.center[axis] = new_position;
+
         var collidingEntities = collidableEntities.filter(function(anotherEntity) {
-            return this.shapesCollide(entity.shape, anotherEntity.shape);
+            return this.shapesCollide(newShape, anotherEntity.shape);
         }.bind(this));
 
         var collidingEntity = collidingEntities[0];

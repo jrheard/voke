@@ -10,35 +10,11 @@
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
 
-(defn to-arr [xs fun]
-  (let [arr (array)]
-    (doseq [x xs]
-      (.push arr (fun x)))
-    arr))
-
-(sm/defn entity->js
-  [entity :- Entity]
-  (let [collision (get entity :collision {})
-        collides-with (collision :collides-with)
-        collision-obj #js {:type          (name (collision :type))
-                           :collides-with (if collides-with
-                                            (to-arr collides-with name)
-                                            nil)}
-        shape (get entity :shape {})
-        center (get shape :center {})
-        center-obj #js {:x (center :x)
-                        :y (center :y)}
-        shape-obj #js {:center center-obj
-                       :width  (shape :width)
-                       :height (shape :height)}]
-
-    #js {:id        (entity :id)
-         :collision collision-obj
-         :shape     shape-obj}))
-
 (sm/defn -track-entity
   [entity :- Entity]
-  (js/Collision.addEntity (entity->js entity)))
+  (js/Collision.addEntity (clj->js
+                            (select-keys entity
+                                         [:id :collision :shape]))))
 
 (defn -update-entity-position
   [entity-id axis new-position]
@@ -60,10 +36,13 @@
   nil if the space `entity` is trying to occupy is empty."
   ; Critical path! Keep fast!
   [entity :- Entity
+   axis :- Axis
+   new-position :- s/Num
    all-entities :- [Entity]]
-  (let [contacting-entity-id (js/Collision.findContactingEntityID (entity->js entity))]
-    (when contacting-entity-id
-      (find-entity-with-id all-entities contacting-entity-id))))
+  (when-let [contacting-entity-id (js/Collision.findContactingEntityID (entity :id)
+                                                                       (name axis)
+                                                                       new-position)]
+    (find-entity-with-id all-entities contacting-entity-id)))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
   [entity :- Entity
@@ -84,10 +63,7 @@
                                          (/ (shape2 field) 2)
                                          (/ (shape1 field) 2)
                                          0.01)]
-    (when-not (find-contacting-entity (assoc-in entity
-                                                [:shape :center axis]
-                                                axis-value-to-try)
-                                      all-entities)
+    (when-not (find-contacting-entity entity axis axis-value-to-try all-entities)
       axis-value-to-try)))
 
 (sm/defn apply-movement
@@ -139,13 +115,9 @@
 
 (defn attempt-to-move!
   [entity axis new-position new-velocity all-entities]
-  (let [moved-entity (assoc-in entity
-                               [:shape :center axis]
-                               new-position)]
-
-    (if-let [contacted-entity (find-contacting-entity moved-entity all-entities)]
-      (handle-contact entity axis new-velocity contacted-entity all-entities)
-      (apply-movement entity axis new-position new-velocity))))
+  (if-let [contacted-entity (find-contacting-entity entity axis new-position all-entities)]
+    (handle-contact entity axis new-velocity contacted-entity all-entities)
+    (apply-movement entity axis new-position new-velocity)))
 
 ;; System definition
 

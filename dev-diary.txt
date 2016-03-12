@@ -2076,7 +2076,7 @@ good to know
 
 notes / things i want to do next:
 
-1) remove :intended-movement event in favor of attempt-to-move function
+[DONE] 1) remove :intended-movement event in favor of attempt-to-move function
 2) stop doing separate :x and :y movements, just do one combined movement and have the collision system
    sort things out.
      most of the time, you're not colliding, so moving in 2 steps all the time makes our average-case
@@ -2092,3 +2092,8 @@ notes / things i want to do next:
    doing n^2 work. nlogn work is much much much more attractive. will need to have the quadtree live in js-land
    obviously
 
+ok, #1 was easy enough.
+right now, 13% of our time is lost inline in move-system-tick, and 8% is lost inline in attempt-to-move
+
+hm maybe that 'self' stuff the timeline view was reporting was garbage?
+the profiling view doesn't corroborate it
