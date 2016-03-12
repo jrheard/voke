@@ -2064,3 +2064,31 @@ TODOs:
 * figure out how to get vanilla Collision js file to work with closure compiler :advanced mode
 
 we can handle about 140 moving entities on the screen before we stop dropping the occasional frame, for posterity
+
+just did some benchmarks
+100 update-ins on :player cost about 1ms
+100 get-ins on :player cost about 1ms
+good to know
+
+=====
+
+3/12/16
+
+notes / things i want to do next:
+
+1) remove :intended-movement event in favor of attempt-to-move function
+2) stop doing separate :x and :y movements, just do one combined movement and have the collision system
+   sort things out.
+     most of the time, you're not colliding, so moving in 2 steps all the time makes our average-case
+     scenario slower.
+     have the collision system attempt to apply the combined x/y movement - then if you collide with something,
+     you definitely fire a contact event
+     and after that, first try to move in the x direction, then in the y direction
+     if both are blocked, that's fine. but make sure you fire *one* contact event total
+     (can you call cljs functions from js? hopefully we don't need to get to that point)
+3) read prettified compiled js to see where all the overhead is in our cljs code, then keep profiling
+   until as much overhead as possible goes away and most of the work is being done in js-land
+4) look into quadtrees. right now we have ~140 moving entities before the system begins to slow down, and we're
+   doing n^2 work. nlogn work is much much much more attractive. will need to have the quadtree live in js-land
+   obviously
+
