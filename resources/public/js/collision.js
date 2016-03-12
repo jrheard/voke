@@ -1,6 +1,19 @@
 (function(window) {
 
+var entitiesByID = {};
+
 var Collision = {
+    addEntity: function(entity) {
+        entitiesByID[entity.id] = entity;
+    },
+
+    updateEntity: function(entityID, axis, newPosition) {
+        entitiesByID[entityID].shape.center[axis] = newPosition;
+    },
+
+    removeEntity: function(entityID) {
+        delete entitiesByID[entityID];
+    },
 
     oneWayCollidabilityCheck: function(a, b) {
         if (!a.collision || !b.collision) {
@@ -47,7 +60,7 @@ var Collision = {
         );
     },
 
-    findContactingEntityID: function(entity, entitiesByID) {
+    findContactingEntityID: function(entity) {
         var allEntities = [];
         for (var entityID in entitiesByID) {
             allEntities.push(entitiesByID[entityID]);

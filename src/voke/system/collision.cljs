@@ -10,15 +10,13 @@
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
 
-(def objects-by-entity-id (js-obj))
-
 (defn to-arr [xs fun]
   (let [arr (array)]
     (doseq [x xs]
       (.push arr (fun x)))
     arr))
 
-(sm/defn entity->js-obj
+(sm/defn entity->js
   [entity :- Entity]
   (let [collision (get entity :collision {})
         collides-with (collision :collides-with)
@@ -38,6 +36,18 @@
          :collision collision-obj
          :shape     shape-obj}))
 
+(sm/defn -track-entity
+  [entity :- Entity]
+  (js/Collision.addEntity (entity->js entity)))
+
+(defn -update-entity-position
+  [entity-id axis new-position]
+  (js/Collision.updateEntity entity-id (name axis) new-position))
+
+(sm/defn -stop-tracking-entity
+  [entity-id :- EntityID]
+  (js/Collision.removeEntity entity-id))
+
 (sm/defn find-entity-with-id :- Entity
   [entities :- [Entity]
    id :- EntityID]
@@ -51,8 +61,7 @@
   ; Critical path! Keep fast!
   [entity :- Entity
    all-entities :- [Entity]]
-  (let [contacting-entity-id (js/Collision.findContactingEntityID (entity->js-obj entity)
-                                                                  objects-by-entity-id)]
+  (let [contacting-entity-id (js/Collision.findContactingEntityID (entity->js entity))]
     (when contacting-entity-id
       (find-entity-with-id all-entities contacting-entity-id))))
 
@@ -91,11 +100,7 @@
                                (assoc-in [:motion :velocity axis] new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
 
-    (let [obj (aget objects-by-entity-id (entity :id))
-          center (-> obj
-                     (aget "shape")
-                     (aget "center"))]
-      (aset center (name axis) new-position))
+    (-update-entity-position (entity :id) axis new-position)
 
     (publish-event {:event-type :movement
                     :entity     (update-entity-fn entity)})))
@@ -142,17 +147,13 @@
 (sm/def collision-system :- System
   {:initialize     (fn [game-state]
                      (doseq [entity (vals (game-state :entities))]
-                       (aset objects-by-entity-id
-                             (entity :id)
-                             (entity->js-obj entity))))
+                       (-track-entity entity)))
 
    :event-handlers [{:event-type :entity-added
                      :fn         (fn [event]
-                                   (aset objects-by-entity-id
-                                         (get-in event [:entity :id])
-                                         (entity->js-obj (event :entity))))}
+                                   (-track-entity (event :entity)))}
                     {:event-type :entity-removed
                      :fn         (fn [event]
-                                   (js-delete objects-by-entity-id (event :entity-id)))}
+                                   (-stop-tracking-entity (event :entity-id)))}
                     {:event-type :intended-movement
                      :fn         handle-intended-movement}]})
