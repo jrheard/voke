@@ -4,6 +4,7 @@
             [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Direction Entity GameState System]]
+            [voke.system.collision :refer [attempt-to-move!]]
             [voke.util :refer [bound-between]])
   (:require-macros [schema.core :as sm]))
 
@@ -137,15 +138,8 @@
 
                   (when (not= moved-entity entity)
                     (doseq [axis [:x :y]]
-                      (publish-event {:event-type   :intended-movement
-                                      :entity       entity
-                                      :axis         axis
-                                      :new-position (safe-get-in moved-entity
-                                                                 [:shape :center axis])
-                                      :new-velocity (safe-get-in moved-entity
-                                                                 [:motion :velocity axis])
-                                      ; XXXX does this system actually work at all?
-                                      ; what happens if two entities try to move to the
-                                      ; same spot in the same tick?
-                                      ; does collision system not notice?
-                                      :all-entities entities}))))))})
+                      (attempt-to-move! entity
+                                        axis
+                                        (safe-get-in moved-entity [:shape :center axis])
+                                        (safe-get-in moved-entity [:motion :velocity axis])
+                                        entities))))))})
