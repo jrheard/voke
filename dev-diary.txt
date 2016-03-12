@@ -2108,3 +2108,27 @@ these are the things that are keeping us slow:
 2) doing n^2 comparisons when doing collision checks (see #4 above)
 
 so let's tackle them in that order.
+
+ok i started on #1 but the collision system is currently all fucked up as a result
+
+gonna need to do some thinking about the best way to express the collision system doing this:
+* try moving the entity to its desired new x/y position
+  * if that works
+    * great
+  * if that doesn't work
+    * fire a contact event
+    * try moving it to its desired new x position
+      * if that works
+        * great
+      * if that doesn't work
+        * find the closest clear x position and move it there
+    * try moving it to its desired new y position
+      * if that works
+        * great
+      * if that doesn't work
+        * find the closest clear y position and move it there
+
+
+we can deal with quadtrees in a few days, the collision system cljs is likely to get a bit hairy over the
+next few hours of work and so i'll be wanting to do a good amount of refactoring on it
+because i am about to fuck it up like crazy
