@@ -1,5 +1,6 @@
 (ns voke.system.collision
-  (:require [plumbing.core :refer [safe-get-in]]
+  (:require [clojure.set :refer [difference]]
+            [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Entity EntityID Event Position Shape System]]
@@ -8,6 +9,8 @@
 
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
+
+(def objects-by-entity-id (atom {}))
 
 (defn to-arr [xs fun]
   (let [arr (array)]
@@ -35,9 +38,26 @@
          :collision collision-obj
          :shape     shape-obj}))
 
-(sm/defn entities->js-objs
+(sm/defn -update-cached-js-objects
   [entities :- [Entity]]
-  (to-arr entities entity->js-obj))
+  (let [objs @objects-by-entity-id
+        seen (js-obj)]
+
+    (doseq [entity entities]
+      (let [entity-id (entity :id)]
+        (aset seen entity-id true)
+
+        (if (contains? objs entity-id)
+          (let [obj (objs entity-id)
+                center (aget (aget obj "shape") "center")]
+            (aset center "x" (get-in entity [:shape :center :x]))
+            (aset center "y" (get-in entity [:shape :center :y])))
+
+          (swap! objects-by-entity-id assoc entity-id (clj->js entity)))))
+
+    (doseq [entity-id (keys objs)]
+      (when-not (aget seen entity-id)
+        (swap! objects-by-entity-id dissoc entity-id)))))
 
 (sm/defn find-entity-with-id :- Entity
   [entities :- [Entity]
@@ -52,9 +72,11 @@
   ; Critical path! Keep fast!
   [entity :- Entity
    all-entities :- [Entity]]
-  (when-let [contacting-entity-id (js/Collision.findContactingEntityID (entity->js-obj entity)
-                                                                       (entities->js-objs all-entities))]
-    (find-entity-with-id all-entities contacting-entity-id)))
+  (let [objs @objects-by-entity-id
+        contacting-entity-id (js/Collision.findContactingEntityID (objs (entity :id))
+                                                                  (to-arr (vals objs) identity))]
+    (when contacting-entity-id
+      (find-entity-with-id all-entities contacting-entity-id))))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
   [event :- Event
@@ -90,6 +112,13 @@
                                (assoc-in [:shape :center axis] new-position)
                                (assoc-in [:motion :velocity axis] new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
+
+    (let [obj (@objects-by-entity-id (entity :id))
+          center (-> obj
+                     (aget "shape")
+                     (aget "center"))]
+      (aset center (name axis) new-position))
+
     (publish-event {:event-type :movement
                     :entity     (update-entity-fn entity)})))
 
@@ -136,5 +165,20 @@
 ;; System definition
 
 (sm/def collision-system :- System
-  {:event-handlers [{:event-type :intended-movement
+  {:initialize     (fn [game-state]
+                     (doseq [entity (vals (game-state :entities))]
+                       (swap! objects-by-entity-id assoc (entity :id) (clj->js entity))))
+
+   :event-handlers [{:event-type :entity-added
+                     :fn         (fn [event]
+                                   (swap! objects-by-entity-id
+                                          assoc
+                                          (get-in event [:entity :id])
+                                          (clj->js (event :entity))))}
+                    {:event-type :entity-removed
+                     :fn         (fn [event]
+                                   (swap! objects-by-entity-id
+                                          dissoc
+                                          (event :entity-id)))}
+                    {:event-type :intended-movement
                      :fn         handle-intended-movement}]})

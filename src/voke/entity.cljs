@@ -1,5 +1,6 @@
 (ns voke.entity
-  (:require [voke.schemas :refer [Brain Entity Weapon]])
+  (:require [voke.events :refer [publish-event]]
+            [voke.schemas :refer [Brain Entity Weapon]])
   (:require-macros [schema.core :as sm]))
 
 (defonce next-entity-id (atom 0))
@@ -11,7 +12,10 @@
 
 (sm/defn make-entity :- Entity
   [entity-map]
-  (assoc entity-map :id (get-next-entity-id)))
+  (let [entity (assoc entity-map :id (get-next-entity-id))]
+    (publish-event {:event-type :entity-added
+                    :entity entity})
+    entity))
 
 (sm/defn make-player-brain :- Brain
   []
