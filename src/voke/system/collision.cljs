@@ -10,7 +10,7 @@
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
 
-(def objects-by-entity-id (atom {}))
+(def objects-by-entity-id (js-obj))
 
 (defn to-arr [xs fun]
   (let [arr (array)]
@@ -38,27 +38,6 @@
          :collision collision-obj
          :shape     shape-obj}))
 
-(sm/defn -update-cached-js-objects
-  [entities :- [Entity]]
-  (let [objs @objects-by-entity-id
-        seen (js-obj)]
-
-    (doseq [entity entities]
-      (let [entity-id (entity :id)]
-        (aset seen entity-id true)
-
-        (if (contains? objs entity-id)
-          (let [obj (objs entity-id)
-                center (aget (aget obj "shape") "center")]
-            (aset center "x" (get-in entity [:shape :center :x]))
-            (aset center "y" (get-in entity [:shape :center :y])))
-
-          (swap! objects-by-entity-id assoc entity-id (clj->js entity)))))
-
-    (doseq [entity-id (keys objs)]
-      (when-not (aget seen entity-id)
-        (swap! objects-by-entity-id dissoc entity-id)))))
-
 (sm/defn find-entity-with-id :- Entity
   [entities :- [Entity]
    id :- EntityID]
@@ -72,9 +51,8 @@
   ; Critical path! Keep fast!
   [entity :- Entity
    all-entities :- [Entity]]
-  (let [objs @objects-by-entity-id
-        contacting-entity-id (js/Collision.findContactingEntityID (objs (entity :id))
-                                                                  (to-arr (vals objs) identity))]
+  (let [contacting-entity-id (js/Collision.findContactingEntityID (entity->js-obj entity)
+                                                                  objects-by-entity-id)]
     (when contacting-entity-id
       (find-entity-with-id all-entities contacting-entity-id))))
 
@@ -113,7 +91,7 @@
                                (assoc-in [:motion :velocity axis] new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
 
-    (let [obj (@objects-by-entity-id (entity :id))
+    (let [obj (aget objects-by-entity-id (entity :id))
           center (-> obj
                      (aget "shape")
                      (aget "center"))]
@@ -148,37 +126,33 @@
   (publish-event {:event-type :contact
                   :entities   [(event :entity) contacted-entity]}))
 
-(sm/defn handle-intended-movement
-  [event :- Event]
-  (let [entity (event :entity)
-        moved-entity (assoc-in entity
-                               [:shape :center (event :axis)]
-                               (event :new-position))]
+; TODO have this just be a plain old function (not an event handler) called attempt-to-move
+(defn handle-intended-movement
+  [{:keys [entity axis new-position new-velocity all-entities] :as event}]
+  (let [moved-entity (assoc-in entity
+                               [:shape :center axis]
+                               new-position)]
 
-    (if-let [contacted-entity (find-contacting-entity moved-entity (event :all-entities))]
+    (if-let [contacted-entity (find-contacting-entity moved-entity all-entities)]
       (handle-contact event contacted-entity)
-      (apply-movement entity
-                      (event :axis)
-                      (event :new-position)
-                      (event :new-velocity)))))
+      (apply-movement entity axis new-position new-velocity))))
 
 ;; System definition
 
 (sm/def collision-system :- System
   {:initialize     (fn [game-state]
                      (doseq [entity (vals (game-state :entities))]
-                       (swap! objects-by-entity-id assoc (entity :id) (clj->js entity))))
+                       (aset objects-by-entity-id
+                             (entity :id)
+                             (entity->js-obj entity))))
 
    :event-handlers [{:event-type :entity-added
                      :fn         (fn [event]
-                                   (swap! objects-by-entity-id
-                                          assoc
-                                          (get-in event [:entity :id])
-                                          (clj->js (event :entity))))}
+                                   (aset objects-by-entity-id
+                                         (get-in event [:entity :id])
+                                         (entity->js-obj (event :entity))))}
                     {:event-type :entity-removed
                      :fn         (fn [event]
-                                   (swap! objects-by-entity-id
-                                          dissoc
-                                          (event :entity-id)))}
+                                   (js-delete objects-by-entity-id (event :entity-id)))}
                     {:event-type :intended-movement
                      :fn         handle-intended-movement}]})

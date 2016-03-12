@@ -47,7 +47,12 @@ var Collision = {
         );
     },
 
-    findContactingEntityID: function(entity, allEntities) {
+    findContactingEntityID: function(entity, entitiesByID) {
+        var allEntities = [];
+        for (var entityID in entitiesByID) {
+            allEntities.push(entitiesByID[entityID]);
+        }
+
         var collidableEntities = allEntities.filter(function(anotherEntity) {
             return this.entitiesCanCollide(entity, anotherEntity);
         }.bind(this));
