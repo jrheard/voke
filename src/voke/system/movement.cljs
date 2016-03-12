@@ -137,9 +137,7 @@
                                        update-position)]
 
                   (when (not= moved-entity entity)
-                    (doseq [axis [:x :y]]
-                      (attempt-to-move! entity
-                                        axis
-                                        (safe-get-in moved-entity [:shape :center axis])
-                                        (safe-get-in moved-entity [:motion :velocity axis])
-                                        entities))))))})
+                    (attempt-to-move! entity
+                                      (safe-get-in moved-entity [:shape :center])
+                                      (safe-get-in moved-entity [:motion :velocity])
+                                      entities)))))})

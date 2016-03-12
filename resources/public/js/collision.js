@@ -17,8 +17,8 @@ var Collision = {
         entitiesByID[entity.id] = entity;
     },
 
-    updateEntity: function(entityID, axis, newPosition) {
-        entitiesByID[entityID].shape.center[axis] = newPosition;
+    updateEntity: function(entityID, newCenter) {
+        entitiesByID[entityID].shape.center = newCenter;
     },
 
     removeEntity: function(entityID) {
@@ -72,7 +72,7 @@ var Collision = {
         );
     },
 
-    findContactingEntityID: function(entityID, axis, new_position) {
+    findContactingEntityID: function(entityID, newCenter) {
         var movingEntity = entitiesByID[entityID];
 
         var allEntities = [];
@@ -85,11 +85,7 @@ var Collision = {
         }.bind(this));
 
         var newShape = this.shallowCopy(movingEntity.shape);
-        newShape.center = {
-            x: movingEntity.shape.center.x,
-            y: movingEntity.shape.center.y
-        };
-        newShape.center[axis] = new_position;
+        newShape.center = newCenter;
 
         var collidingEntities = collidableEntities.filter(function(anotherEntity) {
             return this.shapesCollide(newShape, anotherEntity.shape);

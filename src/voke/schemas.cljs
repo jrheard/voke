@@ -9,18 +9,17 @@
 
 (sm/defschema Axis (s/enum :x :y))
 
-(sm/defschema Position {:x s/Num
+(sm/defschema Vector2 {:x s/Num
                         :y s/Num})
 
 (sm/defschema Shape {:type        (s/enum :rectangle :circle)
-                     :center      Position
+                     :center      Vector2
                      :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
 
 (sm/defschema ProjectileShape (dissoc Shape :orientation :center))
 
-(sm/defschema Motion {:velocity             {:x s/Num
-                                             :y s/Num}
+(sm/defschema Motion {:velocity             Vector2
                       :affected-by-friction s/Bool
                       :max-speed            s/Num
                       :max-acceleration     s/Num})

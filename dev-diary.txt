@@ -2086,7 +2086,7 @@ notes / things i want to do next:
      and after that, first try to move in the x direction, then in the y direction
      if both are blocked, that's fine. but make sure you fire *one* contact event total
      (can you call cljs functions from js? hopefully we don't need to get to that point)
-3) read prettified compiled js to see where all the overhead is in our cljs code, then keep profiling
+[mostly done] 3) read prettified compiled js to see where all the overhead is in our cljs code, then keep profiling
    until as much overhead as possible goes away and most of the work is being done in js-land
 4) look into quadtrees. right now we have ~140 moving entities before the system begins to slow down, and we're
    doing n^2 work. nlogn work is much much much more attractive. will need to have the quadtree live in js-land
@@ -2097,3 +2097,14 @@ right now, 13% of our time is lost inline in move-system-tick, and 8% is lost in
 
 hm maybe that 'self' stuff the timeline view was reporting was garbage?
 the profiling view doesn't corroborate it
+
+will stick with profiling view from now on, i think. timeline view is pretty, but kept fighting me.
+we're cpu-bound here and not doing a ton of GCs or paints or whatever, so profiling view is plenty fine.
+
+at this point, the majority of the cljs overhead i've been able to find has been optimized away.
+these are the things that are keeping us slow:
+
+1) moving in 2 steps, first x then y (see #2 above)
+2) doing n^2 comparisons when doing collision checks (see #4 above)
+
+so let's tackle them in that order.
