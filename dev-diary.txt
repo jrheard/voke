@@ -2009,7 +2009,7 @@ goals for today:
 
 [DONE] 0) revert last commit from yesterday
 
-1) rewrite core collision checking logic in vanilla JS, call out to it from cljs
+[DONE] 1) rewrite core collision checking logic in vanilla JS, call out to it from cljs
   granger does this vanilla-js interop in https://github.com/ibdknox/ChromaShift
   https://github.com/liabru/matter-js/tree/master/src/collision has well-annotated js collision detection code
 
@@ -2054,3 +2054,13 @@ so we spend 80% of our time in entities->js-objs
 oh right uh maybe the reason that things get worse over time is that COLLISION DETECTION ISN'T WORKING
 SO NO BULLETS EVER GET REMOVED
 DUH
+
+ok, like four hours later, that's enough for today
+
+tomorrow let's circle back and clean up / document the state of the collision system
+
+TODOs:
+* kill :intended-movement message in favor of attempt-to-move function
+* figure out how to get vanilla Collision js file to work with closure compiler :advanced mode
+
+we can handle about 140 moving entities on the screen before we stop dropping the occasional frame, for posterity
