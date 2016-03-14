@@ -27,13 +27,19 @@
 (sm/defn make-system-runner
   "Returns a function from game-state -> game-state, which you can call to make a unit
   of time pass in the game-world."
-  [player-entity-id]
+  [game-state player-entity-id]
+
+  ; Run systems' initalize functions.
+  (doseq [initialize-fn (keep identity
+                              (map :initialize game-systems))]
+    (initialize-fn game-state))
+
   ; Set up systems' event handlers.
   (doseq [event-handler-map (flatten
                               (keep identity
                                     (map :event-handlers game-systems)))]
     (subscribe-to-event (event-handler-map :event-type)
-                        #((event-handler-map :fn) %)))
+                        (event-handler-map :fn)))
 
   ; Listen to keyboard input.
   (handle-keyboard-events player-entity-id)

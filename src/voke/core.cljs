@@ -26,7 +26,7 @@
   (voke.events/unsub-all!)
   (voke.state/flush!)
 
-  (let [run-systems-fn (make-system-runner (player :id))]
+  (let [run-systems-fn (make-system-runner @game-state (player :id))]
 
     (js/window.requestAnimationFrame (fn process-frame [ts]
                                        (swap! game-state run-systems-fn)

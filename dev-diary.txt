@@ -2009,7 +2009,7 @@ goals for today:
 
 [DONE] 0) revert last commit from yesterday
 
-1) rewrite core collision checking logic in vanilla JS, call out to it from cljs
+[DONE] 1) rewrite core collision checking logic in vanilla JS, call out to it from cljs
   granger does this vanilla-js interop in https://github.com/ibdknox/ChromaShift
   https://github.com/liabru/matter-js/tree/master/src/collision has well-annotated js collision detection code
 
@@ -2020,3 +2020,121 @@ http://www.bestinclass.dk/blog/brians-brain-optimized-clojurescript-html5 good p
 
 ok actually before steps 1 or 2, i'm going to get rid of this separate :position field and put it back
 in :shape, in :center like wtimoney does in https://github.com/wrmsr/voke/commit/27e3ab88b1bdc617c7643d64d96c5826c9d9d8b1
+
+cool that was pretty easy, hopefully i didn't miss anything
+
+on to step 1
+
+ibdknox makes it looks pretty easy. he writes a vanilla js file, game.js:
+https://github.com/ibdknox/ChromaShift/blob/master/js/game.js
+
+which basically just defines a namespace and some functions (it looks like he's doing some sort of mapping
+of entities to components and vice versa), and makes them available on window.Game.
+
+and so to access these plain js functions from cljs, in
+https://github.com/ibdknox/ChromaShift/blob/master/cljs/game/lib/core.cljs
+he just accesses js/Game.a-fn-name
+
+so let's try that.
+
+making some progress on this approach. hilariously, the major bottleneck is converting clj datastructures
+to js objects.
+
+right now, on a profile where we spend 3161ms in process-frame,
+we spend 2120ms converting entities to js objects
+we spend 51ms actually checking for collisions
+
+so if i can optimize the conversion codepath, we should be groovy.
+
+ok continuing to work on optimizing conversions, but i'm seeing all sorts of weird perf behavior
+(and btw there are some bugs in the vanilla js collision code, collisions don't seem to be happening at all)
+
+so we spend 80% of our time in entities->js-objs
+
+oh right uh maybe the reason that things get worse over time is that COLLISION DETECTION ISN'T WORKING
+SO NO BULLETS EVER GET REMOVED
+DUH
+
+ok, like four hours later, that's enough for today
+
+tomorrow let's circle back and clean up / document the state of the collision system
+
+TODOs:
+* kill :intended-movement message in favor of attempt-to-move function
+* figure out how to get vanilla Collision js file to work with closure compiler :advanced mode
+
+we can handle about 140 moving entities on the screen before we stop dropping the occasional frame, for posterity
+
+just did some benchmarks
+100 update-ins on :player cost about 1ms
+100 get-ins on :player cost about 1ms
+good to know
+
+=====
+
+3/12/16
+
+notes / things i want to do next:
+
+[DONE] 1) remove :intended-movement event in favor of attempt-to-move function
+2) stop doing separate :x and :y movements, just do one combined movement and have the collision system
+   sort things out.
+     most of the time, you're not colliding, so moving in 2 steps all the time makes our average-case
+     scenario slower.
+     have the collision system attempt to apply the combined x/y movement - then if you collide with something,
+     you definitely fire a contact event
+     and after that, first try to move in the x direction, then in the y direction
+     if both are blocked, that's fine. but make sure you fire *one* contact event total
+     (can you call cljs functions from js? hopefully we don't need to get to that point)
+[mostly done] 3) read prettified compiled js to see where all the overhead is in our cljs code, then keep profiling
+   until as much overhead as possible goes away and most of the work is being done in js-land
+4) look into quadtrees. right now we have ~140 moving entities before the system begins to slow down, and we're
+   doing n^2 work. nlogn work is much much much more attractive. will need to have the quadtree live in js-land
+   obviously
+
+ok, #1 was easy enough.
+right now, 13% of our time is lost inline in move-system-tick, and 8% is lost inline in attempt-to-move
+
+hm maybe that 'self' stuff the timeline view was reporting was garbage?
+the profiling view doesn't corroborate it
+
+will stick with profiling view from now on, i think. timeline view is pretty, but kept fighting me.
+we're cpu-bound here and not doing a ton of GCs or paints or whatever, so profiling view is plenty fine.
+
+at this point, the majority of the cljs overhead i've been able to find has been optimized away.
+these are the things that are keeping us slow:
+
+1) moving in 2 steps, first x then y (see #2 above)
+2) doing n^2 comparisons when doing collision checks (see #4 above)
+
+so let's tackle them in that order.
+
+ok i started on #1 but the collision system is currently all fucked up as a result
+
+gonna need to do some thinking about the best way to express the collision system doing this:
+* try moving the entity to its desired new x/y position
+  * if that works
+    * great
+  * if that doesn't work
+    * fire a contact event
+    * try moving it to its desired new x position
+      * if that works
+        * great
+      * if that doesn't work
+        * find the closest clear x position and move it there
+    * try moving it to its desired new y position
+      * if that works
+        * great
+      * if that doesn't work
+        * find the closest clear y position and move it there
+
+
+we can deal with quadtrees in a few days, the collision system cljs is likely to get a bit hairy over the
+next few hours of work and so i'll be wanting to do a good amount of refactoring on it
+because i am about to fuck it up like crazy
+
+the above bullet points are proving to be harder than i expected to expressin code.
+wrote some awful shit, stashed it, gonna try again tomorrow from scratch.
+
+you know what, this is proving to be more trouble than it's worth. shelving it for now.
+let's do quadtrees next instead.
