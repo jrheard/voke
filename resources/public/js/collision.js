@@ -109,5 +109,3 @@ var Collision = {
 window.Collision = Collision;
 
 })(window);
-// i'm cargo-culting this function()(window) style from https://github.com/ibdknox/ChromaShift/blob/master/js/game.js
-// i have no idea why it's necessary. TODO: google+learn
