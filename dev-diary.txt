@@ -2132,3 +2132,6 @@ gonna need to do some thinking about the best way to express the collision syste
 we can deal with quadtrees in a few days, the collision system cljs is likely to get a bit hairy over the
 next few hours of work and so i'll be wanting to do a good amount of refactoring on it
 because i am about to fuck it up like crazy
+
+the above bullet points are proving to be harder than i expected to expressin code.
+wrote some awful shit, stashed it, gonna try again tomorrow from scratch.
