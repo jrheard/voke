@@ -2135,3 +2135,6 @@ because i am about to fuck it up like crazy
 
 the above bullet points are proving to be harder than i expected to expressin code.
 wrote some awful shit, stashed it, gonna try again tomorrow from scratch.
+
+you know what, this is proving to be more trouble than it's worth. shelving it for now.
+let's do quadtrees next instead.

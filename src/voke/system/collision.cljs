@@ -3,7 +3,7 @@
             [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Axis Entity EntityID Event Shape System Vector2]]
+            [voke.schemas :refer [Axis Entity EntityID Event Position Shape System]]
             [voke.state :refer [remove-entity! update-entity!]])
   (:require-macros [schema.core :as sm]))
 
@@ -16,9 +16,9 @@
                             (select-keys entity
                                          [:id :collision :shape]))))
 
-(defn -update-entity-center
-  [entity-id new-center]
-  (js/Collision.updateEntity entity-id new-center))
+(defn -update-entity-position
+  [entity-id axis new-position]
+  (js/Collision.updateEntity entity-id (name axis) new-position))
 
 (sm/defn -stop-tracking-entity
   [entity-id :- EntityID]
@@ -36,16 +36,18 @@
   nil if the space `entity` is trying to occupy is empty."
   ; Critical path! Keep fast!
   [entity :- Entity
-   new-center :- Vector2
+   axis :- Axis
+   new-position :- s/Num
    all-entities :- [Entity]]
-  (let [{:keys [x y]} new-center]
-    (when-let [contacting-entity-id (js/Collision.findContactingEntityID (entity :id)
-                                                                         #js {:x x :y y})]
-      (find-entity-with-id all-entities contacting-entity-id))))
+  (when-let [contacting-entity-id (js/Collision.findContactingEntityID (entity :id)
+                                                                       (name axis)
+                                                                       new-position)]
+    (find-entity-with-id all-entities contacting-entity-id)))
 
 (sm/defn find-closest-clear-spot :- (s/maybe s/Num)
   [entity :- Entity
-   new-velocity :- Vector2
+   axis :- Axis
+   new-velocity :- s/Num
    contacted-entity :- Entity
    all-entities :- [Entity]]
   "Takes an :intended-movement event (for entity A) and the Entity that occupies the position that entity A
@@ -53,8 +55,7 @@
   that entity A can occupy without contacting entity B and returns it if entity A fits there, or returns nil
   if no open spot exists."
   ; TODO - only supports rectangles
-  ; XXXX TODO
-  #_(let [shape1 (entity :shape)
+  (let [shape1 (entity :shape)
         shape2 (contacted-entity :shape)
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)
@@ -63,28 +64,29 @@
                                          (/ (shape1 field) 2)
                                          0.01)]
     (when-not (find-contacting-entity entity axis axis-value-to-try all-entities)
-      axis-value-to-try))
-  entity)
+      axis-value-to-try)))
 
 (sm/defn apply-movement
   [entity :- Entity
-   new-center :- Vector2
-   new-velocity :- Vector2]
+   axis :- Axis
+   new-position :- s/Num
+   new-velocity :- s/Num]
   "Fires events to notify the world that a particular entity should have a new position+velocity."
   (let [update-entity-fn (fn [entity]
                            (assert entity)
                            (-> entity
-                               (assoc-in [:shape :center] new-center)
-                               (assoc-in [:motion :velocity] new-velocity)))]
+                               (assoc-in [:shape :center axis] new-position)
+                               (assoc-in [:motion :velocity axis] new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
 
-    (-update-entity-center (entity :id) new-center)
+    (-update-entity-position (entity :id) axis new-position)
 
     (publish-event {:event-type :movement
                     :entity     (update-entity-fn entity)})))
 
 (sm/defn handle-contact
   [entity :- Entity
+   axis :- Axis
    new-velocity :- s/Num
    contacted-entity :- Entity
    all-entities :- [Entity]]
@@ -93,17 +95,18 @@
     (remove-entity! (entity :id) :collision-system)
 
     ; This entity doesn't need to be destroyed on contact. Let it live.
-    (if-let [closest-clear-spot (find-closest-clear-spot entity new-velocity contacted-entity all-entities)]
+    (if-let [closest-clear-spot (find-closest-clear-spot entity axis new-velocity contacted-entity all-entities)]
       ; Great, we found a clear spot nearby! Move there and stand still.
-      (apply-movement entity closest-clear-spot {:x 0 :y 0})
+      (apply-movement entity
+                      axis
+                      closest-clear-spot
+                      0)
 
       ; Couldn't find a clear spot; slow the entity down, it can try moving again next tick.
       (update-entity! (entity :id)
                       :collision-system
                       (fn [old-entity]
-                        old-entity
-                        ; XXXXXX TODO
-                        #_(update-in old-entity
+                        (update-in old-entity
                                    [:motion :velocity axis]
                                    #(* % 0.7))))))
 
@@ -111,10 +114,10 @@
                   :entities   [entity contacted-entity]}))
 
 (defn attempt-to-move!
-  [entity new-center new-velocity all-entities]
-  (if-let [contacted-entity (find-contacting-entity entity new-center all-entities)]
-    (handle-contact entity new-velocity contacted-entity all-entities)
-    (apply-movement entity new-center new-velocity)))
+  [entity axis new-position new-velocity all-entities]
+  (if-let [contacted-entity (find-contacting-entity entity axis new-position all-entities)]
+    (handle-contact entity axis new-velocity contacted-entity all-entities)
+    (apply-movement entity axis new-position new-velocity)))
 
 ;; System definition
 
