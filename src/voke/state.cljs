@@ -14,16 +14,13 @@
 (sm/defn process-update-events :- GameState
   [state :- GameState
    update-events]
-  (let [updated-entities (loop [events update-events
-                                entities (transient (state :entities))]
-                           (if (seq events)
-                             (let [event (first events)
-                                   entity-id (event :entity-id)]
-                               (recur (rest events)
-                                      (assoc! entities
-                                              entity-id
-                                              ((event :fn) (get entities entity-id)))))
-                             entities))]
+  (let [updated-entities (reduce (fn [entities event]
+                                   (let [entity-id (event :entity-id)]
+                                     (assoc! entities
+                                             entity-id
+                                             ((event :fn) (get entities entity-id)))))
+                                 (transient (state :entities))
+                                 update-events)]
     (assoc state
            :entities
            (persistent! updated-entities))))
