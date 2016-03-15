@@ -109,6 +109,7 @@
     entity))
 
 (sm/defn update-position :- Entity
+  ; apparently we spend 4% of our time in this trivial-ass function. TODO: investigate
   [entity :- Entity]
   (reduce
     (fn [entity axis]
