@@ -11,6 +11,38 @@
 
 (def ^:private buffer (atom []))
 
+(sm/defn process-update-events :- GameState
+  [state :- GameState
+   update-events]
+  (let [updated-entities (loop [events update-events
+                                entities (transient (state :entities))]
+                           (if (seq events)
+                             (let [event (first events)
+                                   entity-id (event :entity-id)]
+                               (recur (rest events)
+                                      (assoc! entities
+                                              entity-id
+                                              ((event :fn) (get entities entity-id)))))
+                             entities))]
+    (assoc state
+           :entities
+           (persistent! updated-entities))))
+
+(sm/defn process-remove-events :- GameState
+  [state :- GameState
+   remove-events]
+  (let [entities (transient (state :entities))
+        entities-after-removal (reduce (fn [entities remove-event]
+                                         (let [entity-id (remove-event :entity-id)]
+                                           (publish-event {:type      :entity-removed
+                                                           :entity-id entity-id})
+                                           (dissoc! entities entity-id)))
+                                       entities
+                                       remove-events)]
+    (assoc state
+           :entities
+           (persistent! entities-after-removal))))
+
 ;; Public (but only intended to be used by voke.core)
 
 (sm/defn make-game-state :- GameState
@@ -29,20 +61,12 @@
         update-events (filter #(= (% :type) :update) buffer-contents)
         remove-events (filter #(= (% :type) :remove) buffer-contents)]
     (reset! buffer [])
-    (sm/fn buffer-runner :- GameState
-      [state :- GameState]
-      (let [state-after-updates (reduce (fn [state update-event]
-                                          (update-in state
-                                                     [:entities (update-event :entity-id)]
-                                                     (update-event :fn)))
-                                        state
-                                        update-events)]
-        (reduce (fn [state remove-event]
-                  (publish-event {:type :entity-removed
-                                  :entity-id  (remove-event :entity-id)})
-                  (update-in state [:entities] dissoc (remove-event :entity-id)))
-                state-after-updates
-                remove-events)))))
+
+    (fn buffer-runner
+      [state]
+      (-> state
+          (process-update-events update-events)
+          (process-remove-events remove-events)))))
 
 ;; Public
 

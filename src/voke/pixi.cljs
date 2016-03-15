@@ -47,7 +47,8 @@
   (.addChild stage obj))
 
 (defn remove-from-stage! [stage obj]
-  (.removeChild stage obj))
+  (.removeChild stage obj)
+  (.destroy obj))
 
 (defn render! [renderer stage]
   (.render renderer stage))
