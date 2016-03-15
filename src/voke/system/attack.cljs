@@ -47,6 +47,7 @@
         [(assoc-in entity
                    [:weapon :last-attack-timestamp]
                    (now))
+         ; TODO: instead of returning new entities, call add-entity! (also, write add-entity!)
          (projectile (entity :id)
                      (safe-get-in entity [:shape :center])
                      (safe-get-in entity [:weapon :projectile-shape])

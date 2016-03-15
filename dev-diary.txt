@@ -2176,3 +2176,34 @@ hopefully these things will improve over time? in the meantime, just gotta work 
 i wonder if austin's run into any of these perf problems i've been facing?
 
 anyway, tomorrow it's finally time for quadtrees, because today i got the 2-call->1-call thing to happen.
+
+or maybe i'll look into a few other things first :)
+
+* records (schema has support for 'em) - benchmark them against maps
+  * interested in get-in, update-in, assoc-in performance
+  * curious to read the generated js
+  * http://alexkehayias.tumblr.com/post/78711349238/entity-component-model-in-clojurescript sketch re: ecs
+* https://funcool.github.io/clojurescript-unraveled/#transients - would `into` be a good fit for some of our
+  hot spots? assoc-ins, merges, etc?
+* figure out what externs are, get collision.js hooked up / able to be advanced-compiled
+  really interested to see if the cljs overhead i'm seeing persists through advanced compilation
+  if not, it could render the above two bullet points unnecessary
+
+"The intent is that, unless interop forces one to go beyond their circumscribed scope, one need not leave
+Clojure to get the highest-performing data structures possible on the platform."
+- http://clojure.org/reference/datatypes
+
+hm - worth looking into this to see if collision.js could actually just be fine if we used records
+
+would be interesting to benchmark/profile a cljs+defrecord vs vanilla-js version of collision.js
+
+notes from benchmarking a simple entity map-vs-record implementation in cljs-sandbox:
+(update-in player-map [:shape :center :x] (fn [x] (inc x))), 10000000 runs, 22819 msecs
+(update-in player-record [:shape :center :x] (fn [x] (inc x))), 10000000 runs, 17327 msecs
+(assoc-in player-map [:shape :center :x] 6), 10000000 runs, 19845 msecs
+(assoc-in player-record [:shape :center :x] 6), 10000000 runs, 14406 msecs
+(get-in player-map [:shape :center :x]), 10000000 runs, 11781 msecs
+(get-in player-record [:shape :center :x]), 10000000 runs, 8446 msecs
+
+so on the whole, operations on records appear to run in about 70-80% of the time that they take on maps.
+which is certainly a speed boost, but isn't the like 10x increase i was hoping for.
