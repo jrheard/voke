@@ -56,7 +56,7 @@
                                                                axis
                                                                new-center)
                                                         all-entities)]
-    (if (> (count contacted-entities) 0)
+    (if (seq contacted-entities)
       (move-to-closest-clear-spot entity axis new-velocity contacted-entities)
       (apply-movement entity {axis new-center} {axis new-velocity}))))
 
