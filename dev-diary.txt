@@ -2161,7 +2161,18 @@ there are a few other things i'm worried about. for instance, what if an entity'
 and it collides with *two* entities in a single frame, and we try to resolve its collision by moving it
 to the unoccupied spot to the left of the entity it collided with, but we pick the *rightmost* of the two
 entities instead of the *leftmost*?
-the solution is for the js collisoin system to return a list of all the entities collided with,
+the solution is for the js collision system to return a list of all the entities collided with,
 and for the resolution system (?) to do its homework and figure out which enttiy's relevant.
 
 resolution system... i kinda like the sound of that. what would that look like?
+
+ok, cool, i spent today following that thread and i think it turned out pretty well.
+the collision system is easier to read+understand, and everything seems to be working, and i've tightened
+up a bunch of loose perf spots.
+lots of stuff in cljs is slow. get-in is slow. update-in is slow. assoc-in is slow. merge is slow.
+calling functions is slow.
+
+hopefully these things will improve over time? in the meantime, just gotta work around 'em.
+i wonder if austin's run into any of these perf problems i've been facing?
+
+anyway, tomorrow it's finally time for quadtrees, because today i got the 2-call->1-call thing to happen.
