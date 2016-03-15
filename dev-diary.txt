@@ -2219,3 +2219,41 @@ tried again with advanced optimizations
 
 so assoc-in appears to be super cheap for records in advanced mode for... some reason. and otherwise it appears to
 mostly be a wash.
+
+current mystery - https://www.evernote.com/shard/s11/sh/39854162-88a7-4fd6-88e5-b01f25183ef7/b63355ace4a9966e
+cannot figure out what is going on here.
+gonna read through the relevant cljs source and generated js i guess
+might have to ask in slack
+...oh christ if i expand it i see it's just flush!
+whooops.
+
+====
+
+3/15/16
+
+on a hunch tried this
+(-> player-map :shape :center :x), 10000000 runs, 2215 msecs
+(->> player-record :shape :center :x), 10000000 runs, 1502 msecs
+(get-in player-map [:shape :center :x]), 10000000 runs, 2674 msecs
+(get-in player-record [:shape :center :x]), 10000000 runs, 2316 msecs
+
+so two things to try first off today:
+
+1) try threading macros instead of get-in
+2) dig into flush, see if it's easily optimizable
+      seems like a perfect situation to use a transient, right? or into or something?
+
+and then also i want to look into setting up externs for collision.js, so we can see how all this performs
+(and profiles) in advanced mode
+
+http://clojure.org/reference/transients
+
+"You run into a similar scenario, at a higher level, when you want to initialize or transform a
+large persistent data structure using multiple steps, none of which will be seen by any code other
+than the constructing/transforming code. The challenge here is that the source of a transformation
+will be an existing persistent data structure, and the result of the function _will_ be shared."
+
+create a transient with (transient my-thing)
+creation is o(1)
+(peristent! the-transient) is o(1)
+calling transient! on an entity won't make its nested maps transient, though!

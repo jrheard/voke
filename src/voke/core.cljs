@@ -31,8 +31,7 @@
   (js/window.requestAnimationFrame (fn process-frame [ts]
                                      (swap! game-state process-a-tick)
 
-                                     (let [apply-state-modifications (voke.state/flush!)]
-                                       (swap! game-state apply-state-modifications))
+                                     (swap! game-state (voke.state/flush!))
 
                                      (render-tick @game-state)
 
