@@ -109,15 +109,14 @@
     entity))
 
 (sm/defn update-position :- Entity
-  ; apparently we spend 4% of our time in this trivial-ass function. TODO: investigate
   [entity :- Entity]
-  (reduce
-    (fn [entity axis]
-      (update-in entity
-                 [:shape :center axis]
-                 #(+ % (safe-get-in entity [:motion :velocity axis]))))
-    entity
-    [:x :y]))
+  ; we spend about 4% of our time in this function. i can't figure out how to optimize it any more than this.
+  (let [velocity (get-in entity [:motion :velocity])
+        center (get-in entity [:shape :center])
+        new-center (-> center
+                       (assoc :x (+ (velocity :x) (center :x)))
+                       (assoc :y (+ (velocity :y) (center :y))))]
+    (assoc-in entity [:shape :center] new-center)))
 
 (sm/defn relevant-to-movement-system? :- s/Bool
   [entity :- Entity]
@@ -139,6 +138,6 @@
 
                   (when (not= moved-entity entity)
                     (attempt-to-move! entity
-                                      (safe-get-in moved-entity [:shape :center])
-                                      (safe-get-in moved-entity [:motion :velocity])
+                                      (get-in moved-entity [:shape :center])
+                                      (get-in moved-entity [:motion :velocity])
                                       entities)))))})
