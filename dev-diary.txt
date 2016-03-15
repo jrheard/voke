@@ -2138,3 +2138,41 @@ wrote some awful shit, stashed it, gonna try again tomorrow from scratch.
 
 you know what, this is proving to be more trouble than it's worth. shelving it for now.
 let's do quadtrees next instead.
+
+=====
+
+3/14/16
+
+ok, so does the quadtree live in js or cljs?
+i'm betting js.
+
+--- time passes ---
+
+ok i went on a walk and did some more thinking about the 2-calls-vs-1-call movement->collisions system thing
+i had some trouble working on it yesterday, both because i was pretty hungover but also because i kept
+worrying that there was some case where we try to resolve a collision and just literally can't.
+but i don't think that such a case exists. as long as we update the collision system every time
+a) an entity is created
+b) an entity is moved
+c) an entity is deleted,
+and we do validation at a)-time and b)-time, the collision system will never be in an invalid state.
+
+there are a few other things i'm worried about. for instance, what if an entity's moving to the right,
+and it collides with *two* entities in a single frame, and we try to resolve its collision by moving it
+to the unoccupied spot to the left of the entity it collided with, but we pick the *rightmost* of the two
+entities instead of the *leftmost*?
+the solution is for the js collision system to return a list of all the entities collided with,
+and for the resolution system (?) to do its homework and figure out which enttiy's relevant.
+
+resolution system... i kinda like the sound of that. what would that look like?
+
+ok, cool, i spent today following that thread and i think it turned out pretty well.
+the collision system is easier to read+understand, and everything seems to be working, and i've tightened
+up a bunch of loose perf spots.
+lots of stuff in cljs is slow. get-in is slow. update-in is slow. assoc-in is slow. merge is slow.
+calling functions is slow.
+
+hopefully these things will improve over time? in the meantime, just gotta work around 'em.
+i wonder if austin's run into any of these perf problems i've been facing?
+
+anyway, tomorrow it's finally time for quadtrees, because today i got the 2-call->1-call thing to happen.

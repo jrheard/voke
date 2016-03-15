@@ -38,7 +38,7 @@
                                         state
                                         update-events)]
         (reduce (fn [state remove-event]
-                  (publish-event {:event-type :entity-removed
+                  (publish-event {:type :entity-removed
                                   :entity-id  (remove-event :entity-id)})
                   (update-in state [:entities] dissoc (remove-event :entity-id)))
                 state-after-updates

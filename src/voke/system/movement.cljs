@@ -4,7 +4,7 @@
             [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Direction Entity GameState System]]
-            [voke.system.collision :refer [attempt-to-move!]]
+            [voke.system.collision.system :refer [attempt-to-move!]]
             [voke.util :refer [bound-between]])
   (:require-macros [schema.core :as sm]))
 
@@ -110,13 +110,13 @@
 
 (sm/defn update-position :- Entity
   [entity :- Entity]
-  (reduce
-    (fn [entity axis]
-      (update-in entity
-                 [:shape :center axis]
-                 #(+ % (safe-get-in entity [:motion :velocity axis]))))
-    entity
-    [:x :y]))
+  ; we spend about 4% of our time in this function. i can't figure out how to optimize it any more than this.
+  (let [velocity (get-in entity [:motion :velocity])
+        center (get-in entity [:shape :center])
+        new-center (-> center
+                       (assoc :x (+ (velocity :x) (center :x)))
+                       (assoc :y (+ (velocity :y) (center :y))))]
+    (assoc-in entity [:shape :center] new-center)))
 
 (sm/defn relevant-to-movement-system? :- s/Bool
   [entity :- Entity]
@@ -137,9 +137,7 @@
                                        update-position)]
 
                   (when (not= moved-entity entity)
-                    (doseq [axis [:x :y]]
-                      (attempt-to-move! entity
-                                        axis
-                                        (safe-get-in moved-entity [:shape :center axis])
-                                        (safe-get-in moved-entity [:motion :velocity axis])
-                                        entities))))))})
+                    (attempt-to-move! entity
+                                      (get-in moved-entity [:shape :center])
+                                      (get-in moved-entity [:motion :velocity])
+                                      entities)))))})

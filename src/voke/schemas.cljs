@@ -9,18 +9,17 @@
 
 (sm/defschema Axis (s/enum :x :y))
 
-(sm/defschema Position {:x s/Num
+(sm/defschema Vector2 {:x s/Num
                         :y s/Num})
 
 (sm/defschema Shape {:type        (s/enum :rectangle :circle)
-                     :center      Position
+                     :center      Vector2
                      :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
 
 (sm/defschema ProjectileShape (dissoc Shape :orientation :center))
 
-(sm/defschema Motion {:velocity             {:x s/Num
-                                             :y s/Num}
+(sm/defschema Motion {:velocity             Vector2
                       :affected-by-friction s/Bool
                       :max-speed            s/Num
                       :max-acceleration     s/Num})
@@ -64,7 +63,7 @@
 
 ; TODO not well defined
 ; maybe best thing to do would be to schematize each individual event and then say an Event is any of 'em
-(sm/defschema Event {:event-type EventType
+(sm/defschema Event {:type EventType
                      s/Any       s/Any})
 
 (sm/defschema System {(s/optional-key :tick-fn)        s/Any

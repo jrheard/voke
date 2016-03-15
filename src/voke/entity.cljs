@@ -13,7 +13,7 @@
 (sm/defn make-entity :- Entity
   [entity-map]
   (let [entity (assoc entity-map :id (get-next-entity-id))]
-    (publish-event {:event-type :entity-added
+    (publish-event {:type :entity-added
                     :entity entity})
     entity))
 

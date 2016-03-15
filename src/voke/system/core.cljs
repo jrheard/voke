@@ -3,7 +3,7 @@
             [voke.input :refer [handle-keyboard-events]]
             [voke.schemas :refer [GameState System]]
             [voke.system.attack :refer [attack-system]]
-            [voke.system.collision :refer [collision-system]]
+            [voke.system.collision.system :refer [collision-system]]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]])
   (:require-macros [schema.core :as sm]))
