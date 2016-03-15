@@ -23,11 +23,14 @@
 
 (sm/defn update-obj-position!
   [obj
-   shape :- Shape]
+   new-center]
   ; xxx also only supports rectangles
-  (doto obj
-    (aset "x" (- (get-in shape [:center :x]) (/ (shape :width) 2)))
-    (aset "y" (- (get-in shape [:center :y]) (/ (shape :height) 2)))))
+  (let [new-x (new-center :x)
+        new-y (new-center :y)]
+    (when new-x
+      (aset obj "x" (- new-x (/ (aget obj "width") 2))))
+    (when new-y
+      (aset obj "y" (- new-y (/ (aget obj "height") 2))))))
 
 (defn make-renderer [width height node]
   (doto (js/PIXI.CanvasRenderer.

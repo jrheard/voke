@@ -12,7 +12,14 @@
 
 (defn -update-entity-center
   [entity-id new-center]
-  (js/Collision.updateEntity entity-id (clj->js new-center)))
+  (let [new-center-obj (js-obj)
+        new-x (new-center :x)
+        new-y (new-center :y)]
+    (when new-x
+      (aset new-center-obj "x" new-x))
+    (when new-y
+      (aset new-center-obj "y" new-y))
+    (js/Collision.updateEntity entity-id new-center-obj)))
 
 (sm/defn -stop-tracking-entity
   [entity-id :- EntityID]
@@ -33,8 +40,8 @@
     (update-entity! (entity :id) :collision-system update-entity-fn)
 
     (publish-event {:type :movement
-                    ; XXXXXX
-                    :entity     (update-entity-fn entity)})))
+                    :entity-id (entity :id)
+                    :new-center new-center})))
 
 (sm/defn find-contacting-entities :- [Entity]
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
