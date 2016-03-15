@@ -1,7 +1,7 @@
 (ns voke.system.collision.resolution
   (:require [schema.core :as s]
             [voke.schemas :refer [Axis Entity Vector2]]
-            [voke.system.collision.utils :refer [apply-movement find-contacting-entities]])
+            [voke.system.collision.util :refer [apply-movement find-contacting-entities]])
   (:require-macros [schema.core :as sm]))
 
 (defn left-edge-x [rect] (- (rect :x)

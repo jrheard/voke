@@ -33,6 +33,7 @@
                 :compiler {:output-to "resources/public/js/compiled/voke.js"
                            :main voke.core
                            :optimizations :advanced
+                           :externs ["externs/collision.js"]
                            :pretty-print false}}]}
 
   :figwheel {:css-dirs ["resources/public/css"]})

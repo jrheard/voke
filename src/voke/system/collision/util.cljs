@@ -1,4 +1,4 @@
-(ns voke.system.collision.utils
+(ns voke.system.collision.util
   (:require [voke.events :refer [publish-event]]
             [voke.schemas :refer [Entity EntityID Vector2]]
             [voke.state :refer [update-entity!]])

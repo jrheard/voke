@@ -3,7 +3,7 @@
             [voke.schemas :refer [Axis Entity EntityID System Vector2]]
             [voke.state :refer [remove-entity!]]
             [voke.system.collision.resolution :refer [resolve-collision]]
-            [voke.system.collision.utils :refer [-track-entity -stop-tracking-entity
+            [voke.system.collision.util :refer [-track-entity -stop-tracking-entity
                                                  apply-movement find-contacting-entities]])
   (:require-macros [schema.core :as sm]))
 
