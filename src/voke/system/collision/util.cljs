@@ -44,8 +44,8 @@
    new-center :- Vector2
    all-entities :- [Entity]]
   (let [contacting-entity-ids (js/Collision.findContactingEntityID (entity :id) (clj->js new-center))]
-    (seq (keep (fn [entity]
-                 (when (> (.indexOf contacting-entity-ids (entity :id))
-                          -1)
-                   entity))
-               all-entities))))
+    (keep (fn [entity]
+            (when (> (.indexOf contacting-entity-ids (entity :id))
+                     -1)
+              entity))
+          all-entities)))

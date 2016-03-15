@@ -51,14 +51,14 @@
    new-velocity :- s/Num
    axis :- Axis
    all-entities :- [Entity]]
-  (if-let [contacted-entities (find-contacting-entities entity
+  (let [contacted-entities (find-contacting-entities entity
                                                         (assoc (get-in entity [:shape :center])
                                                                axis
                                                                new-center)
                                                         all-entities)]
-    (move-to-closest-clear-spot entity axis new-velocity contacted-entities)
-    (apply-movement entity {axis new-center} {axis new-velocity})))
-
+    (if (> (count contacted-entities) 0)
+      (move-to-closest-clear-spot entity axis new-velocity contacted-entities)
+      (apply-movement entity {axis new-center} {axis new-velocity}))))
 
 (sm/defn resolve-collision
   [entity :- Entity

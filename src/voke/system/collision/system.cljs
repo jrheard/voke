@@ -22,11 +22,12 @@
 
 (defn attempt-to-move!
   [entity new-center new-velocity all-entities]
-  (if-let [contacted-entities (find-contacting-entities entity new-center all-entities)]
-    (do
-      (handle-contact entity contacted-entities)
-      (resolve-collision entity new-center new-velocity all-entities))
-    (apply-movement entity new-center new-velocity)))
+  (let [contacted-entities (find-contacting-entities entity new-center all-entities)]
+    (if (> (count contacted-entities) 0)
+      (do
+        (handle-contact entity contacted-entities)
+        (resolve-collision entity new-center new-velocity all-entities))
+      (apply-movement entity new-center new-velocity))))
 
 ;; System definition
 
