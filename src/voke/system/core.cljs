@@ -45,7 +45,7 @@
   (handle-keyboard-events player-entity-id)
 
   ; Return a run-systems-every-tick function.
-  (fn [state]
+  (fn process-a-tick [state]
     (reduce (fn [state tick-function]
               (tick-function state))
             state

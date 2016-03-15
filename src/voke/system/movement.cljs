@@ -112,11 +112,11 @@
   [entity :- Entity]
   ; we spend about 4% of our time in this function. i can't figure out how to optimize it any more than this.
   (let [velocity (get-in entity [:motion :velocity])
-        center (get-in entity [:shape :center])
-        new-center (-> center
-                       (assoc :x (+ (velocity :x) (center :x)))
-                       (assoc :y (+ (velocity :y) (center :y))))]
-    (assoc-in entity [:shape :center] new-center)))
+        center (get-in entity [:shape :center])]
+    (assoc-in entity
+              [:shape :center]
+              {:x (+ (velocity :x) (center :x))
+               :y (+ (velocity :y) (center :y))})))
 
 (sm/defn relevant-to-movement-system? :- s/Bool
   [entity :- Entity]

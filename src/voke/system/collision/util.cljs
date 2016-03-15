@@ -38,8 +38,8 @@
   (let [update-entity-fn (fn [entity]
                            (assert entity)
                            (-> entity
-                               (update-in [:shape :center] merge new-center)
-                               (update-in [:motion :velocity] merge new-velocity)))]
+                               (update-in [:shape :center] into new-center)
+                               (update-in [:motion :velocity] into new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
 
     (publish-event {:type :movement

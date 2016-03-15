@@ -2207,3 +2207,15 @@ notes from benchmarking a simple entity map-vs-record implementation in cljs-san
 
 so on the whole, operations on records appear to run in about 70-80% of the time that they take on maps.
 which is certainly a speed boost, but isn't the like 10x increase i was hoping for.
+
+tried again with advanced optimizations
+
+(assoc-in player-map [:shape :center :x] 6), 10000000 runs, 16450 msecs
+(assoc-in player-record [:shape :center :x] 6), 10000000 runs, 7049 msecs
+(update-in player-map [:shape :center :x] (fn [x] inc x)), 10000000 runs, 7421 msecs
+(update-in player-record [:shape :center :x] (fn [x] inc x)), 10000000 runs, 8872 msecs
+(get-in player-map [:shape :center :x]), 10000000 runs, 4713 msecs
+(get-in player-record [:shape :center :x]), 10000000 runs, 4284 msecs
+
+so assoc-in appears to be super cheap for records in advanced mode for... some reason. and otherwise it appears to
+mostly be a wash.
