@@ -4,6 +4,16 @@
             [voke.state :refer [update-entity!]])
   (:require-macros [schema.core :as sm]))
 
+(defn vector2->js [vector2]
+  (let [obj (js-obj)
+        x (vector2 :x)
+        y (vector2 :y)]
+    (when x
+      (aset obj "x" x))
+    (when y
+      (aset obj "y" y))
+    obj))
+
 (sm/defn -track-entity
   [entity :- Entity]
   (js/Collision.addEntity (clj->js
@@ -12,14 +22,7 @@
 
 (defn -update-entity-center
   [entity-id new-center]
-  (let [new-center-obj (js-obj)
-        new-x (new-center :x)
-        new-y (new-center :y)]
-    (when new-x
-      (aset new-center-obj "x" new-x))
-    (when new-y
-      (aset new-center-obj "y" new-y))
-    (js/Collision.updateEntity entity-id new-center-obj)))
+       (js/Collision.updateEntity entity-id (vector2->js new-center)))
 
 (sm/defn -stop-tracking-entity
   [entity-id :- EntityID]
@@ -51,7 +54,7 @@
   [entity :- Entity
    new-center :- Vector2
    all-entities :- [Entity]]
-  (let [contacting-entity-ids (js/Collision.findContactingEntityID (entity :id) (clj->js new-center))]
+  (let [contacting-entity-ids (js/Collision.findContactingEntityID (entity :id) (vector2->js new-center))]
     (if (> (.-length contacting-entity-ids) 0)
       (let [entity-ids (set (js->clj contacting-entity-ids))]
         (keep (fn [entity]
