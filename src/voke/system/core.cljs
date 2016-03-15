@@ -24,9 +24,13 @@
                    move-system
                    render-system])
 
-(sm/defn make-system-runner
-  "Returns a function from game-state -> game-state, which you can call to make a unit
-  of time pass in the game-world."
+(def tick-functions
+  (map system-to-tick-fn
+       (filter :tick-fn game-systems)))
+
+;; Public
+
+(sm/defn initialize-systems!
   [game-state player-entity-id]
 
   ; Run systems' initalize functions.
@@ -42,11 +46,13 @@
                         (event-handler-map :fn)))
 
   ; Listen to keyboard input.
-  (handle-keyboard-events player-entity-id)
+  (handle-keyboard-events player-entity-id))
 
-  ; Return a run-systems-every-tick function.
-  (fn process-a-tick [state]
-    (reduce (fn [state tick-function]
-              (tick-function state))
-            state
-            (map system-to-tick-fn (filter :tick-fn game-systems)))))
+(sm/defn process-a-tick :- GameState
+  "A function from game-state -> game-state, which you can call to make a unit
+  of time pass in the game-world."
+  [state :- GameState]
+  (reduce (fn [state tick-function]
+            (tick-function state))
+          state
+          tick-functions))

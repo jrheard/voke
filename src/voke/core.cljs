@@ -2,7 +2,7 @@
   (:require [voke.entity :as e]
             [voke.events]
             [voke.state :refer [make-game-state]]
-            [voke.system.core :refer [make-system-runner]]
+            [voke.system.core :refer [initialize-systems! process-a-tick]]
             [voke.system.rendering :refer [render-tick]]))
 
 (defonce player (e/player 500 300))
@@ -26,16 +26,16 @@
   (voke.events/unsub-all!)
   (voke.state/flush!)
 
-  (let [run-systems-fn (make-system-runner @game-state (player :id))]
+  (initialize-systems! @game-state (player :id))
 
-    (js/window.requestAnimationFrame (fn process-frame [ts]
-                                       (swap! game-state run-systems-fn)
+  (js/window.requestAnimationFrame (fn process-frame [ts]
+                                     (swap! game-state process-a-tick)
 
-                                       (let [apply-state-modifications (voke.state/flush!)]
-                                         (swap! game-state apply-state-modifications))
+                                     (let [apply-state-modifications (voke.state/flush!)]
+                                       (swap! game-state apply-state-modifications))
 
-                                       (render-tick @game-state)
+                                     (render-tick @game-state)
 
-                                       (reset! animation-frame-request-id
-                                               (js/window.requestAnimationFrame process-frame))))))
+                                     (reset! animation-frame-request-id
+                                             (js/window.requestAnimationFrame process-frame)))))
 
