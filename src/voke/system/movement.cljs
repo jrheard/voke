@@ -4,7 +4,7 @@
             [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Direction Entity GameState System]]
-            [voke.system.collision :refer [attempt-to-move!]]
+            [voke.system.collision.system :refer [attempt-to-move!]]
             [voke.util :refer [bound-between]])
   (:require-macros [schema.core :as sm]))
 
@@ -137,9 +137,7 @@
                                        update-position)]
 
                   (when (not= moved-entity entity)
-                    (doseq [axis [:x :y]]
-                      (attempt-to-move! entity
-                                        axis
-                                        (safe-get-in moved-entity [:shape :center axis])
-                                        (safe-get-in moved-entity [:motion :velocity axis])
-                                        entities))))))})
+                    (attempt-to-move! entity
+                                      (safe-get-in moved-entity [:shape :center])
+                                      (safe-get-in moved-entity [:motion :velocity])
+                                      entities)))))})

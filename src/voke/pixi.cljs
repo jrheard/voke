@@ -1,6 +1,6 @@
 (ns voke.pixi
   (:require [cljsjs.pixi]
-            [voke.schemas :refer [Entity Position Shape System]])
+            [voke.schemas :refer [Entity Shape System]])
   (:require-macros [schema.core :as sm]))
 
 (defn rectangle [graphic x y w h color]
