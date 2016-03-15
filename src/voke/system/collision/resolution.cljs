@@ -29,7 +29,7 @@
                 current-winner))
             contacted-entities)))
 
-(sm/defn move-to-closest-clear-spot
+(sm/defn find-closest-clear-spot :- s/Num
   [entity :- Entity
    axis :- Axis
    new-velocity :- s/Num
@@ -38,14 +38,14 @@
         shape1 (entity :shape)
         shape2 (closest-entity :shape)
         arithmetic-fn (if (pos? new-velocity) - +)
-        field (if (= axis :x) :width :height)
-        axis-value (arithmetic-fn (get-in shape2 [:center axis])
+        field (if (= axis :x) :width :height)]
+    (arithmetic-fn (get-in shape2 [:center axis])
                                   (/ (shape2 field) 2)
                                   (/ (shape1 field) 2)
-                                  0.01)]
-    (apply-movement entity {axis axis-value} {axis 0})))
+                                  0.01)))
 
-(sm/defn move-in-direction
+(sm/defn find-new-position-and-velocity-on-axis :- [(s/one s/Num "new-position")
+                                                    (s/one s/Num "new-velocity")]
   [entity :- Entity
    new-center :- s/Num
    new-velocity :- s/Num
@@ -57,13 +57,24 @@
                                                                new-center)
                                                         all-entities)]
     (if (seq contacted-entities)
-      (move-to-closest-clear-spot entity axis new-velocity contacted-entities)
-      (apply-movement entity {axis new-center} {axis new-velocity}))))
+      [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
+      [new-center new-velocity])))
 
 (sm/defn resolve-collision
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2
    all-entities :- [Entity]]
-  (move-in-direction entity (new-center :x) (new-velocity :x) :x all-entities)
-  (move-in-direction entity (new-center :y) (new-velocity :y) :y all-entities))
+  (let [finder (fn [axis]
+                 (find-new-position-and-velocity-on-axis entity
+                                                         (new-center axis)
+                                                         (new-velocity axis)
+                                                         axis
+                                                         all-entities))
+        [x-position x-velocity] (finder :x)
+        [y-position y-velocity] (finder :y)]
+    (apply-movement entity
+                    {:x x-position
+                     :y y-position}
+                    {:x x-velocity
+                     :y y-velocity})))

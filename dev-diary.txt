@@ -2257,3 +2257,37 @@ create a transient with (transient my-thing)
 creation is o(1)
 (peristent! the-transient) is o(1)
 calling transient! on an entity won't make its nested maps transient, though!
+
+well, applying transients to flush! didn't help all that much - at best, we shaved off 2% of the program's runtime
+
+threading macros don't seem to have bought us all that much either, update-position remains at 4% of our runtime
+no matter what i try
+
+so, let's try externs next, and then finally quadtrees after that
+
+more notes tho
+
+(assoc player-map :renderable true), 10000000 runs, 991 msecs
+(assoc player-record :renderable true), 10000000 runs, 1975 msecs
+(-> player-map :shape :center (assoc :x 5)), 10000000 runs, 5620 msecs
+(assoc (-> player-record :shape :center) :x 5), 10000000 runs, 2476 msecs
+;
+(assoc player-map :renderable true), 10000000 runs, 908 msecs
+(assoc player-record :renderable true), 10000000 runs, 1480 msecs
+(-> player-map :shape :center (assoc :x 5)), 10000000 runs, 2187 msecs
+(assoc (-> player-record :shape :center) :x 5), 10000000 runs, 1355 msecs
+;
+(assoc player-map :renderable true), 10000000 runs, 773 msecs
+(assoc player-record :renderable true), 10000000 runs, 1366 msecs
+(-> player-map :shape :center (assoc :x 5)), 10000000 runs, 2152 msecs
+(assoc (-> player-record :shape :center) :x 5), 10000000 runs, 1419 msecs
+;
+(assoc player-map :renderable true), 10000000 runs, 809 msecs
+(assoc player-record :renderable true), 10000000 runs, 1455 msecs
+(-> player-map :shape :center (assoc :x 5)), 10000000 runs, 2049 msecs
+(assoc (-> player-record :shape :center) :x 5), 10000000 runs, 1450 msecs
+
+bare assocs seem to be slower on records than on maps
+but assoc-ins are faster on records than on maps
+ugh whatever
+

@@ -5,14 +5,8 @@
   (:require-macros [schema.core :as sm]))
 
 (defn vector2->js [vector2]
-  (let [obj (js-obj)
-        x (vector2 :x)
-        y (vector2 :y)]
-    (when x
-      (aset obj "x" x))
-    (when y
-      (aset obj "y" y))
-    obj))
+  #js {:x (vector2 :x)
+       :y (vector2 :y)})
 
 (sm/defn -track-entity
   [entity :- Entity]
@@ -30,16 +24,16 @@
 
 (sm/defn apply-movement
   [entity :- Entity
-   new-center
-   new-velocity]
+   new-center :- Vector2
+   new-velocity :- Vector2]
   "Fires events to notify the world that a particular entity should have a new center+velocity."
   ; XXXXX orientation is never threaded this far! orientation never gets updated!!!
   (-update-entity-center (entity :id) new-center)
   (let [update-entity-fn (fn [entity]
                            (assert entity)
                            (-> entity
-                               (update-in [:shape :center] into new-center)
-                               (update-in [:motion :velocity] into new-velocity)))]
+                               (assoc-in [:shape :center] new-center)
+                               (assoc-in [:motion :velocity] new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
 
     (publish-event {:type :movement
