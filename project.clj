@@ -33,6 +33,9 @@
                 :compiler {:output-to "resources/public/js/compiled/voke.js"
                            :main voke.core
                            :optimizations :advanced
+                           :output-dir "resources/public/js/compiled/out-min"
+                           :asset-path "js/compiled/out-min"
+                           :source-map "resources/public/js/compiled/voke.js.map"
                            :externs ["externs/collision.js"]
                            :pretty-print false}}]}
 

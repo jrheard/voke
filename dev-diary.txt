@@ -2291,3 +2291,18 @@ bare assocs seem to be slower on records than on maps
 but assoc-ins are faster on records than on maps
 ugh whatever
 
+ok, i got externs working, nice
+that wasn't so bad
+lost most of a day to this dumb issue where i had a file with the ns voke.system.collision.utils
+but the file was util.cljs instead of util.cljs
+because ugh
+
+anyway that's working now
+so i'm profiling the advanced-mode js
+i don't completely understand it, it looks like there's two distinct-but-same codepaths that start in the move
+system and bottom out in the vanilla js Collision
+
+anyway uh it looks like quadtrees are definitely the right next step. cool. will start researching
+what the hell those are
+
+

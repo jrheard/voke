@@ -110,7 +110,6 @@
 
 (sm/defn update-position :- Entity
   [entity :- Entity]
-  ; we spend about 4% of our time in this function. i can't figure out how to optimize it any more than this.
   (let [velocity (-> entity :motion :velocity)
         center (-> entity :shape :center)]
     (assoc-in entity
