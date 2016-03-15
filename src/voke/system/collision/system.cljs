@@ -23,7 +23,7 @@
 (defn attempt-to-move!
   [entity new-center new-velocity all-entities]
   (let [contacted-entities (find-contacting-entities entity new-center all-entities)]
-    (if (> (count contacted-entities) 0)
+    (if (seq contacted-entities)
       (do
         (handle-contact entity contacted-entities)
         (resolve-collision entity new-center new-velocity all-entities))

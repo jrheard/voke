@@ -35,17 +35,18 @@
                     :entity     (update-entity-fn entity)})))
 
 (sm/defn find-contacting-entities :- [Entity]
-  ; XXX update docstring
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
-  Entities in the game. Returns another Entity if the space `entity` is trying to occupy is already filled,
-  nil if the space `entity` is trying to occupy is empty."
+  Entities in the game. Returns a (possibly empty) list of all of the other entities that `entity` would collide
+  with if it were to move to `new-center`."
   ; Critical path! Keep fast!
   [entity :- Entity
    new-center :- Vector2
    all-entities :- [Entity]]
   (let [contacting-entity-ids (js/Collision.findContactingEntityID (entity :id) (clj->js new-center))]
-    (keep (fn [entity]
-            (when (> (.indexOf contacting-entity-ids (entity :id))
-                     -1)
-              entity))
-          all-entities)))
+    (if (> (.-length contacting-entity-ids) 0)
+      (let [entity-ids (set (js->clj contacting-entity-ids))]
+        (keep (fn [entity]
+                (when (contains? entity-ids (entity :id))
+                  entity))
+              all-entities))
+      [])))
