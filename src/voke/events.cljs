@@ -3,9 +3,8 @@
   (:require [voke.schemas :refer [EventType]])
   (:require-macros [schema.core :as sm]))
 
-; A map of {event-name -> [event-handler-fn]}.
+; A map of {EventType -> [event-handler-fn]}.
 (def ^:private registry (atom {}))
-; TODO rename :event-type to :type
 
 (sm/defn publish-event [event]
   (doseq [handler (@registry (event :type))]
