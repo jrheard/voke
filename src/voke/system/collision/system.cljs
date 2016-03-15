@@ -17,7 +17,7 @@
     (remove-entity! (entity :id) :collision-system))
 
   (doseq [contacted-entity contacted-entities]
-    (publish-event {:event-type :contact
+    (publish-event {:type :contact
                     :entities   [entity contacted-entity]})))
 
 (defn attempt-to-move!

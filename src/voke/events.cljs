@@ -8,7 +8,7 @@
 ; TODO rename :event-type to :type
 
 (sm/defn publish-event [event]
-  (doseq [handler (@registry (event :event-type))]
+  (doseq [handler (@registry (event :type))]
     (handler event)))
 
 (sm/defn subscribe-to-event

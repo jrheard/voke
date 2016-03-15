@@ -63,7 +63,7 @@
 
 ; TODO not well defined
 ; maybe best thing to do would be to schematize each individual event and then say an Event is any of 'em
-(sm/defschema Event {:event-type EventType
+(sm/defschema Event {:type EventType
                      s/Any       s/Any})
 
 (sm/defschema System {(s/optional-key :tick-fn)        s/Any

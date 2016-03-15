@@ -32,7 +32,8 @@
                                (update-in [:motion :velocity] merge new-velocity)))]
     (update-entity! (entity :id) :collision-system update-entity-fn)
 
-    (publish-event {:event-type :movement
+    (publish-event {:type :movement
+                    ; XXXXXX
                     :entity     (update-entity-fn entity)})))
 
 (sm/defn find-contacting-entities :- [Entity]
