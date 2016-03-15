@@ -18,9 +18,7 @@ var Collision = {
     },
 
     updateEntity: function(entityID, newCenter) {
-        for(var axis in newCenter) {
-            entitiesByID[entityID].shape.center[axis] = newCenter[axis];
-        }
+        entitiesByID[entityID].shape.center = newCenter;
     },
 
     removeEntity: function(entityID) {
