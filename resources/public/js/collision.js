@@ -92,15 +92,6 @@ var Collision = {
         return shape.center.y + (shape.height / 2);
     },
 
-    shapesCollide: function(a, b) {
-        return !(
-            this.bottomEdgeY(a) < this.topEdgeY(b) ||
-            this.topEdgeY(a) > this.bottomEdgeY(b) ||
-            this.leftEdgeX(a) > this.rightEdgeX(b) ||
-            this.rightEdgeX(a) < this.leftEdgeX(b)
-        );
-    },
-
     findContactingEntityID: function(entityID, newCenter) {
         var movingEntity = entitiesByID[entityID];
 
