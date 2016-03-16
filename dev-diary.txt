@@ -2413,3 +2413,9 @@ https://github.com/pixijs/pixi.js/issues/356
 hm... how can we have fewer graphics objects?
 
 https://stackoverflow.com/questions/33437002/pixi-js-animate-circle-improving-performance
+
+ok cool that worked great, rendering system is no longer a perf bottleneck
+
+so at this point we're not dropping any frames at all
+
+so i'll just do add-entity! and then we'll be ready to start on monsters

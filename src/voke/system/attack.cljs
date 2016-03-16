@@ -3,6 +3,7 @@
             [schema.core :as s]
             [voke.entity :refer [projectile]]
             [voke.schemas :refer [Axis Entity System]]
+            [voke.state :refer [add-entity!]]
             [voke.util :refer [bound-between now]])
   (:require-macros [schema.core :as sm]))
 
@@ -44,16 +45,16 @@
             y-velocity (+ (entity-velocity-contribution entity :y)
                           (get multiplier :y 0))]
         ; TODO - consider having projectiles start right at the border of their parent entity, instead of inside
-        [(assoc-in entity
-                   [:weapon :last-attack-timestamp]
-                   (now))
-         ; TODO: instead of returning new entities, call add-entity! (also, write add-entity!)
-         (projectile (entity :id)
-                     (safe-get-in entity [:shape :center])
-                     (safe-get-in entity [:weapon :projectile-shape])
-                     (safe-get-in entity [:shape :orientation])
-                     x-velocity
-                     y-velocity)]))))
+        (add-entity! (projectile (entity :id)
+                                 (safe-get-in entity [:shape :center])
+                                 (safe-get-in entity [:weapon :projectile-shape])
+                                 (safe-get-in entity [:shape :orientation])
+                                 x-velocity
+                                 y-velocity)
+                     :attack-system)
+        (assoc-in entity
+                  [:weapon :last-attack-timestamp]
+                  (now))))))
 
 ;; System definition
 

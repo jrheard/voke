@@ -15,6 +15,7 @@
     (update-in state
                [:entities]
                merge
+               ; XXXX assert that the line below contains only entities that already exist in state :entities keys
                (into {}
                      (map (juxt :id identity)
                           ((system :tick-fn) (vals (state :entities))))))))
