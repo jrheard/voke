@@ -28,14 +28,14 @@
     (.beginFill color)
     (.drawRect 0 0 w h)
     (.endFill))
-  (let [graphics-data (aget @graphics "graphicsData")
-        obj (aget graphics-data
-                  (- (.-length graphics-data)
+  (let [graphics-data-list (aget @graphics "graphicsData")
+        graphics-data (aget graphics-data-list
+                  (- (.-length graphics-data-list)
                      1))]
-    (doto (aget obj "shape")
+    (doto (aget graphics-data "shape")
       (aset "x" (- x (/ w 2)))
       (aset "y" (- y (/ h 2))))
-    obj))
+    graphics-data))
 
 (sm/defn entity->graphics-data!
   [entity :- Entity]
@@ -62,12 +62,12 @@
 
 (defn remove-entity!
   [entity-id]
-  (let [obj (@graphics-data-by-entity-id entity-id)
-        graphics-data (aget @graphics "graphicsData")
-        index (.indexOf graphics-data obj)]
+  (let [graphics-data (@graphics-data-by-entity-id entity-id)
+        graphics-data-list (aget @graphics "graphicsData")
+        index (.indexOf graphics-data-list graphics-data)]
 
-    (.splice graphics-data index 1)
-    (.destroy obj)))
+    (.splice graphics-data-list index 1)
+    (.destroy graphics-data)))
 
 (defn render! [entities]
   (handle-unknown-entities! (filter
