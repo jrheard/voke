@@ -23,7 +23,7 @@
     (> (- (now)
           (get-in entity [:weapon :last-attack-timestamp]))
        ; TODO parameterize on :weapon
-       10)))
+       5)))
 
 (sm/defn entity-velocity-contribution
   [entity :- Entity

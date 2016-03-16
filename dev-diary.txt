@@ -2305,4 +2305,68 @@ system and bottom out in the vanilla js Collision
 anyway uh it looks like quadtrees are definitely the right next step. cool. will start researching
 what the hell those are
 
+https://www.youtube.com/watch?v=TJzq_kjtGTc well this sure looks promising
 
+hm, dmitriy suggests typed arrays
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Typed_arrays
+eh, i'll look into 'em later
+
+or spatial hashing? https://www.youtube.com/watch?v=gkKc3upnZU8
+
+https://gamedev.stackexchange.com/questions/69776/when-is-a-quadtree-preferable-over-spatial-hashing hm
+
+"All of which isn't to imply that a tree structure is always the right choice, of course. Flat grids
+are ideal for the situation you have in your example -- dense clouds of objects pretty much evenly
+spread everywhere in the world, and we're doing simple, inexpensive collision tests. Absolutely a grid
+is likely to be the optimal approach in that case!"
+
+http://zufallsgenerator.github.io/2014/01/26/visually-comparing-algorithms/
+
+ok spatial hashing is sounding pretty good man
+
+https://stackoverflow.com/questions/4981866/quadtree-for-2d-collision-detection
+
+" if you look at the benchmarks in the last section you will see that of all the libraries surveyed,
+quadtrees tended to perform quite poorly compared to other collision detection methods like R-Trees,
+grids or segment trees."
+
+http://gamedevelopment.tutsplus.com/tutorials/quick-tip-use-quadtrees-to-detect-likely-collisions-in-2d-space--gamedev-374
+"Any object that cannot fully fit inside a node’s boundary will be placed in the parent node."
+that answers the main question i've had about quadtrees
+
+"At every frame, you’ll insert all objects into the quadtree by first clearing the quadtree then
+using the insert method for every object."
+hm - that's the other question i've had. seems odd but maybe it's fast?
+
+http://0fps.net/2015/01/07/collision-detection-part-1/
+
+http://0fps.net/2015/01/18/collision-detection-part-2/ cautions against grids when:
+"High aspect ratio: If the ratio of the largest to smallest side of the boxes in the grid is too extreme,
+then grids will always fail catastrophically. There is no easy fix or known strategy to avoid this
+failure mode other than to not use a grid."
+
+hm - what's "too extreme" mean here?
+
+"when grids work they are effectively optimal.  The trouble is that when they fail, it is catastrophic."
+eeeeee
+
+********* THIS ARTICLE IS FUCKING GOLD
+http://0fps.net/2015/01/23/collision-detection-part-3-benchmarks/
+he says he highly recommends https://github.com/mourner/rbush , puts it in bold and italics
+
+he says box2d is super slow
+
+"For large, uniform distributions of boxes, grids are still the best.  For everything else, use segment trees."
+
+https://www.reddit.com/r/gamedev/comments/3jrtpc/quadtree_vs_spacial_hashing_which_to_use/
+has lots of people shitting on quadtrees
+
+*** FYI
+https://www.reddit.com/r/gamedev/comments/4adlsk/16gb_of_high_quality_sound_effects_the_sonniss/
+has tons of free sound effects / audio
+for later
+
+ok anyway so he said https://github.com/mourner/rbush is good, let's look at it
+
+
+consider looking into https://github.com/schteppe/p2.js if i end up doing non-box things

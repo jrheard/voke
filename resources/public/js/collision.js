@@ -2,6 +2,10 @@
 
 var entitiesByID = {};
 
+var treeItemsByID = {};
+
+var tree = rbush(5);
+
 var Collision = {
     shallowCopy: function(obj) {
         var newObj = {};
@@ -13,15 +17,40 @@ var Collision = {
         return newObj;
     },
 
+    shapeToTreeItem: function(shape, entityID) {
+        return [
+            this.leftEdgeX(shape),
+            this.topEdgeY(shape),
+            this.rightEdgeX(shape),
+            this.bottomEdgeY(shape),
+            {id: entityID}
+        ];
+    },
+
+    insertIntoTree: function(entity) {
+        var treeItem = (this.shapeToTreeItem(entity.shape, entity.id));
+        tree.insert(treeItem);
+        treeItemsByID[entity.id] = treeItem;
+    },
+
+    removeFromTree: function(entity) {
+        tree.remove(treeItemsByID[entity.id]);
+        delete treeItemsByID[entity.id];
+    },
+
     addEntity: function(entity) {
+        this.insertIntoTree(entity);
         entitiesByID[entity.id] = entity;
     },
 
     updateEntity: function(entityID, newCenter) {
+        this.removeFromTree(entitiesByID[entityID]);
         entitiesByID[entityID].shape.center = newCenter;
+        this.insertIntoTree(entitiesByID[entityID]);
     },
 
     removeEntity: function(entityID) {
+        this.removeFromTree(entitiesByID[entityID]);
         delete entitiesByID[entityID];
     },
 
@@ -75,25 +104,20 @@ var Collision = {
     findContactingEntityID: function(entityID, newCenter) {
         var movingEntity = entitiesByID[entityID];
 
-        var allEntities = [];
-        for (var id in entitiesByID) {
-            allEntities.push(entitiesByID[id]);
-        }
-
-        var collidableEntities = allEntities.filter(function(anotherEntity) {
-            return this.entitiesCanCollide(movingEntity, anotherEntity);
-        }.bind(this));
-
         var newShape = this.shallowCopy(movingEntity.shape);
         newShape.center = newCenter;
 
-        var collidingEntities = collidableEntities.filter(function(anotherEntity) {
-            return this.shapesCollide(newShape, anotherEntity.shape);
-        }.bind(this));
+        var relevantTreeItems = tree.search(
+            this.shapeToTreeItem(newShape, entityID)
+        );
 
-        return collidingEntities.map(function(entity){
-            return entity.id
+        var relevantEntityIDs = relevantTreeItems.map(function(aTreeItem) {
+            return aTreeItem[4].id;
         });
+
+        return relevantEntityIDs.filter(function(anEntityID) {
+            return this.entitiesCanCollide(movingEntity, entitiesByID[anEntityID]);
+        }.bind(this));
     }
 
 };
