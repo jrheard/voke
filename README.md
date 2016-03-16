@@ -2,6 +2,8 @@
 
 a roguelike
 
+http://jrheard.com/voke usually has a reasonably-recent, reasonably-stable version
+
 ## Setup
 
 TODO
