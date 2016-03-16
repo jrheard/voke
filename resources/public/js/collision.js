@@ -4,7 +4,7 @@ var entitiesByID = {};
 
 var treeItemsByID = {};
 
-var tree = rbush(5);
+var tree = rbush(9);
 
 var Collision = {
     shallowCopy: function(obj) {
