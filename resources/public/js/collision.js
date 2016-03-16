@@ -92,6 +92,9 @@ var Collision = {
         return shape.center.y + (shape.height / 2);
     },
 
+    // what's a situation where entitiesByID and tree can get out of sync?
+    //has to do with reload
+
     findContactingEntityID: function(entityID, newCenter) {
         var movingEntity = entitiesByID[entityID];
 

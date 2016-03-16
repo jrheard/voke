@@ -1,6 +1,7 @@
 (ns voke.core
   (:require [voke.entity :as e]
             [voke.events]
+            [voke.pixi]
             [voke.state :refer [make-game-state]]
             [voke.system.core :refer [initialize-systems! process-a-tick]]
             [voke.system.rendering :refer [render-tick]]))
