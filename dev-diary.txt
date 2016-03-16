@@ -2368,5 +2368,48 @@ for later
 
 ok anyway so he said https://github.com/mourner/rbush is good, let's look at it
 
-
 consider looking into https://github.com/schteppe/p2.js if i end up doing non-box things
+
+======
+
+3/16/16
+
+ok rbush was easy to use and now checking collisions takes 1% of our time
+ezpz
+
+that was a lot easier than i expected
+thanks, 0fps guy!
+
+https://stackoverflow.com/questions/5319282/game-engines-what-are-scene-graphs what even is a scene graph tho
+
+ok, current bottlenecks appear to be
+1) render system gets slow over time
+2) timeline view indicates that doing many rbush.remove() calls triggers a major GC
+TODO - look into some form of rbush-related object pooling
+
+anyway i'll look into these a *little* - and also i want to read more about what rbush is and how it works -
+but after that let's do something more interesting. like, i dunno, monsters?
+
+https://github.com/pixijs/pixi.js/issues/351 mentions pixi.debug.js
+
+http://www.html5gamedevs.com/topic/3208-pixi-performance-tile-maps-canvas-and-rendertexture/
+
+http://www.html5gamedevs.com/topic/1315-performance-improvement-suggestions/
+" I think an object culling pass should be added to skip off-screen sprites rendering."
+
+"Off screen culling is userland responsibility. You should be culling items in your engine, that is not
+something we will be adding into Pixi any time soon. The tools to make an item not be rendered are there
+(visible = false) you just need to use them. Creating a tilemap where you spawn every tile and show them all
+(even the ones off screen) is ineffective.
+Try looking at some of the tilemap engines built on pixi to see how you can easily do a smooth scrolling
+engine that only ever creates the number of tiles shown on the screen."
+
+https://github.com/pixijs/pixi.js/issues/48
+
+https://github.com/pixijs/pixi.js/issues/356
+
+"less Graphics objects means less buffer switching and more batching, so better performance."
+
+hm... how can we have fewer graphics objects?
+
+https://stackoverflow.com/questions/33437002/pixi-js-animate-circle-improving-performance
