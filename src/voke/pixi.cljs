@@ -65,6 +65,7 @@
   (let [obj (@graphics-data-by-entity-id entity-id)
         graphics-data (aget @graphics "graphicsData")
         index (.indexOf graphics-data obj)]
+
     (.splice graphics-data index 1)
     (.destroy obj)))
 
