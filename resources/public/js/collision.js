@@ -107,7 +107,10 @@ var Collision = {
         });
 
         return relevantEntityIDs.filter(function(anEntityID) {
-            return this.entitiesCanCollide(movingEntity, entitiesByID[anEntityID]);
+            // XXX HACK - sometimes a figwheel reload will cause situations where
+            // entitiesByID[anEntityID] is null. can't figure out why. :(
+            return entitiesByID[anEntityID] &&
+                this.entitiesCanCollide(movingEntity, entitiesByID[anEntityID]);
         }.bind(this));
     }
 

@@ -20,8 +20,8 @@
                           ((system :tick-fn) (vals (state :entities))))))))
 
 (def game-systems [collision-system
-                   attack-system
                    move-system
+                   attack-system
                    render-system])
 
 (def tick-functions

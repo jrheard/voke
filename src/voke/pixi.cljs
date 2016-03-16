@@ -3,52 +3,76 @@
             [voke.schemas :refer [Entity Shape System]])
   (:require-macros [schema.core :as sm]))
 
-(defn rectangle [graphic x y w h color]
-  (doto graphic
-    (.beginFill color)
-    (.drawRect 0 0 w h)
-    (.endFill)
-    (aset "x" (- x (/ w 2)))
-    (aset "y" (- y (/ h 2)))))
-
-(sm/defn entity->graphic
-  ; FIXME only supports rectangles atm, doesn't look to see if you've got other shapes
-  [entity :- Entity]
-  (rectangle (js/PIXI.Graphics.)
-             (-> entity :shape :center :x)
-             (-> entity :shape :center :y)
-             (-> entity :shape :width)
-             (-> entity :shape :height)
-             0x333333))
-
-(sm/defn update-obj-position!
-  [obj
-   new-center]
-  ; xxx also only supports rectangles
-  (let [new-x (new-center :x)
-        new-y (new-center :y)]
-    (when new-x
-      (aset obj "x" (- new-x (/ (aget obj "width") 2))))
-    (when new-y
-      (aset obj "y" (- new-y (/ (aget obj "height") 2))))))
-
-(defn make-renderer [width height node]
+(defn make-renderer
+  [width height node]
   (doto (js/PIXI.CanvasRenderer.
           width
           height
           #js {:view node})
     (aset "backgroundColor" 0xFFFFFF)))
 
-(defn make-stage []
-  (js/PIXI.Container.))
+(defn make-stage
+  [graphics]
+  (let [stage (js/PIXI.Container.)]
+    (.addChild stage graphics)
+    stage))
 
-; TODO codify "obj" language/terminology
-(defn add-to-stage! [stage obj]
-  (.addChild stage obj))
+(defonce renderer (atom (make-renderer 1000 700 (js/document.getElementById "screen"))))
+(defonce graphics (atom (js/PIXI.Graphics.)))
+(defonce stage (atom (make-stage @graphics)))
+(defonce graphics-data-by-entity-id (atom {}))
 
-(defn remove-from-stage! [stage obj]
-  (.removeChild stage obj)
-  (.destroy obj))
+(defn rectangle
+  [x y w h color]
+  (doto @graphics
+    (.beginFill color)
+    (.drawRect 0 0 w h)
+    (.endFill))
+  (let [graphics-data (aget @graphics "graphicsData")
+        obj (aget graphics-data
+                  (- (.-length graphics-data)
+                     1))]
+    (doto (aget obj "shape")
+      (aset "x" (- x (/ w 2)))
+      (aset "y" (- y (/ h 2))))
+    obj))
 
-(defn render! [renderer stage]
-  (.render renderer stage))
+(sm/defn entity->graphics-data!
+  [entity :- Entity]
+  (rectangle (-> entity :shape :center :x)
+             (-> entity :shape :center :y)
+             (-> entity :shape :width)
+             (-> entity :shape :height)
+             0x333333))
+
+(defn handle-unknown-entities! [entities]
+  ; TODO - only actually operate on the entity if it's visible
+  (doseq [entity entities]
+    (swap! graphics-data-by-entity-id
+           assoc
+           (:id entity)
+           (entity->graphics-data! entity))))
+
+(sm/defn update-entity-position!
+  [entity-id new-center]
+  (let [graphics-data (@graphics-data-by-entity-id entity-id)
+        shape (aget graphics-data "shape")]
+    (aset shape "x" (- (new-center :x) (/ (aget shape "width") 2)))
+    (aset shape "y" (- (new-center :y) (/ (aget shape "height") 2)))))
+
+(defn remove-entity!
+  [entity-id]
+  (let [obj (@graphics-data-by-entity-id entity-id)
+        graphics-data (aget @graphics "graphicsData")
+        index (.indexOf graphics-data obj)]
+
+    (.splice graphics-data index 1)
+    (.destroy obj)))
+
+(defn render! [entities]
+  (handle-unknown-entities! (filter
+                              #(not (contains? @graphics-data-by-entity-id (:id %)))
+                              entities))
+  ; TODO update entity visibility
+  ; TODO something something camera
+  (.render @renderer @stage))
