@@ -37,6 +37,7 @@
                   :center      {:x x :y y}}
      :motion     {:velocity             {:x 0 :y 0}
                   :affected-by-friction true
+                  :direction            nil
                   :max-acceleration     2.0
                   :max-speed            11}
      :collision  {:type :good-guy}
@@ -58,8 +59,9 @@
 (sm/defn projectile :- Entity
   [owner-id position projectile-shape orientation x-velocity y-velocity]
   (make-entity
-    {:shape      (assoc projectile-shape :orientation orientation
-                                         :center position)
+    {:shape      (assoc projectile-shape
+                        :orientation orientation
+                        :center position)
      :owner-id   owner-id
      :collision  {:type                 :projectile
                   ; XXXX TODO parameterize good/bad guy based on projectile owner
@@ -68,6 +70,7 @@
      :renderable true
      :motion     {:velocity             {:x x-velocity
                                          :y y-velocity}
+                  :direction            nil
                   :affected-by-friction false
                   :max-speed            (max x-velocity y-velocity)
                   :max-acceleration     0}}))

@@ -1,10 +1,15 @@
 (ns voke.input
-  (:require [cljs.core.async :refer [chan <! put!]]
+  (:require [clojure.set :refer [intersection difference]]
+            [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
+            [plumbing.core :refer [safe-get-in]]
+            [schema.core :as s]
+            [voke.schemas :refer [Direction Entity]]
             [voke.state :refer [update-entity!]]
             [voke.util :refer [in?]])
   (:import [goog.events KeyCodes])
-  (:require-macros [cljs.core.async.macros :refer [go-loop]]))
+  (:require-macros [cljs.core.async.macros :refer [go-loop]]
+                   [schema.core :as sm]))
 
 (def move-key-mappings {KeyCodes.W :up
                         KeyCodes.A :left
@@ -15,6 +20,8 @@
                         KeyCodes.UP    :up
                         KeyCodes.RIGHT :right})
 (def key-mappings (merge move-key-mappings fire-key-mappings))
+
+;; Browser-level input handling
 
 (defn listen-to-keyboard-inputs [event-chan]
   (events/removeAll (.-body js/document))
@@ -35,6 +42,44 @@
               (put! event-chan {:type      event-type
                                 :direction (key-mappings code)}))))))))
 
+;; Game-engine-level logic
+
+(def direction-value-mappings {:down  (/ Math/PI 2)
+                               :up    (- (/ Math/PI 2))
+                               :left  Math/PI
+                               :right 0})
+
+(sm/defn remove-conflicting-directions :- [Direction]
+  "Takes a seq of directions like #{:up :down :left} and returns a seq of directions
+  where the pairs of conflicting directions - up+down, left+right - are stripped out if they're present."
+  [directions :- [Direction]]
+  (reduce (fn [directions conflicting-pair]
+            (if (= (intersection directions conflicting-pair)
+                   conflicting-pair)
+              (difference directions conflicting-pair)
+              directions))
+          directions
+          [#{:up :down} #{:left :right}]))
+
+(sm/defn human-controlled-entity-movement-directions
+  [entity :- Entity]
+  (-> entity
+      (safe-get-in [:input :intended-move-direction])
+      remove-conflicting-directions))
+
+(sm/defn update-direction :- Entity
+  [entity :- Entity]
+  (let [directions (human-controlled-entity-movement-directions entity)]
+    (if (seq directions)
+      (assoc-in entity
+                [:motion :direction]
+                (let [intended-direction-values (map direction-value-mappings directions)]
+                  (Math/atan2 (apply + (map Math/sin intended-direction-values))
+                              (apply + (map Math/cos intended-direction-values)))))
+      (assoc-in entity
+                [:motion :direction]
+                nil))))
+
 ;;; Public
 
 (defn handle-keyboard-events [player-id]
@@ -46,7 +91,6 @@
     (go-loop []
       (let [msg (<! event-chan)
             direction (msg :direction)
-
             update-entity-args (case (msg :type)
                                  :move-key-down [[:input :intended-move-direction] conj direction]
                                  :move-key-up [[:input :intended-move-direction] disj direction]
@@ -59,6 +103,10 @@
                                                (fn [fire-directions]
                                                  (filterv #(not= direction %) fire-directions))])]
 
-        (update-entity! player-id :keyboard-input (fn [entity]
-                                                    (apply update-in entity update-entity-args)))
+        (update-entity! player-id
+                        :keyboard-input
+                        (fn [entity]
+                          (as-> entity $
+                                (apply update-in $ update-entity-args)
+                                (update-direction $))))
         (recur)))))
