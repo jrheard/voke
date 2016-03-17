@@ -19,8 +19,10 @@
    :intended-fire-direction []})
 
 (sm/defn make-weapon :- Weapon
-  []
+  [fire-direction]
   {:last-attack-timestamp 0
+   :fire-direction        fire-direction
+   :shots-per-second      20
    :projectile-shape      {:type   :rectangle
                            :width  10
                            :height 10}})
@@ -42,7 +44,7 @@
                   :max-speed            11}
      :collision  {:type :good-guy}
      :renderable true
-     :weapon     (make-weapon)
+     :weapon     (make-weapon nil)
      :input      (make-input)}))
 
 (sm/defn monster :- Entity
@@ -59,6 +61,7 @@
                   :max-acceleration     2.0
                   :max-speed            11}
      :collision  {:type :bad-guy}
+     :weapon     (make-weapon (- (/ Math/PI 2)))
      :renderable true}))
 
 (sm/defn wall :- Entity
@@ -73,15 +76,14 @@
      :renderable true}))
 
 (sm/defn projectile :- Entity
-  [owner-id position projectile-shape orientation x-velocity y-velocity]
+  [owner-id position collides-with projectile-shape orientation x-velocity y-velocity]
   (make-entity
     {:shape      (assoc projectile-shape
                         :orientation orientation
                         :center position)
      :owner-id   owner-id
      :collision  {:type                 :projectile
-                  ; XXXX TODO parameterize good/bad guy based on projectile owner
-                  :collides-with        #{:bad-guy :obstacle :item}
+                  :collides-with        collides-with
                   :destroyed-on-contact true}
      :renderable true
      :motion     {:velocity             {:x x-velocity

@@ -3,8 +3,7 @@
             [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
             [plumbing.core :refer [safe-get-in]]
-            [schema.core :as s]
-            [voke.schemas :refer [Direction Entity]]
+            [voke.schemas :refer [Direction Entity IntendedDirection]]
             [voke.state :refer [update-entity!]]
             [voke.util :refer [in?]])
   (:import [goog.events KeyCodes])
@@ -49,10 +48,10 @@
                                :left  Math/PI
                                :right 0})
 
-(sm/defn remove-conflicting-directions :- [Direction]
+(sm/defn remove-conflicting-directions :- [IntendedDirection]
   "Takes a seq of directions like #{:up :down :left} and returns a seq of directions
   where the pairs of conflicting directions - up+down, left+right - are stripped out if they're present."
-  [directions :- [Direction]]
+  [directions :- [IntendedDirection]]
   (reduce (fn [directions conflicting-pair]
             (if (= (intersection directions conflicting-pair)
                    conflicting-pair)
@@ -67,18 +66,31 @@
       (safe-get-in [:input :intended-move-direction])
       remove-conflicting-directions))
 
-(sm/defn update-direction :- Entity
+(sm/defn intended-directions->angle :- Direction
+  [intended-directions :- [IntendedDirection]]
+  (let [intended-direction-values (map direction-value-mappings intended-directions)]
+    (Math/atan2 (apply + (map Math/sin intended-direction-values))
+                (apply + (map Math/cos intended-direction-values)))))
+
+(sm/defn update-move-direction :- Entity
   [entity :- Entity]
-  (let [directions (human-controlled-entity-movement-directions entity)]
-    (if (seq directions)
+  (let [intended-directions (human-controlled-entity-movement-directions entity)]
+    (if (seq intended-directions)
       (assoc-in entity
                 [:motion :direction]
-                (let [intended-direction-values (map direction-value-mappings directions)]
-                  (Math/atan2 (apply + (map Math/sin intended-direction-values))
-                              (apply + (map Math/cos intended-direction-values)))))
+                (intended-directions->angle intended-directions))
       (assoc-in entity
                 [:motion :direction]
                 nil))))
+
+(sm/defn update-fire-direction :- Entity
+  [entity :- Entity]
+  (let [intended-direction (last (get-in entity [:input :intended-fire-direction]))]
+    (if intended-direction
+      (assoc-in entity
+                [:weapon :fire-direction]
+                (intended-directions->angle [intended-direction]))
+      (assoc-in entity [:weapon :fire-direction] nil))))
 
 ;;; Public
 
@@ -106,7 +118,8 @@
         (update-entity! player-id
                         :keyboard-input
                         (fn [entity]
-                          (as-> entity $
-                                (apply update-in $ update-entity-args)
-                                (update-direction $))))
+                          (let [entity (apply update-in entity update-entity-args)]
+                            (if (.startsWith (name (msg :type)) "fire")
+                              (update-fire-direction entity)
+                              (update-move-direction entity)))))
         (recur)))))

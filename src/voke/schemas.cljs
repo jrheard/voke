@@ -4,8 +4,8 @@
 
 (sm/defschema EntityID s/Int)
 
-(sm/defschema Direction (s/enum :up :right :down :left))
-(sm/defschema IntendedDirection #{Direction})
+(sm/defschema IntendedDirection (s/enum :up :right :down :left))
+(sm/defschema IntendedDirectionSet #{IntendedDirection})
 
 (sm/defschema Axis (s/enum :x :y))
 
@@ -17,19 +17,30 @@
                      :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
 
+(defn maybe-0-2pi
+  [x]
+  (or
+    (nil? x)
+    (< 0 x (* Math/PI 2))))
+
+; urp seems to go from neg 2pi to 2pi
+(def Direction maybe-0-2pi)
+
 (sm/defschema ProjectileShape (dissoc Shape :orientation :center))
 
 (sm/defschema Motion {:velocity             Vector2
-                      :direction            (s/maybe s/Num) ; nil or 0->2pi
+                      :direction            Direction
                       :affected-by-friction s/Bool
                       :max-speed            s/Num
                       :max-acceleration     s/Num})
 
 (sm/defschema Weapon {:last-attack-timestamp s/Int
+                      :fire-direction        Direction
+                      :shots-per-second      s/Num
                       :projectile-shape      ProjectileShape})
 
-(sm/defschema Input {:intended-move-direction IntendedDirection
-                     :intended-fire-direction IntendedDirection})
+(sm/defschema Input {:intended-move-direction IntendedDirectionSet
+                     :intended-fire-direction IntendedDirectionSet})
 
 (sm/defschema CollisionType (s/enum
                               :good-guy
