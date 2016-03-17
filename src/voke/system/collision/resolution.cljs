@@ -2,8 +2,7 @@
   (:require [clojure.set :refer [intersection]]
             [schema.core :as s]
             [voke.schemas :refer [Axis Entity Vector2]]
-            [voke.state :refer [remove-entity!]]
-            [voke.system.collision.util :refer [apply-movement find-contacting-entities]]
+            [voke.system.collision.util :refer [apply-movement find-contacting-entities remove-entity!]]
             [voke.util :refer [winnow]])
   (:require-macros [schema.core :as sm]))
 
@@ -98,11 +97,11 @@
     ; We're processing a collision, so go ahead and nuke everything that's supposed to be
     ; destroyed during collisions.
     (doseq [entity-to-destroy entities-to-destroy]
-      (remove-entity! (entity-to-destroy :id) :collision-system))
+      (remove-entity! entity-to-destroy))
 
     (if (get-in entity [:collision :destroyed-on-contact])
       ; entity's supposed to be destroyed, too; destroy it and we're done.
-      (remove-entity! (entity :id) :collision-system)
+      (remove-entity! entity)
 
       ; entity isn't supposed to be destroyed, so let's figure out where to put it.
       (if (seq remaining-entities)

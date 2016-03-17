@@ -2,6 +2,7 @@
   (:require [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Entity EntityID System Vector2]]
             [voke.system.collision.resolution :refer [resolve-collision]]
+            [voke.system.collision.state :refer [collisions-fired dead-entities]]
             [voke.system.collision.util :refer [-track-entity -stop-tracking-entity
                                                  apply-movement find-contacting-entities]])
   (:require-macros [schema.core :as sm]))
@@ -13,17 +14,21 @@
   [entity :- Entity
    contacted-entities :- [Entity]]
   (doseq [contacted-entity contacted-entities]
-    (publish-event {:type :contact
-                    :entities   [entity contacted-entity]})))
+    (let [id-pair #{(entity :id) (contacted-entity :id)}]
+      (when-not (contains? @collisions-fired id-pair)
+        (swap! collisions-fired conj id-pair)
+        (publish-event {:type     :contact
+                        :entities [entity contacted-entity]})))))
 
 (defn attempt-to-move!
   [entity new-center new-velocity all-entities]
-  (let [contacted-entities (find-contacting-entities entity new-center all-entities)]
-    (if (seq contacted-entities)
-      (do
-        (handle-contact entity contacted-entities)
-        (resolve-collision entity new-center new-velocity contacted-entities all-entities))
-      (apply-movement entity new-center new-velocity))))
+  (when-not (contains? @dead-entities (entity :id))
+    (let [contacted-entities (find-contacting-entities entity new-center all-entities)]
+      (if (seq contacted-entities)
+        (do
+          (handle-contact entity contacted-entities)
+          (resolve-collision entity new-center new-velocity contacted-entities all-entities))
+        (apply-movement entity new-center new-velocity)))))
 
 ;; System definition
 
@@ -31,6 +36,10 @@
   {:initialize     (fn [game-state]
                      (doseq [entity (vals (game-state :entities))]
                        (-track-entity entity)))
+
+   :tick-fn (fn [_]
+              (reset! dead-entities #{})
+              (reset! collisions-fired #{}))
 
    :event-handlers [{:event-type :entity-added
                      :fn         (fn [event]

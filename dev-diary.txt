@@ -2491,4 +2491,33 @@ etc
 
 how to avoid/solve?
 
+right so we just defer updating the vanilla-js collision system's state until the update-entity event
+is actually *processed*, rather than when it's queued, that makes more sense / makes things more consistent
 
+but so what if the player and the bullet are moving toward each other, and intersect in the same frame?
+you still end up with a situation where entity 0 has moved into entity 1's space, and entity 1 has moved
+into entity 0's space
+
+so you're *definitely* going to wind up with duplicate contact events - one for [0 1], another for [1 0]
+and they're processed synchronously, with no queueing, so you can't easily dedupe
+
+i guess the collision system could keep an atom that's reset every frame
+and the atom has a set of sets like {0 1}
+and so if you notice a collision between entities 0 and 1 and you resolve it, you record it
+hm but like what goes in the set / how is it checked
+
+maybe you just have an atom that's a set of dead entities
+and if you get an attempt-to-move! call for an entity that's already been killed this frame, you just
+drop it on the ground
+
+that solves the problem for projectiles, but
+what about if a player and a monster both try to move into each other?
+the player's nudged so it's right next to the monster, and a contact is fired
+the monster's nudged so it's right next to the player, and a contact is fired
+
+the end goal is that the player is only damaged once
+whose responsibility is it to dedupe this?
+
+does the collision system keep two atoms, each of which is reset every frame,
+and one of them is a set of dead entity IDs,
+and the other is a set of pairs of IDs that have had collision events fire?
