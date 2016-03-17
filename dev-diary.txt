@@ -2438,6 +2438,20 @@ ok, i made a good amount of progress but now i have to go home
 
 outstanding TODOs / things to work on next
 
-1) clean up the code
+[DONE] 1) clean up the code
 2) hilariously, i can never move the player character into the stream of bad guy bullets.
    look into what's happening and fix it (bad guy bullets should be removed, contact events fired)
+
+=======
+
+3/17/16
+
+https://adambard.com/blog/clojure-reducers-for-mortals/ indicates that core.reducers buys you significant
+performance increases in clj. should benchmark them to see if they work similarly in cljs.
+
+https://bendyworks.com/transducers-clojures-next-big-idea/
+
+apparently reducers were neat but now it's all about transducers?
+what?
+
+http://kukuruku.co/hub/funcprog/clojure-transducers-reducers-and-other-stuff
