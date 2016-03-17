@@ -96,6 +96,8 @@
   [entity-id :- EntityID
    origin :- s/Keyword
    update-fn]
+  ; this swap! call takes a bit onger than i'd like, shows up in profiles at around 3% of
+  ; the time we spend. consider replacing the buffer with (gasp) a regular js array. not worth it yet though
   (swap! buffer conj {:type      :update
                       :origin    origin
                       :entity-id entity-id

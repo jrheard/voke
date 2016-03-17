@@ -45,6 +45,22 @@
      :weapon     (make-weapon)
      :input      (make-input)}))
 
+(sm/defn monster :- Entity
+  [x y]
+  (make-entity
+    {:shape      {:width       25
+                  :height      25
+                  :type        :rectangle
+                  :orientation 0
+                  :center      {:x x :y y}}
+     :motion     {:velocity             {:x 0 :y 0}
+                  :affected-by-friction true
+                  :direction            nil
+                  :max-acceleration     2.0
+                  :max-speed            11}
+     :collision  {:type :bad-guy}
+     :renderable true}))
+
 (sm/defn wall :- Entity
   [x y width height]
   (make-entity
