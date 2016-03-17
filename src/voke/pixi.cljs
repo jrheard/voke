@@ -43,7 +43,7 @@
              (-> entity :shape :center :y)
              (-> entity :shape :width)
              (-> entity :shape :height)
-             0x333333))
+             (-> entity :render-info :fill)))
 
 (defn handle-unknown-entities! [entities]
   ; TODO - only actually operate on the entity if it's visible
