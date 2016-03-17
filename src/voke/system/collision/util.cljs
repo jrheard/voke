@@ -28,9 +28,9 @@
    new-velocity :- Vector2]
   "Fires events to notify the world that a particular entity should have a new center+velocity."
   ; XXXXX orientation is never threaded this far! orientation never gets updated!!!
-  (-update-entity-center (entity :id) new-center)
   (let [update-entity-fn (fn [entity]
                            (assert entity)
+                           (-update-entity-center (entity :id) new-center)
                            (-> entity
                                (assoc-in [:shape :center] new-center)
                                (assoc-in [:motion :velocity] new-velocity)))]

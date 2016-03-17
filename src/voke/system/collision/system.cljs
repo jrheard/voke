@@ -1,7 +1,6 @@
 (ns voke.system.collision.system
   (:require [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Entity EntityID System Vector2]]
-            [voke.state :refer [remove-entity!]]
             [voke.system.collision.resolution :refer [resolve-collision]]
             [voke.system.collision.util :refer [-track-entity -stop-tracking-entity
                                                  apply-movement find-contacting-entities]])
@@ -13,9 +12,6 @@
 (sm/defn handle-contact
   [entity :- Entity
    contacted-entities :- [Entity]]
-  (when (get-in entity [:collision :destroyed-on-contact])
-    (remove-entity! (entity :id) :collision-system))
-
   (doseq [contacted-entity contacted-entities]
     (publish-event {:type :contact
                     :entities   [entity contacted-entity]})))
@@ -26,7 +22,7 @@
     (if (seq contacted-entities)
       (do
         (handle-contact entity contacted-entities)
-        (resolve-collision entity new-center new-velocity all-entities))
+        (resolve-collision entity new-center new-velocity contacted-entities all-entities))
       (apply-movement entity new-center new-velocity))))
 
 ;; System definition

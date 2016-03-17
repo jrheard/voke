@@ -1,7 +1,10 @@
 (ns voke.system.collision.resolution
-  (:require [schema.core :as s]
+  (:require [clojure.set :refer [intersection]]
+            [schema.core :as s]
             [voke.schemas :refer [Axis Entity Vector2]]
-            [voke.system.collision.util :refer [apply-movement find-contacting-entities]])
+            [voke.state :refer [remove-entity!]]
+            [voke.system.collision.util :refer [apply-movement find-contacting-entities]]
+            [voke.util :refer [winnow]])
   (:require-macros [schema.core :as sm]))
 
 (defn left-edge-x [rect] (- (rect :x)
@@ -40,9 +43,9 @@
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)]
     (arithmetic-fn (get-in shape2 [:center axis])
-                                  (/ (shape2 field) 2)
-                                  (/ (shape1 field) 2)
-                                  0.01)))
+                   (/ (shape2 field) 2)
+                   (/ (shape1 field) 2)
+                   0.01)))
 
 (sm/defn find-new-position-and-velocity-on-axis :- [(s/one s/Num "new-position")
                                                     (s/one s/Num "new-velocity")]
@@ -50,26 +53,31 @@
    new-center :- s/Num
    new-velocity :- s/Num
    axis :- Axis
+   remaining-contacted-entities :- [Entity]
    all-entities :- [Entity]]
-  (let [contacted-entities (find-contacting-entities entity
-                                                        (assoc (get-in entity [:shape :center])
-                                                               axis
-                                                               new-center)
-                                                        all-entities)]
+  (let [all-contacted-entities (find-contacting-entities entity
+                                                         (assoc (get-in entity [:shape :center])
+                                                                axis
+                                                                new-center)
+                                                         all-entities)
+        contacted-entities (intersection (set all-contacted-entities)
+                                         (set remaining-contacted-entities))]
     (if (seq contacted-entities)
       [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
       [new-center new-velocity])))
 
-(sm/defn resolve-collision
+(sm/defn move-up-against
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2
+   remaining-contacted-entities :- [Entity]
    all-entities :- [Entity]]
   (let [finder (fn [axis]
                  (find-new-position-and-velocity-on-axis entity
                                                          (new-center axis)
                                                          (new-velocity axis)
                                                          axis
+                                                         remaining-contacted-entities
                                                          all-entities))
         [x-position x-velocity] (finder :x)
         [y-position y-velocity] (finder :y)]
@@ -78,3 +86,29 @@
                      :y y-position}
                     {:x x-velocity
                      :y y-velocity})))
+
+(sm/defn resolve-collision
+  [entity :- Entity
+   new-center :- Vector2
+   new-velocity :- Vector2
+   contacted-entities :- [Entity]
+   all-entities :- [Entity]]
+  (let [[entities-to-destroy remaining-entities] (winnow #(get-in % [:collision :destroyed-on-contact])
+                                                         contacted-entities)]
+    ; We're processing a collision, so go ahead and nuke everything that's supposed to be
+    ; destroyed during collisions.
+    (doseq [entity-to-destroy entities-to-destroy]
+      (remove-entity! (entity-to-destroy :id) :collision-system))
+
+    (if (get-in entity [:collision :destroyed-on-contact])
+      ; entity's supposed to be destroyed, too; destroy it and we're done.
+      (remove-entity! (entity :id) :collision-system)
+
+      ; entity isn't supposed to be destroyed, so let's figure out where to put it.
+      (if (seq remaining-entities)
+        ; There's at least one remaining non-destroyed entity from the set of entities
+        ; that we collided with earlier.
+        (move-up-against entity new-center new-velocity remaining-entities all-entities)
+
+        ; There's nothing left! Go ahead and make the move that this entity was trying to make in the first place.
+        (apply-movement entity new-center new-velocity)))))

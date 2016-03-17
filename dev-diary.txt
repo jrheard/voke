@@ -2455,3 +2455,40 @@ apparently reducers were neat but now it's all about transducers?
 what?
 
 http://kukuruku.co/hub/funcprog/clojure-transducers-reducers-and-other-stuff
+
+scratchpad:
+player is entity 0
+bullet is entity 1
+another bullet is entity 2
+
+player moves in such a way that it intersects bullets 1 and 2
+
+* resolve-collision is called with entity 0, contacted-entities 1 and 2
+    * entities 1 and 2 are queued for removal, entity 0 is allowed to make the move it wanted to
+* resolve-collision is called with entity 1, contacted-entities 0
+    * entity 1 is queued for removal
+* resolve-collision is called with entity 2, contacted-entities 0
+    * entity 2 is queued for removal
+
+a few options on how to proceed
+* voke.state's remove-entity! pipeline can squash duplicates
+    * i don't like this, seems like it's hiding smelly code
+* collision system can use a function that sits on top of remove-entity! and fires a -stop-tracking-entity
+    * i think i like this approach
+
+hm, approach 2 seems to fuck us actually
+by the time that resolve-collision is called on entities 1 and 2, they've been removed from the collision system
+and so it's like "what"
+should removal be made somehow eager? *can* it be? i don't think so
+
+what situations are we worried about here
+
+in the same tick:
+player runs into bullet, takes damage, destroys bullet
+bullet runs into player, causes damage, destroys bullet
+
+etc
+
+how to avoid/solve?
+
+

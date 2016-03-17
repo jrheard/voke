@@ -18,6 +18,7 @@
 
 (defn winnow
   [pred xs]
+  ; XXX is this transient usage overkill?
   (let [matches (transient [])
         not-matches (transient [])]
     (doseq [x xs]
