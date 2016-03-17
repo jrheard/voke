@@ -28,15 +28,13 @@
                  (- maximum-entity-velocity-shot-speed-contribution)
                  maximum-entity-velocity-shot-speed-contribution))
 
-; XXX TODO
-(def SHOT-SPEED 5)
-
 (sm/defn shot-speed
   [entity :- Entity
    axis :- Axis]
-  (let [trig-fn (if (= axis :x) Math/cos Math/sin)]
-    (+ (* (trig-fn (get-in entity [:weapon :fire-direction]))
-          SHOT-SPEED)
+  (let [weapon (entity :weapon)
+        trig-fn (if (= axis :x) Math/cos Math/sin)]
+    (+ (* (trig-fn (weapon :fire-direction))
+          (weapon :shot-speed))
        (entity-velocity-contribution entity axis))))
 
 (sm/defn process-firing-entities :- [Entity]

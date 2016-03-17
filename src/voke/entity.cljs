@@ -23,6 +23,7 @@
   {:last-attack-timestamp 0
    :fire-direction        fire-direction
    :shots-per-second      20
+   :shot-speed            5
    :projectile-shape      {:type   :rectangle
                            :width  10
                            :height 10}})

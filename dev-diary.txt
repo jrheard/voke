@@ -2424,8 +2424,8 @@ actually i'm kinda torn between starting on monsters and starting on bigger leve
 i think monsters'll be more fun though
 
 MONSTER NOTES / ORDER OF OPERATIONS:
-first just make static ones
-then make ones that fire
+[DONE] first just make static ones
+[DONE] then make ones that fire
 then make ones that move toward you
 then make ones that fire toward you
 then implement health and damage
