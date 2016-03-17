@@ -50,7 +50,6 @@ var Collision = {
     },
 
     removeEntity: function(entityID) {
-    console.log("removing " + entityID);
         this.removeFromTree(entitiesByID[entityID]);
         delete entitiesByID[entityID];
     },

@@ -11,9 +11,10 @@
 
 (sm/defn -track-entity
   [entity :- Entity]
-  (js/Collision.addEntity (clj->js
-                            (select-keys entity
-                                         [:id :collision :shape]))))
+  (-> entity
+      (select-keys [:id :collision :shape])
+      clj->js
+      js/Collision.addEntity))
 
 (defn -update-entity-center
   [entity-id new-center]
@@ -44,7 +45,12 @@
                   :new-center new-center}))
 
 (sm/defn remove-entity!
+  "Wrapper around voke.state/remove-entity! so that we can keep track of which entities have been destroyed
+  by us during this frame."
   [entity :- Entity]
+  ; The collision system should only be killing :destroyed-on-contact entities.
+  (assert (get-in entity [:collision :destroyed-on-contact]))
+
   (swap! dead-entities conj (entity :id))
   (voke.state/remove-entity! (entity :id) :collision-system))
 

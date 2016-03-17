@@ -20,6 +20,9 @@
                      (map (juxt :id identity)
                           ((system :tick-fn) (vals (state :entities))))))))
 
+; smell: collision system is listed first so that its tick function can reset its internal state atoms
+; before anything else can happen in each frame.
+; should systems have a :before-tick function that serves this purpose?
 (def game-systems [collision-system
                    move-system
                    attack-system

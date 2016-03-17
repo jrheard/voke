@@ -65,7 +65,7 @@
       [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
       [new-center new-velocity])))
 
-(sm/defn move-up-against
+(sm/defn move-to-nearest-clear-spot
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2
@@ -92,6 +92,8 @@
    new-velocity :- Vector2
    contacted-entities :- [Entity]
    all-entities :- [Entity]]
+  "Resolves a collision between `entity` and `contacted-entities`. Destroys any :destroyed-on-contact entities
+  involved in the collision, and makes some decisions about the final location of all other entities involved."
   (let [[entities-to-destroy remaining-entities] (winnow #(get-in % [:collision :destroyed-on-contact])
                                                          contacted-entities)]
     ; We're processing a collision, so go ahead and nuke everything that's supposed to be
@@ -107,7 +109,7 @@
       (if (seq remaining-entities)
         ; There's at least one remaining non-destroyed entity from the set of entities
         ; that we collided with earlier.
-        (move-up-against entity new-center new-velocity remaining-entities all-entities)
+        (move-to-nearest-clear-spot entity new-center new-velocity remaining-entities all-entities)
 
         ; There's nothing left! Go ahead and make the move that this entity was trying to make in the first place.
         (apply-movement entity new-center new-velocity)))))

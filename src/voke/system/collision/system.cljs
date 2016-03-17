@@ -2,7 +2,7 @@
   (:require [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Entity EntityID System Vector2]]
             [voke.system.collision.resolution :refer [resolve-collision]]
-            [voke.system.collision.state :refer [collisions-fired dead-entities]]
+            [voke.system.collision.state :refer [contacts-fired dead-entities]]
             [voke.system.collision.util :refer [-track-entity -stop-tracking-entity
                                                  apply-movement find-contacting-entities]])
   (:require-macros [schema.core :as sm]))
@@ -15,8 +15,10 @@
    contacted-entities :- [Entity]]
   (doseq [contacted-entity contacted-entities]
     (let [id-pair #{(entity :id) (contacted-entity :id)}]
-      (when-not (contains? @collisions-fired id-pair)
-        (swap! collisions-fired conj id-pair)
+      ; Use the contacts-fired atom to dedupe contact events, so we don't fire multiple events
+      ; for the same id-pair in the same frame.
+      (when-not (contains? @contacts-fired id-pair)
+        (swap! contacts-fired conj id-pair)
         (publish-event {:type     :contact
                         :entities [entity contacted-entity]})))))
 
@@ -39,7 +41,7 @@
 
    :tick-fn (fn [_]
               (reset! dead-entities #{})
-              (reset! collisions-fired #{}))
+              (reset! contacts-fired #{}))
 
    :event-handlers [{:event-type :entity-added
                      :fn         (fn [event]
