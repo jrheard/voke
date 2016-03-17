@@ -2426,6 +2426,8 @@ i think monsters'll be more fun though
 MONSTER NOTES / ORDER OF OPERATIONS:
 [DONE] first just make static ones
 [DONE] then make ones that fire
+then draw them in red or something
+and draw their projectiles in some redlike color too
 then make ones that move toward you
 then make ones that fire toward you
 then implement health and damage

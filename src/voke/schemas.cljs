@@ -17,14 +17,7 @@
                      :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
 
-(defn maybe-0-2pi
-  [x]
-  (or
-    (nil? x)
-    (< 0 x (* Math/PI 2))))
-
-; urp seems to go from neg 2pi to 2pi
-(def Direction maybe-0-2pi)
+(def Direction (s/maybe s/Num))
 
 (sm/defschema ProjectileShape (dissoc Shape :orientation :center))
 

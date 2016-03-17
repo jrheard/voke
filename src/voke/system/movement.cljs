@@ -19,6 +19,8 @@
 (def min-velocity 0.05)
 
 (sm/defn should-update-velocity? :- s/Bool
+  "Entities' velocity should be updated if they're intending to move somewhere
+  or if they're currently moving and affected by friction."
   [entity :- Entity]
   (or (get-in entity [:motion :direction])
       (and
@@ -33,7 +35,7 @@
     (get-in entity [:motion :max-acceleration])
     0))
 
-(sm/defn ^:private -update-axis-velocity :- Entity
+(sm/defn -update-axis-velocity :- Entity
   [entity :- Entity
    axis :- Axis
    trig-fn :- (s/enum Math/cos Math/sin)]
@@ -77,7 +79,7 @@
 (sm/defn relevant-to-movement-system? :- s/Bool
   [entity :- Entity]
   (or
-    (seq (get-in entity [:input :intended-move-direction]))
+    (get-in entity [:motion :direction])
     (not= (get-in entity [:motion :velocity :x] 0) 0)
     (not= (get-in entity [:motion :velocity :y] 0) 0)))
 
