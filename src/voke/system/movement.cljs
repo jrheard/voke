@@ -39,13 +39,13 @@
 
 (sm/defn human-controlled-entity-movement-directions
   [entity :- Entity]
-  (remove-conflicting-directions (safe-get-in entity [:brain :intended-move-direction])))
+  (remove-conflicting-directions (safe-get-in entity [:input :intended-move-direction])))
 
 (sm/defn should-update-orientation? :- s/Bool
   [entity :- Entity]
   (and
     ; TODO - support monsters
-    (get-in entity [:brain :intended-move-direction])
+    (get-in entity [:input :intended-move-direction])
     (not-empty (human-controlled-entity-movement-directions entity))))
 
 (sm/defn update-orientation :- Entity
@@ -120,7 +120,7 @@
 (sm/defn relevant-to-movement-system? :- s/Bool
   [entity :- Entity]
   (or
-    (seq (get-in entity [:brain :intended-move-direction]))
+    (seq (get-in entity [:input :intended-move-direction]))
     (not= (get-in entity [:motion :velocity :x] 0) 0)
     (not= (get-in entity [:motion :velocity :y] 0) 0)))
 

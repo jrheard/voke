@@ -20,7 +20,7 @@
   [entity :- Entity]
   ; TODO support monsters
   (and
-    (seq (get-in entity [:brain :intended-fire-direction]))
+    (seq (get-in entity [:input :intended-fire-direction]))
     (> (- (now)
           (get-in entity [:weapon :last-attack-timestamp]))
        ; TODO parameterize on :weapon
@@ -37,7 +37,7 @@
   [entities :- [Entity]]
   (flatten
     (for [entity (filter can-attack? entities)]
-      (let [direction (last (safe-get-in entity [:brain :intended-fire-direction]))
+      (let [direction (last (safe-get-in entity [:input :intended-fire-direction]))
             ; multiplier will eventually be used with a :shot-speed component that'll live somewhere on :weapon
             multiplier (directions-to-velocity-multipliers direction)
             x-velocity (+ (entity-velocity-contribution entity :x)

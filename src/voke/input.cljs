@@ -48,14 +48,14 @@
             direction (msg :direction)
 
             update-entity-args (case (msg :type)
-                                 :move-key-down [[:brain :intended-move-direction] conj direction]
-                                 :move-key-up [[:brain :intended-move-direction] disj direction]
-                                 :fire-key-down [[:brain :intended-fire-direction]
+                                 :move-key-down [[:input :intended-move-direction] conj direction]
+                                 :move-key-up [[:input :intended-move-direction] disj direction]
+                                 :fire-key-down [[:input :intended-fire-direction]
                                                  (fn [fire-directions]
                                                    (if (in? fire-directions direction)
                                                      fire-directions
                                                      (conj fire-directions direction)))]
-                                 :fire-key-up [[:brain :intended-fire-direction]
+                                 :fire-key-up [[:input :intended-fire-direction]
                                                (fn [fire-directions]
                                                  (filterv #(not= direction %) fire-directions))])]
 

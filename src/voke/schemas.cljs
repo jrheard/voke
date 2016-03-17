@@ -27,9 +27,7 @@
 (sm/defschema Weapon {:last-attack-timestamp s/Int
                       :projectile-shape      ProjectileShape})
 
-(sm/defschema Brain {:type                    (s/enum :player :skeleton :projectile)
-                     ; TODO - these will be *angles* for non-player entities, not sets!!!!!
-                     :intended-move-direction IntendedDirection
+(sm/defschema Input {:intended-move-direction IntendedDirection
                      :intended-fire-direction IntendedDirection})
 
 (sm/defschema CollisionType (s/enum
@@ -55,7 +53,7 @@
                       (s/optional-key :renderable) s/Bool   ; TODO this will have like colors and stuff
                       (s/optional-key :owner-id)   EntityID
                       (s/optional-key :weapon)     Weapon
-                      (s/optional-key :brain)      Brain})
+                      (s/optional-key :input)      Input})
 
 (sm/defschema GameState {:entities {:s/Int Entity}})
 

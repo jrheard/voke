@@ -1,5 +1,5 @@
 (ns voke.entity
-  (:require [voke.schemas :refer [Brain Entity Weapon]])
+  (:require [voke.schemas :refer [Input Entity Weapon]])
   (:require-macros [schema.core :as sm]))
 
 (defonce next-entity-id (atom 0))
@@ -13,10 +13,9 @@
   [entity-map]
   (assoc entity-map :id (get-next-entity-id)))
 
-(sm/defn make-player-brain :- Brain
+(sm/defn make-input :- Input
   []
-  {:type                    :player
-   :intended-move-direction #{}
+  {:intended-move-direction #{}
    :intended-fire-direction []})
 
 (sm/defn make-weapon :- Weapon
@@ -43,7 +42,7 @@
      :collision  {:type :good-guy}
      :renderable true
      :weapon     (make-weapon)
-     :brain      (make-player-brain)}))
+     :input      (make-input)}))
 
 (sm/defn wall :- Entity
   [x y width height]
