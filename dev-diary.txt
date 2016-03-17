@@ -2419,3 +2419,15 @@ ok cool that worked great, rendering system is no longer a perf bottleneck
 so at this point we're not dropping any frames at all
 
 so i'll just do add-entity! and then we'll be ready to start on monsters
+
+actually i'm kinda torn between starting on monsters and starting on bigger levels / camera
+i think monsters'll be more fun though
+
+MONSTER NOTES / ORDER OF OPERATIONS:
+first just make static ones
+then make ones that fire
+then make ones that move toward you
+then make ones that fire toward you
+then implement health and damage
+then implement invincibility+melee damage
+then implement death
