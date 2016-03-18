@@ -1,5 +1,5 @@
 (ns voke.entity
-  (:require [voke.schemas :refer [Brain Entity Weapon]])
+  (:require [voke.schemas :refer [Input Entity Weapon]])
   (:require-macros [schema.core :as sm]))
 
 (defonce next-entity-id (atom 0))
@@ -13,15 +13,19 @@
   [entity-map]
   (assoc entity-map :id (get-next-entity-id)))
 
-(sm/defn make-player-brain :- Brain
+(sm/defn make-input :- Input
   []
-  {:type                    :player
-   :intended-move-direction #{}
+  {:intended-move-direction #{}
    :intended-fire-direction []})
 
 (sm/defn make-weapon :- Weapon
-  []
+  [fire-direction projectile-color]
   {:last-attack-timestamp 0
+   ; XXXX nuke fire-direction, just temporary thing for testing
+   :fire-direction        fire-direction
+   :shots-per-second      20
+   :shot-speed            5
+   :projectile-color      projectile-color
    :projectile-shape      {:type   :rectangle
                            :width  10
                            :height 10}})
@@ -31,44 +35,64 @@
 (sm/defn player :- Entity
   [x y]
   (make-entity
-    {:shape      {:width       25
-                  :height      25
-                  :type        :rectangle
-                  :orientation 0
-                  :center      {:x x :y y}}
-     :motion     {:velocity             {:x 0 :y 0}
-                  :affected-by-friction true
-                  :max-acceleration     2.0
-                  :max-speed            11}
-     :collision  {:type :good-guy}
-     :renderable true
-     :weapon     (make-weapon)
-     :brain      (make-player-brain)}))
+    {:shape       {:width       25
+                   :height      25
+                   :type        :rectangle
+                   :orientation 0
+                   :center      {:x x :y y}}
+     :motion      {:velocity             {:x 0 :y 0}
+                   :affected-by-friction true
+                   :direction            nil
+                   :max-acceleration     2.0
+                   :max-speed            11}
+     :collision   {:type :good-guy}
+     :render-info {:fill 0x333333}
+     :weapon      (make-weapon nil 0x666666)
+     :input       (make-input)}))
+
+(sm/defn monster :- Entity
+  [x y]
+  (make-entity
+    {:shape       {:width       25
+                   :height      25
+                   :type        :rectangle
+                   :orientation 0
+                   :center      {:x x :y y}}
+     :motion      {:velocity             {:x 0 :y 0}
+                   :affected-by-friction true
+                   :direction            nil
+                   :max-acceleration     2.0
+                   :max-speed            11}
+     :collision   {:type :bad-guy}
+     :weapon      (make-weapon (- (/ Math/PI 2))
+                               0xFF0A00)
+     :render-info {:fill 0xB22822}}))
 
 (sm/defn wall :- Entity
   [x y width height]
   (make-entity
-    {:shape      {:width       width
-                  :height      height
-                  :type        :rectangle
-                  :orientation 0
-                  :center      {:x x :y y}}
-     :collision  {:type :obstacle}
-     :renderable true}))
+    {:shape       {:width       width
+                   :height      height
+                   :type        :rectangle
+                   :orientation 0
+                   :center      {:x x :y y}}
+     :collision   {:type :obstacle}
+     :render-info {:fill 0x333333}}))
 
 (sm/defn projectile :- Entity
-  [owner-id position projectile-shape orientation x-velocity y-velocity]
+  [owner-id position collides-with projectile-shape projectile-color orientation x-velocity y-velocity]
   (make-entity
-    {:shape      (assoc projectile-shape :orientation orientation
-                                         :center position)
-     :owner-id   owner-id
-     :collision  {:type                 :projectile
-                  ; XXXX TODO parameterize good/bad guy based on projectile owner
-                  :collides-with        #{:bad-guy :obstacle :item}
-                  :destroyed-on-contact true}
-     :renderable true
-     :motion     {:velocity             {:x x-velocity
-                                         :y y-velocity}
-                  :affected-by-friction false
-                  :max-speed            (max x-velocity y-velocity)
-                  :max-acceleration     0}}))
+    {:shape       (assoc projectile-shape
+                         :orientation orientation
+                         :center position)
+     :owner-id    owner-id
+     :collision   {:type                 :projectile
+                   :collides-with        collides-with
+                   :destroyed-on-contact true}
+     :render-info {:fill projectile-color}
+     :motion      {:velocity             {:x x-velocity
+                                          :y y-velocity}
+                   :direction            nil
+                   :affected-by-friction false
+                   :max-speed            (max x-velocity y-velocity)
+                   :max-acceleration     0}}))

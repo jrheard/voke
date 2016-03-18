@@ -2419,3 +2419,105 @@ ok cool that worked great, rendering system is no longer a perf bottleneck
 so at this point we're not dropping any frames at all
 
 so i'll just do add-entity! and then we'll be ready to start on monsters
+
+actually i'm kinda torn between starting on monsters and starting on bigger levels / camera
+i think monsters'll be more fun though
+
+MONSTER NOTES / ORDER OF OPERATIONS:
+[DONE] first just make static ones
+[DONE] then make ones that fire
+then draw them in red or something
+and draw their projectiles in some redlike color too
+then make ones that move toward you
+then make ones that fire toward you
+then implement health and damage
+then implement invincibility+melee damage
+then implement death
+
+ok, i made a good amount of progress but now i have to go home
+
+outstanding TODOs / things to work on next
+
+[DONE] 1) clean up the code
+2) hilariously, i can never move the player character into the stream of bad guy bullets.
+   look into what's happening and fix it (bad guy bullets should be removed, contact events fired)
+
+=======
+
+3/17/16
+
+https://adambard.com/blog/clojure-reducers-for-mortals/ indicates that core.reducers buys you significant
+performance increases in clj. should benchmark them to see if they work similarly in cljs.
+
+https://bendyworks.com/transducers-clojures-next-big-idea/
+
+apparently reducers were neat but now it's all about transducers?
+what?
+
+http://kukuruku.co/hub/funcprog/clojure-transducers-reducers-and-other-stuff
+
+scratchpad:
+player is entity 0
+bullet is entity 1
+another bullet is entity 2
+
+player moves in such a way that it intersects bullets 1 and 2
+
+* resolve-collision is called with entity 0, contacted-entities 1 and 2
+    * entities 1 and 2 are queued for removal, entity 0 is allowed to make the move it wanted to
+* resolve-collision is called with entity 1, contacted-entities 0
+    * entity 1 is queued for removal
+* resolve-collision is called with entity 2, contacted-entities 0
+    * entity 2 is queued for removal
+
+a few options on how to proceed
+* voke.state's remove-entity! pipeline can squash duplicates
+    * i don't like this, seems like it's hiding smelly code
+* collision system can use a function that sits on top of remove-entity! and fires a -stop-tracking-entity
+    * i think i like this approach
+
+hm, approach 2 seems to fuck us actually
+by the time that resolve-collision is called on entities 1 and 2, they've been removed from the collision system
+and so it's like "what"
+should removal be made somehow eager? *can* it be? i don't think so
+
+what situations are we worried about here
+
+in the same tick:
+player runs into bullet, takes damage, destroys bullet
+bullet runs into player, causes damage, destroys bullet
+
+etc
+
+how to avoid/solve?
+
+right so we just defer updating the vanilla-js collision system's state until the update-entity event
+is actually *processed*, rather than when it's queued, that makes more sense / makes things more consistent
+
+but so what if the player and the bullet are moving toward each other, and intersect in the same frame?
+you still end up with a situation where entity 0 has moved into entity 1's space, and entity 1 has moved
+into entity 0's space
+
+so you're *definitely* going to wind up with duplicate contact events - one for [0 1], another for [1 0]
+and they're processed synchronously, with no queueing, so you can't easily dedupe
+
+i guess the collision system could keep an atom that's reset every frame
+and the atom has a set of sets like {0 1}
+and so if you notice a collision between entities 0 and 1 and you resolve it, you record it
+hm but like what goes in the set / how is it checked
+
+maybe you just have an atom that's a set of dead entities
+and if you get an attempt-to-move! call for an entity that's already been killed this frame, you just
+drop it on the ground
+
+that solves the problem for projectiles, but
+what about if a player and a monster both try to move into each other?
+the player's nudged so it's right next to the monster, and a contact is fired
+the monster's nudged so it's right next to the player, and a contact is fired
+
+the end goal is that the player is only damaged once
+whose responsibility is it to dedupe this?
+
+does the collision system keep two atoms, each of which is reset every frame,
+and one of them is a set of dead entity IDs,
+and the other is a set of pairs of IDs that have had collision events fire?

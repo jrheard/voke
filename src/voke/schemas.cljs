@@ -4,33 +4,36 @@
 
 (sm/defschema EntityID s/Int)
 
-(sm/defschema Direction (s/enum :up :right :down :left))
-(sm/defschema IntendedDirection #{Direction})
+(sm/defschema IntendedDirection (s/enum :up :right :down :left))
+(sm/defschema IntendedDirectionSet #{IntendedDirection})
 
 (sm/defschema Axis (s/enum :x :y))
 
 (sm/defschema Vector2 {:x s/Num
-                        :y s/Num})
+                       :y s/Num})
 
 (sm/defschema Shape {:type        (s/enum :rectangle :circle)
                      :center      Vector2
                      :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
 
+(def Direction (s/maybe s/Num))
+
 (sm/defschema ProjectileShape (dissoc Shape :orientation :center))
 
 (sm/defschema Motion {:velocity             Vector2
+                      :direction            Direction
                       :affected-by-friction s/Bool
                       :max-speed            s/Num
                       :max-acceleration     s/Num})
 
 (sm/defschema Weapon {:last-attack-timestamp s/Int
+                      :fire-direction        Direction
+                      :shots-per-second      s/Num
                       :projectile-shape      ProjectileShape})
 
-(sm/defschema Brain {:type                    (s/enum :player :skeleton :projectile)
-                     ; TODO - these will be *angles* for non-player entities, not sets!!!!!
-                     :intended-move-direction IntendedDirection
-                     :intended-fire-direction IntendedDirection})
+(sm/defschema Input {:intended-move-direction IntendedDirectionSet
+                     :intended-fire-direction IntendedDirectionSet})
 
 (sm/defschema CollisionType (s/enum
                               :good-guy
@@ -55,7 +58,7 @@
                       (s/optional-key :renderable) s/Bool   ; TODO this will have like colors and stuff
                       (s/optional-key :owner-id)   EntityID
                       (s/optional-key :weapon)     Weapon
-                      (s/optional-key :brain)      Brain})
+                      (s/optional-key :input)      Input})
 
 (sm/defschema GameState {:entities {:s/Int Entity}})
 
@@ -64,7 +67,7 @@
 ; TODO not well defined
 ; maybe best thing to do would be to schematize each individual event and then say an Event is any of 'em
 (sm/defschema Event {:type EventType
-                     s/Any       s/Any})
+                     s/Any s/Any})
 
 (sm/defschema System {(s/optional-key :tick-fn)        s/Any
                       (s/optional-key :initialize)     s/Any

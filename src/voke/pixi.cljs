@@ -22,6 +22,7 @@
 (defonce stage (atom (make-stage @graphics)))
 (defonce graphics-data-by-entity-id (atom {}))
 
+; TODO borders
 (defn rectangle
   [x y w h color]
   (doto @graphics
@@ -43,7 +44,7 @@
              (-> entity :shape :center :y)
              (-> entity :shape :width)
              (-> entity :shape :height)
-             0x333333))
+             (-> entity :render-info :fill)))
 
 (defn handle-unknown-entities! [entities]
   ; TODO - only actually operate on the entity if it's visible

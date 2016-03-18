@@ -19,7 +19,7 @@
   [state :- GameState]
   (let [relevant-entities (filter #(and
                                     (contains? % :shape)
-                                    (contains? % :renderable))
+                                    (contains? % :render-info))
                                   (vals (state :entities)))]
     (render! relevant-entities)))
 
