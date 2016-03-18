@@ -2521,3 +2521,12 @@ whose responsibility is it to dedupe this?
 does the collision system keep two atoms, each of which is reset every frame,
 and one of them is a set of dead entity IDs,
 and the other is a set of pairs of IDs that have had collision events fire?
+
+======
+
+3/18/16
+
+i ended up doing all that stuff above re: collision system
+
+hung out with the pdx clojure guys last night, they said transducers definitely sound relevant to the perf/
+overhead issues i've seen. boy i have a lot of reading to do
