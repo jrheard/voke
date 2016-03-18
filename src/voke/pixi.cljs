@@ -22,6 +22,7 @@
 (defonce stage (atom (make-stage @graphics)))
 (defonce graphics-data-by-entity-id (atom {}))
 
+; TODO borders
 (defn rectangle
   [x y w h color]
   (doto @graphics
