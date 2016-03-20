@@ -2532,3 +2532,6 @@ hung out with the pdx clojure guys last night, they said transducers definitely 
 overhead issues i've seen. boy i have a lot of reading to do
 
 also at some point i should look into http://gafferongames.com/game-physics/fix-your-timestep/ again
+
+also need to look into having a moving camera - i think we can just adjust the root Graphics node's
+x and y, might be pretty easy to get working
