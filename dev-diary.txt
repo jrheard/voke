@@ -2542,3 +2542,23 @@ x and y, might be pretty easy to get working
 
 i have done nothing for the past 48 hours aside from playing the division.
 i'll get back to work tomorrow.
+
+=====
+
+3/22/16
+
+spent most of day doing adult stuff, taxes etc.
+
+here's where voke is currently at
+
+1) i need to read / process / decide http://gafferongames.com/game-physics/fix-your-timestep/
+2) i want to look into transducers to see if they can help eliminate some of the cljs-land overhead
+i've been seeing in profiles.
+3) continue work on monsters as per notes from a few days back; spin up a voke/system/ai/ folder with movement,
+attack, etc namespaces, as well as a system namespace
+
+assorted notes from hanging out with the clojure guys the other day:
+https://www.conj.io/
+https://github.com/rm-hull/monet
+"if you're using a lot of functions inside maps, that's a sign that you might want multimethods"
+"if you're doing a lot of type checks, that's a sign that you might want protocols"
