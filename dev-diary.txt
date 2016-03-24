@@ -2636,3 +2636,28 @@ so we can try seeing what would happen if we ran the simulation at like 100fps a
 will we be able to get the performance necessary for that, though? already difficult enough hitting
 60fps, and we're definitely not render-bound...
 i dunno, man
+
+======
+
+3/24/16
+
+http://www.html5gamedevs.com/topic/5509-how-do-you-guys-write-your-timestep-stuff-any-advice/
+"setTimeout is good if you need your loop to continue running when the window is blurred", hm
+
+"You need to make your calculations based on the delta, even if requestAnimationFrame will most
+likely be ~60fps, because not ALL devices are 60fps. And in the future, when all devices are 120hz,
+people might still be playing your game! "
+
+okokok i'll need to do this good timestep business, fine
+
+http://codeincomplete.com/posts/2013/12/4/javascript_game_foundations_the_game_loop/
+
+"One additional note is that requestAnimationFrame might pause if our browser loses focus, resulting in
+a very, very large dt after it resumes. We can workaround this by limiting the delta to one second"
+
+nice
+
+i'll limit it to 1 frame i think, rather than 1 second, to avoid tunneling / etc
+
+"The basic idea is to accumulate our dt until it is greater than our desired fixed timestep, call
+update with the fixed timestep, and carry over the remainder to accumulate for the next time."
