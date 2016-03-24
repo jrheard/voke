@@ -2562,3 +2562,77 @@ https://www.conj.io/
 https://github.com/rm-hull/monet
 "if you're using a lot of functions inside maps, that's a sign that you might want multimethods"
 "if you're doing a lot of type checks, that's a sign that you might want protocols"
+
+http://gafferongames.com/game-physics/integration-basics/
+"An excellent option for greater accuracy and less memory when simulating a large number of particles
+is verlet integration. In this case, the integrator does not require storing velocity per-particle, as
+it derives it from the difference in the previous two frames position values. This makes collision
+detection and position fix-up (eg. pushing particles out of collision) really quick and easy to implement."
+sounds super interesting
+
+=======
+
+3/23/16
+
+http://gafferongames.com/game-physics/fix-your-timestep/
+
+ok i'm having a hard time processing this writing/code style for some reason
+so in "semi-fixed timestep" he's got an approach where
+every frame, you check to see how long it's been since the beginning of the last frame, call that X
+let's say X is .1 seconds
+if so, you process N ticks of your game's logic, where N is .1 / (1/60), which is basically 6
+and then you render
+let's say X is 0.001 seconds somehow
+if so, you process 1 tick of your game's logic
+
+"we’re now taking multiple steps per-display update including one additional step to consume any
+the remainder of frame time not divisible by dt. This is no problem if you are render bound, but
+if your simulation is the most expensive part of your frame you could run into problems including
+the so called “spiral of death”."
+
+"You really need to ensure that it takes significantly less than X seconds of real time to update X
+seconds worth of physics simulation. If you can do this then your physics engine can “catch up” from
+any temporary spike by simulating more frames. Alternatively you can clamp at a maximum # of steps
+per-frame and the simulation will appear to slow down under heavy load. Arguably this is better than
+spiraling to death, assuming of course that the heavy load is just a temporary spike."
+hm
+
+"The renderer produces time and the simulation consumes it in discrete dt sized chunks." hm
+new code chunk
+at the start of each frame, you check to see how long it's been since the beginning of the last frame, call that X
+you keep an "accumulator" value that basically stores the.. remainder of any.. trailing frame time.
+bad wording on previous line but this stuff is unusual for me
+basically it seems like this is the exact same as the above code chunk, except it addresses the
+"including one additional step to consume any the remainder of frame time not divisible by dt"
+bit from the first chunk
+
+"we only ever integrate with steps sized dt so it follows that in the common case we have some unsimulated
+time left over at the end of each frame. This is important! This left over time is passed on to the next
+frame via the accumulator variable and is not thrown away."
+
+code snippet from game programming patterns
+http://gameprogrammingpatterns.com/game-loop.html#play-catch-up
+
+"Note that the time step here isn’t the visible frame rate anymore. MS_PER_UPDATE is just the granularity
+we use to update the game. The shorter this step is, the more processing time it takes to catch up to real
+time. The longer it is, the choppier the gameplay is. Ideally, you want it pretty short, often faster than
+60 FPS, so that the game simulates with high fidelity on fast machines."
+
+"The end result is the game simulates at a constant rate using safe fixed time steps across a range of hardware.
+It’s just that the player’s visible window into the game gets choppier on a slower machine."
+
+i'm really impressed by the clarity of this author's writing. this is much more comprehensible than the
+fix your timestep article
+
+i'm not super sure about this whole "render(lag / MS_PER_UPDATE);" thing, though - probably won't do that
+i don't like the idea of having to teach the rendering system about velocities + positions
+i dunno, maybe it would help address the issue where bullets "appear" to be vanishing a little bit before
+they get to walls, because physics + collision detection happens before rendering
+
+ok so at the end of the day, do i want to do this?
+i guess i can cut a branch and give it a shot
+maybe it won't even be that bad tbh
+so we can try seeing what would happen if we ran the simulation at like 100fps and just render at 60fps
+will we be able to get the performance necessary for that, though? already difficult enough hitting
+60fps, and we're definitely not render-bound...
+i dunno, man
