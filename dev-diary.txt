@@ -2661,3 +2661,9 @@ i'll limit it to 1 frame i think, rather than 1 second, to avoid tunneling / etc
 
 "The basic idea is to accumulate our dt until it is greater than our desired fixed timestep, call
 update with the fixed timestep, and carry over the remainder to accumulate for the next time."
+
+http://codepen.io/anthdeldev/pen/QwGpxM
+
+http://www.isaacsukin.com/news/2015/01/detailed-explanation-javascript-game-loops-and-timing
+***** this is a very good article
+

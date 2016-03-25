@@ -21,6 +21,10 @@
 ; Useful in dev, so figwheel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))
 
+(def timestep (/ 1000 60))
+(def last-frame-time (atom nil))
+(def time-accumulator (atom 0))
+
 (defn ^:export main []
   (js/window.cancelAnimationFrame @animation-frame-request-id)
   (voke.events/unsub-all!)
@@ -28,13 +32,21 @@
 
   (initialize-systems! @game-state (player :id))
 
-  (js/window.requestAnimationFrame (fn process-frame [ts]
-                                     (swap! game-state process-a-tick)
+  (reset! last-frame-time (js/performance.now))
 
-                                     (swap! game-state (voke.state/flush!))
+  (js/window.requestAnimationFrame
+    (fn process-frame [ts]
+      (swap! time-accumulator + (min (- ts @last-frame-time) timestep))
+      (reset! last-frame-time ts)
 
-                                     (render-tick @game-state)
+      (while (>= @time-accumulator timestep)
+        (swap! game-state process-a-tick)
+        (swap! game-state (voke.state/flush!))
 
-                                     (reset! animation-frame-request-id
-                                             (js/window.requestAnimationFrame process-frame)))))
+        (swap! time-accumulator - timestep))
+
+      (render-tick @game-state)
+
+      (reset! animation-frame-request-id
+              (js/window.requestAnimationFrame process-frame)))))
 
