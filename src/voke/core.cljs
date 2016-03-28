@@ -1,6 +1,7 @@
 (ns voke.core
   (:require [voke.entity :as e]
             [voke.events]
+            [voke.clock :refer [add-time!]]
             [voke.state :refer [make-game-state]]
             [voke.system.core :refer [initialize-systems! process-a-tick]]
             [voke.system.rendering :refer [render-tick]]))
@@ -21,20 +22,34 @@
 ; Useful in dev, so figwheel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))
 
-(defn ^:export main []
+(def timestep (/ 1000 60))
+(def last-frame-time (atom nil))
+(def time-accumulator (atom 0))
+
+(defn -initialize! []
   (js/window.cancelAnimationFrame @animation-frame-request-id)
   (voke.events/unsub-all!)
   (voke.state/flush!)
-
   (initialize-systems! @game-state (player :id))
+  (reset! last-frame-time (js/performance.now)))
 
-  (js/window.requestAnimationFrame (fn process-frame [ts]
-                                     (swap! game-state process-a-tick)
+(defn ^:export main []
+  (-initialize!)
 
-                                     (swap! game-state (voke.state/flush!))
+  (js/window.requestAnimationFrame
+    (fn process-frame [ts]
+      (swap! time-accumulator + (min (- ts @last-frame-time) 200))
+      (reset! last-frame-time ts)
 
-                                     (render-tick @game-state)
+      (while (>= @time-accumulator timestep)
+        (add-time! timestep)
+        (swap! game-state process-a-tick)
+        (swap! game-state (voke.state/flush!))
 
-                                     (reset! animation-frame-request-id
-                                             (js/window.requestAnimationFrame process-frame)))))
+        (swap! time-accumulator - timestep))
+
+      (render-tick @game-state)
+
+      (reset! animation-frame-request-id
+              (js/window.requestAnimationFrame process-frame)))))
 

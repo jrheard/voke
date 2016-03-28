@@ -1,10 +1,11 @@
 (ns voke.system.attack
   (:require [plumbing.core :refer [safe-get-in]]
             [schema.core :as s]
+            [voke.clock :refer [now]]
             [voke.entity :refer [projectile]]
             [voke.schemas :refer [Axis CollisionType Direction Entity System Vector2]]
             [voke.state :refer [add-entity!]]
-            [voke.util :refer [bound-between now]])
+            [voke.util :refer [bound-between]])
   (:require-macros [schema.core :as sm]))
 
 (def maximum-entity-velocity-shot-speed-contribution 2)
@@ -16,10 +17,10 @@
   (let [weapon (entity :weapon)]
     (and
       (get-in entity [:weapon :fire-direction])
-      (> (- (now)
-            (get-in entity [:weapon :last-attack-timestamp]))
-         (/ 1000
-            (weapon :shots-per-second))))))
+      (>= (- (now)
+             (weapon :last-attack-timestamp))
+          (/ 1000
+             (weapon :shots-per-second))))))
 
 (sm/defn entity-velocity-contribution
   [entity :- Entity

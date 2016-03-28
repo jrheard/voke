@@ -17,9 +17,11 @@
     (.addChild stage graphics)
     stage))
 
+; does it make sense to have these be atoms?
 (defonce renderer (atom (make-renderer 1000 700 (js/document.getElementById "screen"))))
 (defonce graphics (atom (js/PIXI.Graphics.)))
 (defonce stage (atom (make-stage @graphics)))
+
 (defonce graphics-data-by-entity-id (atom {}))
 
 ; TODO borders
@@ -31,8 +33,8 @@
     (.endFill))
   (let [graphics-data-list (aget @graphics "graphicsData")
         graphics-data (aget graphics-data-list
-                  (- (.-length graphics-data-list)
-                     1))]
+                            (- (.-length graphics-data-list)
+                               1))]
     (doto (aget graphics-data "shape")
       (aset "x" (- x (/ w 2)))
       (aset "y" (- y (/ h 2))))
@@ -56,10 +58,11 @@
 
 (sm/defn update-entity-position!
   [entity-id new-center]
-  (let [graphics-data (@graphics-data-by-entity-id entity-id)
-        shape (aget graphics-data "shape")]
-    (aset shape "x" (- (new-center :x) (/ (aget shape "width") 2)))
-    (aset shape "y" (- (new-center :y) (/ (aget shape "height") 2)))))
+  (let [graphics-data (@graphics-data-by-entity-id entity-id)]
+    (when graphics-data
+      (let [shape (aget graphics-data "shape")]
+        (aset shape "x" (- (new-center :x) (/ (aget shape "width") 2)))
+        (aset shape "y" (- (new-center :y) (/ (aget shape "height") 2)))))))
 
 (defn remove-entity!
   [entity-id]
@@ -67,8 +70,9 @@
         graphics-data-list (aget @graphics "graphicsData")
         index (.indexOf graphics-data-list graphics-data)]
 
-    (.splice graphics-data-list index 1)
-    (.destroy graphics-data)))
+    (when (> index -1)
+      (.splice graphics-data-list index 1)
+      (.destroy graphics-data))))
 
 (defn render! [entities]
   (handle-unknown-entities! (filter

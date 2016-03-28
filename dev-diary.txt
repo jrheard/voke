@@ -2661,3 +2661,57 @@ i'll limit it to 1 frame i think, rather than 1 second, to avoid tunneling / etc
 
 "The basic idea is to accumulate our dt until it is greater than our desired fixed timestep, call
 update with the fixed timestep, and carry over the remainder to accumulate for the next time."
+
+http://codepen.io/anthdeldev/pen/QwGpxM
+
+http://www.isaacsukin.com/news/2015/01/detailed-explanation-javascript-game-loops-and-timing
+***** this is a very good article
+
+========
+
+3/28/16
+
+ok cool back in the saddle
+
+so right now i'm trying to get the core game logic to tick at 100fps, and leave the rendering system at 60fps
+and i'm running into this situation where the rendering system is being told to move entities that it doesn't
+yet know about
+
+i guess the right thing to do here is for the rendering system to discard movement events if it isn't already
+tracking the entity, because it'll pick the entity up at the next rendering tick
+
+okok that was easy enough to fix.
+
+now i'm digging into some weirdness re: getting the attack system to generate evenly-spaced bullets.
+i'm running into issues because
+* the attack system uses (now) to figure out how much time has passed, so it can check to see
+  if the given entity is ready to fire again
+* (now) currently uses js/performance.now, which tracks *wall* time, not sim time
+* multiple sim ticks can happen in rapid succession
+
+so i guess we need to have a clock that tracks sim time. might as well add it to util i guess
+nah let's do voke.clock
+
+ok made some progress with time
+
+ran into an issue where the monster's weapon was behing like this:
+it would shoot a lot of bullets quickly with little spacing between them for a while
+then it would shoot them with more spacing between them for a while
+then it would revert back, etc
+
+it was supposed to fire 20 times a second
+
+each tick, the amount of time that had passed since the last time the weapon had fired looked like this sometimes:
+
+16.66666666666424
+33.33333333332848
+49.999999999992724
+
+and other times it looked like this:
+
+16.66666666666788
+33.33333333333576
+50.00000000000364
+
+and so basically sometimes the weapon would fire every 4 ticks, and sometimes it would fire every 3 ticks
+because of something something floating point math
