@@ -5,10 +5,6 @@
   [coll elm]
   (some #(= elm %) coll))
 
-(defn now
-  []
-  (.getTime (js/Date.)))
-
 (defn bound-between
   [num lower upper]
   (cond

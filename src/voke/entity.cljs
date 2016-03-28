@@ -21,9 +21,9 @@
 (sm/defn make-weapon :- Weapon
   [fire-direction projectile-color]
   {:last-attack-timestamp 0
-   ; XXXX nuke fire-direction, just temporary thing for testing
+   ; XXXX nuke fire-direction arg, just temporary thing for testing
    :fire-direction        fire-direction
-   :shots-per-second      20
+   :shots-per-second      21
    :shot-speed            5
    :projectile-color      projectile-color
    :projectile-shape      {:type   :rectangle
@@ -61,8 +61,8 @@
      :motion      {:velocity             {:x 0 :y 0}
                    :affected-by-friction true
                    :direction            nil
-                   :max-acceleration     2.0
-                   :max-speed            11}
+                   :max-acceleration     1.5
+                   :max-speed            8}
      :collision   {:type :bad-guy}
      :weapon      (make-weapon (- (/ Math/PI 2))
                                0xFF0A00)
