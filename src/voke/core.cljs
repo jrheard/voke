@@ -23,8 +23,8 @@
 (defonce animation-frame-request-id (atom nil))
 
 (def timestep (/ 1000 60))
-(def last-frame-time (atom nil))
-(def time-accumulator (atom 0))
+(defonce last-frame-time (atom nil))
+(defonce time-accumulator (atom 0))
 
 (defn -initialize! []
   (js/window.cancelAnimationFrame @animation-frame-request-id)

@@ -2715,3 +2715,88 @@ and other times it looked like this:
 
 and so basically sometimes the weapon would fire every 4 ticks, and sometimes it would fire every 3 ticks
 because of something something floating point math
+
+=======
+
+3/29/16
+
+ok whatever transducers
+https://www.youtube.com/watch?v=6mTbuzafcII
+
+https://youtu.be/6mTbuzafcII?t=27m26s mentions speed
+
+there's no actual (mapping f)
+just (map f) returns a transducer
+
+http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming
+
+pretty good code snippets on that post
+
+http://kukuruku.co/hub/funcprog/clojure-transducers-reducers-and-other-stuff
+
+(def cc (vec (range 10000000)))
+(time (reduce + 0 (->> cc (filter odd?) (map inc))))
+"Elapsed time: 697.390000 msecs"
+(time (transduce (comp (filter odd?) (map inc))
+                 +
+                 cc))
+"Elapsed time: 358.080000 msecs"
+
+https://gist.github.com/ptaoussanis/e537bd8ffdc943bbbce7
+**** lots of discussion on this one
+
+http://stackoverflow.com/questions/26317325/can-someone-explain-clojure-transducers-to-me-in-simple-terms
+
+ok so the transducer is the process, like
+(comp
+  (map inc)
+  (filter even?))
+that's a transducer right there apparently.
+whereas (map inc) is.. a reducing function? or is it also a transducer
+hm i think inc is actually the reducing function
+(map inc) is a transducer
+
+a poster on that SO thread suggested that transducers may be more valuable for folks like rich / david / etc
+than they are for plebs like me, abstraction-wise
+but still might be able to use them for perf
+
+http://clojure.org/reference/transducers
+
+To apply a transducer to an input collection and construct a new output collection, use into
+(which efficiently uses reduce and transients if possible):
+(into [] xf (range 1000))
+
+ok, anyway let's see if we can get any perf out of all this business
+
+profile indicates that we spend 7.2% of our time in process-update-events
+
+lol i ended up with this just completely batshit insane reimplementation
+
+  (if (seq update-events)
+    (assoc state
+           :entities
+           (transduce (fn [step]
+                        (fn
+                          ([result] (step result))
+                          ([result event]
+                           (step result
+                                 [(event :entity-id)
+                                  ((event :fn) (get result (event :entity-id)))]))))
+
+                      (fn ([acc] acc)
+                        ([acc [k v]]
+                         (assoc acc k v)))
+
+                      (state :entities)
+
+                      update-events))
+    state)
+
+which is completely retarded - i'm sure i'm doing this wrong - and affects perf not at all, not even a little
+
+anyway i don't think transducers are even relevant to this particular situation. all i want to do is
+take a map of {thing-id: thing}
+and a list of events that look like {:thing-id an-id :fn a-function}
+and apply those events to the original map
+and i think that the preexisting implementation in voke.state already does as good a job of this
+as we're likely to get
