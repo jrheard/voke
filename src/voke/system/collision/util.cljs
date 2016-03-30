@@ -51,8 +51,9 @@
   ; The collision system should only be killing :destroyed-on-contact entities.
   (assert (get-in entity [:collision :destroyed-on-contact]))
 
-  (swap! dead-entities conj (entity :id))
-  (voke.state/remove-entity! (entity :id) :collision-system))
+  (when-not (contains? @dead-entities (entity :id))
+    (swap! dead-entities conj (entity :id))
+    (voke.state/remove-entity! (entity :id) :collision-system)))
 
 (sm/defn find-contacting-entities :- [Entity]
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the

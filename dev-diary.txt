@@ -2872,3 +2872,17 @@ B happens because 0 is *right* above 5
 cljs system is using out-of-date center for 0, moves 5 to the wrong spot
 
 one resolution: have cljs system ask for most up-to-date position of 0 before moving 5
+
+ok i did that
+
+still a few lingering problems
+
+sometimes the player teleports in.. certain situations. not sure which. particularly if it's chasing you
+and you stop moving (?)
+also if you're shooting a bunch of bullets and it collides with you as a bullet's dying, sometimes it crashes?
+not sure what's going on in either situation
+
+ok i fixed the second of thsoe two things
+haven't started on the first yet
+
+
