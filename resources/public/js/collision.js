@@ -49,6 +49,11 @@ var Collision = {
         this.insertIntoTree(entitiesByID[entityID]);
     },
 
+// XX document
+    getEntityCenter: function(entityID) {
+        return entitiesByID[entityID].shape.center;
+    },
+
     removeEntity: function(entityID) {
         this.removeFromTree(entitiesByID[entityID]);
         delete entitiesByID[entityID];

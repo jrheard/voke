@@ -2819,3 +2819,56 @@ nudged so that it's to the right of the monster
 i'll deal with it tomorrow
 
 to make things simpler, have the monster always move up very slowly
+
+====
+
+3/30/16
+
+this situation is a bit difficult to debug / reason about. i wonder if it would be helpful to slow things to
+like 5fps and to add a pause button - so if you hit P, time stops. that could be useful
+
+anyway so what's happening?
+
+player is 0, moving down
+monster is 5, moving up
+
+A:
+system resolves for 0
+nothing contacted in x direction
+contacted 5 in y direction
+0's bottom is moved to be right above 5's top (todo confirm this is working correctly)
+
+B:
+system resolves for 5
+nothing in x direction
+contacted 0 in y direction
+5's top is moved to be right below 0's bottom
+
+at this point 0 has y 291.01412121520923
+5 has y 315.61896848408577
+
+the difference between those two numbers is 24.60484726887654
+
+so the resolution system puts 0 and y too close together!
+
+...hm i think this is happening because step B isn't aware that step A has happened and 0's position has shifted
+0 starts at y=290.608 and is moved to y=291.014
+5 starts at 316.024 and is moved to y=315.618
+
+yeah
+
+well, why is B happening?
+
+0 is moving down
+5 is moving up
+
+0 attempts to move
+A happens
+0 is nudged to be in a good spot so it's right above 5
+js system's state is updated to reflect this
+
+5 attempts to move
+B happens because 0 is *right* above 5
+cljs system is using out-of-date center for 0, moves 5 to the wrong spot
+
+one resolution: have cljs system ask for most up-to-date position of 0 before moving 5

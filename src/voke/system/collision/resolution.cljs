@@ -37,20 +37,24 @@
    new-velocity :- s/Num
    contacted-entities :- [Entity]]
   (let [closest-entity (find-closest-contacted-entity axis new-velocity contacted-entities)
+        ; XXXX ask js system for entities' actual shapes?
         shape1 (entity :shape)
-        shape2 (closest-entity :shape)
+        possibly-out-of-date-shape2 (closest-entity :shape)
+        shape2 (assoc possibly-out-of-date-shape2
+                      :center
+                      (js->clj (js/Collision.getEntityCenter (closest-entity :id))
+                               :keywordize-keys true))
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)]
-    (when (= (entity :id) 0)
-      (js/console.log "yo" (clj->js (shape1 :center)) (clj->js (shape2 :center)))
-      (js/console.log (clj->js axis))
-      (js/console.log
-          (arithmetic-fn (get-in shape2 [:center axis])
-                         (/ (shape2 field) 2)
-                         (/ (shape1 field) 2)
-                         0.01)
-          )
+    (js/console.log "find-closest-clear-spot between these shapes" (clj->js (shape1 :center)) (clj->js (shape2 :center)))
+    (js/console.log (clj->js axis))
+    (js/console.log
+      (arithmetic-fn (get-in shape2 [:center axis])
+                     (/ (shape2 field) 2)
+                     (/ (shape1 field) 2)
+                     0.01)
       )
+
     (arithmetic-fn (get-in shape2 [:center axis])
                    (/ (shape2 field) 2)
                    (/ (shape1 field) 2)
@@ -71,9 +75,15 @@
                                                          all-entities)
         contacted-entities (intersection (set all-contacted-entities)
                                          (set remaining-contacted-entities))]
+    (js/console.log (name axis))
     (if (seq contacted-entities)
-      [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
-      [new-center new-velocity])))
+      (do
+        (js/console.log "contacted")
+        (js/console.log (clj->js contacted-entities))
+        [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0])
+      (do
+        (js/console.log "nothing contacted")
+        [new-center new-velocity]))))
 
 (sm/defn move-to-nearest-clear-spot
   [entity :- Entity
@@ -81,6 +91,7 @@
    new-velocity :- Vector2
    remaining-contacted-entities :- [Entity]
    all-entities :- [Entity]]
+  (js/console.log "move-to-nearest" (entity :id))
   (let [finder (fn [axis]
                  (find-new-position-and-velocity-on-axis entity
                                                          (new-center axis)
