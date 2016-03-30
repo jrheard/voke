@@ -2,6 +2,7 @@
   (:require [voke.events :refer [subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
             [voke.schemas :refer [GameState System]]
+            [voke.system.ai.system :refer [ai-system]]
             [voke.system.attack :refer [attack-system]]
             [voke.system.collision.system :refer [collision-system]]
             [voke.system.movement :refer [move-system]]
@@ -26,6 +27,7 @@
 (def game-systems [collision-system
                    move-system
                    attack-system
+                   ai-system
                    render-system])
 
 (def tick-functions

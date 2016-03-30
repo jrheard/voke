@@ -66,6 +66,8 @@
      :collision   {:type :bad-guy}
      :weapon      (make-weapon (- (/ Math/PI 2))
                                0xFF0A00)
+     :ai          {:movement :basic
+                   :attack   :basic}
      :render-info {:fill 0xB22822}}))
 
 (sm/defn wall :- Entity

@@ -92,7 +92,10 @@
                       :entity entity}))
 
 (sm/defn update-entity!
-  "Queue an update to a particular entity."
+  "Queue an update to a particular entity.
+
+  Mainly intended to be used by system's event handlers. System tick functions should return modified entities
+  rather than calling this function."
   [entity-id :- EntityID
    origin :- s/Keyword
    update-fn]
