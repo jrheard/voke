@@ -2800,3 +2800,12 @@ and a list of events that look like {:thing-id an-id :fn a-function}
 and apply those events to the original map
 and i think that the preexisting implementation in voke.state already does as good a job of this
 as we're likely to get
+
+http://ignaciothayer.com/post/Transducers-Are-Fundamental/
+
+transducers seem to basically be useful when you have a list/stream/whatever of inputs, and you want
+to do some arbitrary operations on them, and so if you have like ten operations that you want to chain together,
+transducers can buy you a lot of performance there.
+
+but in my situation, i tend to have some inputs and i want to apply all of them to a particular single
+map, and vanilla reduce seems to be about as good as it's possible to get
