@@ -2809,3 +2809,13 @@ transducers can buy you a lot of performance there.
 
 but in my situation, i tend to have some inputs and i want to apply all of them to a particular single
 map, and vanilla reduce seems to be about as good as it's possible to get
+
+ok started work on ai movement
+the monster trundles along after the player
+but if both of them move into each other, weird shit happens in collision resolution
+if player is above and monster is below, and they move toward each other vertically, player's x-position gets
+nudged so that it's to the right of the monster
+
+i'll deal with it tomorrow
+
+to make things simpler, have the monster always move up very slowly

@@ -41,6 +41,16 @@
         shape2 (closest-entity :shape)
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)]
+    (when (= (entity :id) 0)
+      (js/console.log "yo" (clj->js (shape1 :center)) (clj->js (shape2 :center)))
+      (js/console.log (clj->js axis))
+      (js/console.log
+          (arithmetic-fn (get-in shape2 [:center axis])
+                         (/ (shape2 field) 2)
+                         (/ (shape1 field) 2)
+                         0.01)
+          )
+      )
     (arithmetic-fn (get-in shape2 [:center axis])
                    (/ (shape2 field) 2)
                    (/ (shape1 field) 2)
@@ -94,6 +104,7 @@
    all-entities :- [Entity]]
   "Resolves a collision between `entity` and `contacted-entities`. Destroys any :destroyed-on-contact entities
   involved in the collision, and makes some decisions about the final location of all other entities involved."
+  (js/console.log "resolving for" (entity :id))
   (let [[entities-to-destroy remaining-entities] (winnow #(get-in % [:collision :destroyed-on-contact])
                                                          contacted-entities)]
     ; We're processing a collision, so go ahead and nuke everything that's supposed to be

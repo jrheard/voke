@@ -44,7 +44,7 @@
                    :affected-by-friction true
                    :direction            nil
                    :max-acceleration     2.0
-                   :max-speed            11}
+                   :max-speed            2}
      :collision   {:type :good-guy}
      :render-info {:fill 0x333333}
      :weapon      (make-weapon nil 0x666666)
@@ -62,9 +62,9 @@
                    :affected-by-friction true
                    :direction            nil
                    :max-acceleration     1.5
-                   :max-speed            8}
+                   :max-speed            2}
      :collision   {:type :bad-guy}
-     :weapon      (make-weapon (- (/ Math/PI 2))
+     :weapon      nil #_(make-weapon (- (/ Math/PI 2))
                                0xFF0A00)
      :ai          {:movement :basic
                    :attack   :basic}
