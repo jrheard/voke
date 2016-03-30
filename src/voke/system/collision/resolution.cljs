@@ -46,15 +46,6 @@
                                :keywordize-keys true))
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)]
-    (js/console.log "find-closest-clear-spot between these shapes" (clj->js (shape1 :center)) (clj->js (shape2 :center)))
-    (js/console.log (clj->js axis))
-    (js/console.log
-      (arithmetic-fn (get-in shape2 [:center axis])
-                     (/ (shape2 field) 2)
-                     (/ (shape1 field) 2)
-                     0.01)
-      )
-
     (arithmetic-fn (get-in shape2 [:center axis])
                    (/ (shape2 field) 2)
                    (/ (shape1 field) 2)
@@ -75,15 +66,9 @@
                                                          all-entities)
         contacted-entities (intersection (set all-contacted-entities)
                                          (set remaining-contacted-entities))]
-    (js/console.log (name axis))
     (if (seq contacted-entities)
-      (do
-        (js/console.log "contacted")
-        (js/console.log (clj->js contacted-entities))
-        [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0])
-      (do
-        (js/console.log "nothing contacted")
-        [new-center new-velocity]))))
+      [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
+      [new-center new-velocity])))
 
 (sm/defn move-to-nearest-clear-spot
   [entity :- Entity
@@ -91,7 +76,6 @@
    new-velocity :- Vector2
    remaining-contacted-entities :- [Entity]
    all-entities :- [Entity]]
-  (js/console.log "move-to-nearest" (entity :id))
   (let [finder (fn [axis]
                  (find-new-position-and-velocity-on-axis entity
                                                          (new-center axis)
@@ -115,7 +99,6 @@
    all-entities :- [Entity]]
   "Resolves a collision between `entity` and `contacted-entities`. Destroys any :destroyed-on-contact entities
   involved in the collision, and makes some decisions about the final location of all other entities involved."
-  (js/console.log "resolving for" (entity :id))
   (let [[entities-to-destroy remaining-entities] (winnow #(get-in % [:collision :destroyed-on-contact])
                                                          contacted-entities)]
     ; We're processing a collision, so go ahead and nuke everything that's supposed to be
