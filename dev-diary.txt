@@ -2899,3 +2899,35 @@ we handle a collision for 5
 we check each axis to see if 5 is clear to move on that axis
 and it *is* clear to move on both axes
 but then we move it and bad shit happens
+
+======
+
+3/31/16
+
+ok i did some thinking about this corner collision situation
+
+so the problem is that we're in a situation where you're clear if you *just* move laterally, and clear if you
+*just* move vertically, but if you actually apply both axes' movement direction, you collide with something
+
+right now, the resolution system's like "cool you're clear on top and clear on the right so go ahead and
+move up and right", and then you're in an invalid place and things get a little fucked up
+
+so i think the right way to solve this is to detect when we're in this situation (pretty easy: when we've
+been asked to resolve a collision, but we appear to be clear vertically and horizontally)
+
+and when that happens:
+
+take the list of entities that we know we've collided with
+break them down into all of their component lines
+  so eg an entity with width 10 height 10 that's at x=20 y=40 would have 4 lines
+  x=10, x=30, y=30, y=40
+
+take the line that the moving entity is traveling on - figure out a way to express it, we have its position
+and its direction so it should be easy to turn that into a line; call that L or whatever
+
+then, for each of our collided entities' lines, calculate the point at which line L intersects with it
+so now we have a set of points
+then all you do is figure out which of those points is closest, and - say the entity is moving up+right - you
+just move its top-right corner to be at (or slightly slightly before) that point
+
+i think i have a little more hammering out to do, but that sounds like a reasonable way of solving the problem

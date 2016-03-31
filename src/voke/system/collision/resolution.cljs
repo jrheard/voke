@@ -85,6 +85,10 @@
         [x-position x-velocity] (finder :x)
         [y-position y-velocity] (finder :y)]
     ; xxxxxx too simplistic
+    ; 5 can never touch 0 this way
+    ; if there was a collision, but we're clear both vertically and horizontally,
+    ; then if we move both vertically *and* horizontally we *know* we're going to collide with something.
+    ; what should we do in that situation?
 
     (when (not= {:x x-position
                  :y y-position}
