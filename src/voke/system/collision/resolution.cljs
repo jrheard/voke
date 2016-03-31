@@ -37,7 +37,6 @@
    new-velocity :- s/Num
    contacted-entities :- [Entity]]
   (let [closest-entity (find-closest-contacted-entity axis new-velocity contacted-entities)
-        ; XXXX ask js system for entities' actual shapes?
         shape1 (entity :shape)
         possibly-out-of-date-shape2 (closest-entity :shape)
         shape2 (assoc possibly-out-of-date-shape2
@@ -85,11 +84,16 @@
                                                          all-entities))
         [x-position x-velocity] (finder :x)
         [y-position y-velocity] (finder :y)]
-    (apply-movement entity
-                    {:x x-position
-                     :y y-position}
-                    {:x x-velocity
-                     :y y-velocity})))
+    ; xxxxxx too simplistic
+
+    (when (not= {:x x-position
+                 :y y-position}
+                new-center)
+      (apply-movement entity
+                      {:x x-position
+                       :y y-position}
+                      {:x x-velocity
+                       :y y-velocity}))))
 
 (sm/defn resolve-collision
   [entity :- Entity

@@ -2885,4 +2885,17 @@ not sure what's going on in either situation
 ok i fixed the second of thsoe two things
 haven't started on the first yet
 
+ok, what's happening here
+can't really reproduce it reliably
+it seems to happen when the monster catches up to you - diagonally - as you're slowing to a stop
 
+resolving for 5 -> no further logging?!
+
+is it the situation where an entity's corner precisely collides with your corner?
+
+yeah i think it might be
+
+we handle a collision for 5
+we check each axis to see if 5 is clear to move on that axis
+and it *is* clear to move on both axes
+but then we move it and bad shit happens
