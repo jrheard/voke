@@ -6,16 +6,20 @@
             [voke.util :refer [winnow]])
   (:require-macros [schema.core :as sm]))
 
-(defn left-edge-x [rect] (- (rect :x)
+; Austin told me not to write your own collision system. I should have listened.
+
+(defn left-edge-x [rect] (- (get-in rect [:center :x])
                             (/ (rect :width) 2)))
-(defn right-edge-x [rect] (+ (rect :x)
+(defn right-edge-x [rect] (+ (get-in rect [:center :x])
                              (/ (rect :width) 2)))
-(defn top-edge-y [rect] (- (rect :y)
+(defn top-edge-y [rect] (- (get-in rect [:center :y])
                            (/ (rect :height) 2)))
-(defn bottom-edge-y [rect] (+ (rect :y)
+(defn bottom-edge-y [rect] (+ (get-in rect [:center :y])
                               (/ (rect :height) 2)))
 
 (sm/defn find-closest-contacted-entity
+  ; TODO test this!!! it rarely gets executed because contacted-entities is almost always a list of 1 item
+  ; and so reduce just picks that one item without executing the reducing function
   [axis :- Axis
    new-velocity :- s/Num
    contacted-entities :- [Entity]]
@@ -41,6 +45,8 @@
         possibly-out-of-date-shape2 (closest-entity :shape)
         shape2 (assoc possibly-out-of-date-shape2
                       :center
+                      ; XXXXX DIAGONAL WILL NEED THIS INFO TOO I BET
+                      ; FUCK
                       (js->clj (js/Collision.getEntityCenter (closest-entity :id))
                                :keywordize-keys true))
         arithmetic-fn (if (pos? new-velocity) - +)
@@ -69,6 +75,67 @@
       [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
       [new-center new-velocity])))
 
+; We only support axis-aligned bounding boxes, so entities' component lines always look like
+; y = 4 or x = -2.021, etc.
+(sm/defschema AxisAlignedLine {:axis  Axis
+                               :value s/Num})
+
+(sm/defn entity-to-lines :- [AxisAlignedLine]
+  [entity :- Entity]
+  (let [shape (entity :shape)]
+    [{:axis :x :value (left-edge-x shape)}
+     {:axis :x :value (right-edge-x shape)}
+     {:axis :y :value (top-edge-y shape)}
+     {:axis :y :value (bottom-edge-y shape)}]))
+
+(sm/defn find-intersection :- Vector2
+  [slope :- s/Num
+   intercept :- s/Num
+   line :- AxisAlignedLine]
+  (condp = (line :axis)
+    :x {:x (line :value)
+        :y (+ (* slope
+                 (line :value))
+              intercept)}
+    :y {:x (/ (- (line :value)
+                 intercept)
+              slope)
+        :y (line :value)}))
+
+(sm/defn distance-between-points :- s/Num
+  [a :- Vector2
+   b :- Vector2]
+  (Math/sqrt (+ (Math/pow (- (a :x) (b :x))
+                          2)
+                (Math/pow (- (a :y) (b :y))
+                          2))))
+
+(sm/defn resolve-diagonal-collision
+  [entity :- Entity
+   new-velocity :- Vector2
+   remaining-contacted-entities :- [Entity]]
+  (let [lines (mapcat entity-to-lines remaining-contacted-entities)
+        velocity-line-slope (/ (new-velocity :y) (new-velocity :x))
+        ; y = mx + b, so b = y - mx
+        velocity-line-intercept (- (get-in entity [:shape :center :y])
+                                   (* velocity-line-slope
+                                      (get-in entity [:shape :center :x])))
+        intersections (map (partial find-intersection velocity-line-slope velocity-line-intercept)
+                           lines)
+        closest-intersection (apply min-key
+                                    (partial distance-between-points (get-in entity [:shape :center]))
+                                    intersections)
+        x-operation (if (pos? (new-velocity :x)) - +)
+        y-operation (if (pos? (new-velocity :y)) - +)]
+    (apply-movement entity
+                    {:x (x-operation (closest-intersection :x)
+                                     (/ (get-in entity [:shape :width]) 2)
+                                     0.1)
+                     :y (y-operation (closest-intersection :y)
+                                     (/ (get-in entity [:shape :height]) 2)
+                                     0.1)}
+                    {:x 0 :y 0})))
+
 (sm/defn move-to-nearest-clear-spot
   [entity :- Entity
    new-center :- Vector2
@@ -83,19 +150,16 @@
                                                          remaining-contacted-entities
                                                          all-entities))
         [x-position x-velocity] (finder :x)
-        [y-position y-velocity] (finder :y)]
-    ; xxxxxx too simplistic
-    ; 5 can never touch 0 this way
-    ; if there was a collision, but we're clear both vertically and horizontally,
-    ; then if we move both vertically *and* horizontally we *know* we're going to collide with something.
-    ; what should we do in that situation?
+        [y-position y-velocity] (finder :y)
+        nearest-clear-spot {:x x-position
+                            :y y-position}]
+    (if (= nearest-clear-spot new-center)
+      (resolve-diagonal-collision entity
+                                  new-velocity
+                                  remaining-contacted-entities)
 
-    (when (not= {:x x-position
-                 :y y-position}
-                new-center)
       (apply-movement entity
-                      {:x x-position
-                       :y y-position}
+                      nearest-clear-spot
                       {:x x-velocity
                        :y y-velocity}))))
 

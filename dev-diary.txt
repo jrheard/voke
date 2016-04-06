@@ -2931,3 +2931,22 @@ then all you do is figure out which of those points is closest, and - say the en
 just move its top-right corner to be at (or slightly slightly before) that point
 
 i think i have a little more hammering out to do, but that sounds like a reasonable way of solving the problem
+
+======
+
+4/4/16
+
+http://www.eff-lang.org/ looks neat, found via an article pwrice sent me
+
+which was https://codewords.recurse.com/issues/six/immutability-is-not-enough , which i thought was good
+
+======
+
+4/5/16
+
+garrick says his game state handling works similarly to voke.state, except with a priority int as well,
+to determine the order in which updates are applied. interesting
+
+ok well let's try this line stuff
+
+
