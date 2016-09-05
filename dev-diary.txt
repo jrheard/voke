@@ -3040,3 +3040,103 @@ approaches, yet the planning process will be noticeably slower at runtime and re
 
 https://archives.nucl.ai/recording/building-a-galaxy-procedural-generation-in-no-mans-sky/
 "we're building a game, not a tech demo" - har har
+
+http://aigamedev.com/open/article/hfsm-gist/ heirarchical FSMs
+
+http://aigamedev.com/open/article/bt-overview/ behavior trees
+
+==========
+
+9/3/16
+
+http://gamesfromwithin.com/data-oriented-design
+
+"Programming, by definition, is about transforming data: It’s the act of creating a sequence
+of machine instructions describing how to process the input data and create some specific output data"
+
+"In general, the ideal data is in a format that we can use with the least amount of effort"
+"In any case, the goal is to minimize the amount of transformations, and whenever possible,
+you should bake your data into this ideal format offline, during your asset-building process."
+
+"To achieve the best possible data layout, it’s helpful to break down each object into the
+different components, and group components of the same type together in memory, regardless of
+what object they came from. This organization results in large blocks of homogeneous data,
+which allow us to process the data sequentially"
+
+http://buildnewgames.com/particle-systems/
+** good article
+
+object pooling makes a lot of sense in particle systems
+
+"Instead what we need is a pool of particles. When we want to fire a particle out, we will
+grab an available one from the pool. When a particle dies, it will be returned to the pool
+to be recycled later."
+
+=========
+
+9/4/16
+
+http://norvig.com/lispy.html
+
+http://norvig.com/lispy2.html
+
+http://www.redblobgames.com/pathfinding/a-star/introduction.html
+***** great
+
+"Dijkstra’s Algorithm can find paths to all locations; A* finds paths to one location."
+
+super fuckin great article
+
+a* is djikstra + greedy best first search
+
+"If you want to find paths from or to all all locations, use Breadth First Search or Dijkstra’s Algorithm.
+  Use Breadth First Search if movement costs are all the same; use Dijkstra’s Algorithm if movement costs vary.
+
+If you want to find paths to one location, use Greedy Best First Search or A*. Prefer A* in most cases."
+
+"A* is guaranteed to find the shortest path if the heuristic is never larger than the true distance.
+As the heuristic becomes smaller, A* turns into Dijkstra’s Algorithm.
+As the heuristic becomes larger, A* turns into Greedy Best First Search."
+
+"What about performance? The best thing to do is to eliminate unnecessary locations in your graph."
+recommends reading http://www.redblobgames.com/pathfinding/grids/algorithms.html if using a grid
+
+"I’ve not needed any of these optimizations in my own projects." interesting
+quadtrees are mentioned
+
+http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
+
+http://theory.stanford.edu/~amitp/GameProgramming/UserExperience.html
+
+"Making units too smart is almost as bad as making units too dumb. If the player has to deal
+with fog of war but the pathfinder has access to the entire map, the units will mysteriously
+know where to go even though the user does not. That’s a clear sign to the user that something
+odd is going on. On the other hand, it gives better paths. A compromise is to scale up the
+movement costs on unexplored areas."
+
+http://theory.stanford.edu/~amitp/GameProgramming/MapRepresentations.html
+
+"The most common alternative to grids is to use a polygonal representation. If the movement cost
+across large areas is uniform, and if your units can move in straight lines instead of following
+a grid, you may want to use a non-grid representation."
+
+"In many grid games, there are large areas of maps that have uniform movement costs. A* doesn’t
+“know” this, and wastes effort exploring them. Creating a simpler graph (navigation mesh,
+visibility graph, or hierarchical representation of the grid map) can help A*."
+
+https://web.archive.org/web/20110723003329/http://www.ai-blog.net/archives/000152.html
+
+this guy really likes navigation meshes
+
+=========
+
+9/5/16
+
+http://www.redblobgames.com/pathfinding/grids/graphs.html
+
+"Graph search algorithms like Dijkstra’s Algorithm and A* work on weighted directed graphs,
+sets of nodes connected by edges that have numeric weights (movement costs) attached to them."
+
+http://www.redblobgames.com/pathfinding/a-star/implementation.html
+
+just implements a Graph, which is a set of (directed) locations and edges, no Node class
