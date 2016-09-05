@@ -3140,3 +3140,116 @@ sets of nodes connected by edges that have numeric weights (movement costs) atta
 http://www.redblobgames.com/pathfinding/a-star/implementation.html
 
 just implements a Graph, which is a set of (directed) locations and edges, no Node class
+
+http://aigamedev.com/open/article/bt-overview/
+
+pretty bad article
+
+http://www.gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php
+
+"a behaviour tree is a tree of hierarchical nodes that control the flow of decision making
+of an AI entity. At the extents of the tree, the leaves, are the actual commands that control
+the AI entity, and forming the branches are various types of utility nodes that control the
+AI’s walk down the trees to reach the sequences of commands best suited to the situation."
+
+"A core aspect of Behavior Trees is that unlike a method within your codebase, a particular
+node or branch in the tree may take many ticks of the game to complete."
+
+hm
+makes sense, interesting tho
+
+so i guess the idea is that a particular node on an entity's behavior tree is active at
+any given point in time, and it can have a certain state associated with it -
+example states are success, failure, and running
+
+it keeps talking about how nodes can return a value to their parent - eg:
+
+"A composite node is a node that can have one or more children. They will process one or
+more of these children [...] and at some stage will consider their processing complete
+and pass either success or failure to their parent, often determined by the success or failure
+of the child nodes. During the time they are processing children, they will continue to return
+Running to the parent."
+
+not sure i 100% follow this
+
+i guess the idea is that one way of using a BT is to:
+every tick, walk each npc's BT to see if any states have completed
+for each active node: check all of its active children and see their statuses
+if a child node is Running, then ignore it / let it continue
+if it's marked as Success, then do something about that
+if it's marked as Failure, then do something about that
+
+this article is pretty solid; it makes BTs sound way more complicated than i'll ever need
+in any game i'm likely to build, though; cool concept, but more useful in complex FPS/RPG games
+where you really want to have rich/complex NPC behavior
+
+my dudes are only ever gonna be idle, chasing, attacking, healing, or leashing, and probably
+not ever really anything else to speak of
+
+looks like BTs are actually most useful in a context where you've got some sort of GUI
+tool that you've built to allow your characters' BTs to be manipulated, and you have some
+sort of established library of Node classes, and so you're not actually writing code when
+you're manipulating a character's behavior, you're just using this tool and dragging Nodes around
+
+ok fuck it let's try to read the re-frame screed
+
+https://github.com/Day8/re-frame
+
+"we believe in one-way data flow"
+
+"Although app-db is a Reagent atom (hereafter ratom), I'd encourage you to think of it as
+an in-memory database. It will contain structured data. You will need to query that data.
+You will perform CRUD and other transformations on it. You'll often want to transact on this
+database atomically, etc."
+
+ok, the history-lesson portion is all pretty straightforward
+
+talks about `subscription`s, which appear to be a tool that you can use to have your component
+functions query app-db (rather than just having them directly do like (:b @app-db) or whatever)
+
+"subscription handlers" - functions that do a named query
+
+"components never source data directly from app-db, and instead, they use a subscription."
+"subscriptions are only ever used by components (they are never used in, say, event handlers)."
+
+   (subscribe  [query-id some optional query parameters])
+
+(register-sub) function hooks up query IDs to query functions
+
+so far, it just seems like we've added a layer of indirection between component functions
+and the app-db atom; hasn't yet been explained what this buys us
+
+"We don't want to perform this computationally expensive re-sort each time something unrelated in app-db changes."
+
+"Luckily, we can easily fix that up by tweaking our subscription function so that it chains reactions"
+
+********
+"That 3rd, expensive reaction will be re-run when either one of its two input Signals change,
+right? Not quite. reaction will only re-run the computation when one of the inputs has _changed in value_."
+********
+
+this seems to be the main point of the discussion so far - using chained reactions so that
+you only do expensive recomputations when you actually *have* to, rather than redoing them
+every time the db changes in any way
+
+"An application has many handlers, and collectively they represent the control layer of the application."
+
+events are just data, like [:header-button-clicked :about] or whatever
+
+you fire events with (dispatch)
+
+event handlers take a) the value of @app-db and b) an event (a vector), and return the
+new value which should be reset! into @app-db
+
+(reg-event-db) is used to register events
+
+"It is almost like app-db is the temporary place where this imagined perpetual reduce stores its on-going reduction."
+cute
+
+i wonder if multiple handlers can subscribe to the same event?
+
+eg he keeps talking about how there's this stream of all events that have happened
+how do you actually record that stream? can you make a handler that subscribes to all events
+and just conjes them onto a list?
+
+anyway reframe seems good, just like a good base common vocabulary for writing apps using reagent
