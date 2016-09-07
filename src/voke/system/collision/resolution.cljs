@@ -40,6 +40,11 @@
    axis :- Axis
    new-velocity :- s/Num
    contacted-entities :- [Entity]]
+  ; xxxxx seeing some fuckery likely related to this function
+  ; if the monster is to your left, and moving to its right to chase you
+  ; and you're firing to your left, at the monster
+  ; and you're moving up and down
+  ; sometimes you get teleported way far away from where you should be
   (let [closest-entity (find-closest-contacted-entity axis new-velocity contacted-entities)
         shape1 (entity :shape)
         possibly-out-of-date-shape2 (closest-entity :shape)
@@ -51,6 +56,10 @@
                                :keywordize-keys true))
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)]
+    ; hm - is this equation always correct?
+    ; what if we're moving to the right and run into something on our right?
+    ; it probably handles that fine, haven't checked yet though
+    ; but - what if we're moving right and something on our left is moving right *faster* than us, and runs into us?
     (arithmetic-fn (get-in shape2 [:center axis])
                    (/ (shape2 field) 2)
                    (/ (shape1 field) 2)

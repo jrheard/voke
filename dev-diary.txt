@@ -3253,3 +3253,28 @@ how do you actually record that stream? can you make a handler that subscribes t
 and just conjes them onto a list?
 
 anyway reframe seems good, just like a good base common vocabulary for writing apps using reagent
+
+=======
+
+9/6/16
+
+https://www.youtube.com/watch?v=fU9hR3kiOK0
+samza
+
+good talk, bit general but good intro to why streams / idempotence / etc are good in db-land
+
+=======
+
+9/7/16
+
+ok cool
+
+so what was i working on six months ago, anyway?
+
+the last thing i wrote was "let's try this line stuff" - what the hell does that mean?
+
+looks like i was tinkering around in collision.resolution, something to do with corner collisions
+
+i should really start by going through and resolving every TODO i find in the codebase
+
+the "line stuff" seems to refer to my notes from 3/31/16

@@ -44,6 +44,8 @@
                         (* (get-acceleration entity)
                            (trig-fn (get-in entity [:motion :direction]))))
         max-speed (get-in entity [:motion :max-speed])
+        ; XXXXXXX TOTAL VELOCITY SHOULD BE CAPPED, NOT JUST AXIS
+        ; OTHERWISE ENTITIES TRAVEL FASTER IF THEY'RE MOVING IN BOTH X AND Y DIRECTIONS
         capped-velocity (bound-between new-velocity (- max-speed) max-speed)]
     (if (> (Math/abs capped-velocity) min-velocity)
       (assoc-in entity [:motion :velocity axis] capped-velocity)
