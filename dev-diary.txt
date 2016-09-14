@@ -3278,3 +3278,25 @@ looks like i was tinkering around in collision.resolution, something to do with 
 i should really start by going through and resolving every TODO i find in the codebase
 
 the "line stuff" seems to refer to my notes from 3/31/16
+
+=====
+
+9/14/16
+
+did some reading on kubernetes for no reason, that was fun
+
+https://youtu.be/9MKY4KypBzg?t=52m22s has a good bit on coordinated omission
+"when you see a vertical rise in a percentile chart, you should be extremely suspicious
+of the input: your data is probably wrong."
+
+recommends that you test your measurement system. seems like a good idea
+
+always measure max time, can be a hint re: coordinated omission
+
+https://www.usenix.org/system/files/conference/atc14/atc14-paper-ongaro.pdf raft paper
+
+ok anyway i'm trying to set up dirac, a tool for debugging cljs
+
+https://github.com/binaryage/dirac/blob/master/docs/installation.md
+
+

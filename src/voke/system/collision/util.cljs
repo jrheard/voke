@@ -25,10 +25,18 @@
   (js/Collision.removeEntity entity-id))
 
 (sm/defn apply-movement
+  "Fires events to notify the world that a particular entity should have a new center+velocity."
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2]
-  "Fires events to notify the world that a particular entity should have a new center+velocity."
+  (let [x-distance (js/Math.abs (- (get-in entity [:shape :center :x])
+                                   (new-center :x)))
+        y-distance (js/Math.abs (- (get-in entity [:shape :center :y])
+                                   (new-center :y)))]
+    (when (or (> x-distance 20)
+              (> y-distance 20))
+      (js/console.log "SOMETHING BAD HAS HAPPENED")))
+
   ; XXXXX orientation is never threaded this far! orientation never gets updated!!!
   (-update-entity-center (entity :id) new-center)
 

@@ -101,7 +101,7 @@
   [slope :- s/Num
    intercept :- s/Num
    line :- AxisAlignedLine]
-  (condp = (line :axis)
+  (case (line :axis)
     :x {:x (line :value)
         :y (+ (* slope
                  (line :value))
@@ -120,6 +120,7 @@
                           2))))
 
 (sm/defn resolve-diagonal-collision
+  "TODO document me - translate 3/31 notes into documentation"
   [entity :- Entity
    new-velocity :- Vector2
    remaining-contacted-entities :- [Entity]]
