@@ -3341,3 +3341,137 @@ will have to take a look at that in the future
 https://github.com/adzerk-oss/boot-reload
 https://github.com/adzerk-oss/boot-cljs-repl
 https://github.com/boot-clj/boot-cljs-devtools
+
+====
+
+9/15/16
+
+https://github.com/adzerk-oss/boot-test
+
+http://tech.adstage.io/2016/09/12/how-we-test-full-stack-clojure.html
+
+http://clojure.org/guides/spec
+
+so apparently a big part of spec is this concept of a central registry, so you do things like
+
+(s/def ::date inst?)
+(s/def ::suit #{:club :diamond :heart :spade})
+
+(s/valid? ::date (Date.))
+;;=> true
+(s/conform ::suit :club)
+;;=> :club
+
+but is it not clumsy to have to do stuff like constantly referring to voke.specs/foo, voke.specs/bar, etc?
+
+because like 99% of the time you're not going to be in the `voke.specs` ns
+
+"You will see later that registered specs can (and should) be used anywhere we compose specs."
+
+"When an or is conformed, it returns a vector with the tag name and conformed value:"
+(s/def ::name-or-id (s/or :name string? :id int?))
+(s/conform ::name-or-id "abc")
+;;=> [:name "abc"]
+(s/conform ::name-or-id 100)
+;;=> [:id 100]
+
+s/nilable exists:
+(s/valid? string? nil)
+;;=> false
+(s/valid? (s/nilable string?) nil)
+;;=> true
+
+interesting - spec guide mentions #: syntax for auto-namespaced map keys, like this:
+
+#:{ :foo {:bar :baz}}
+
+apparently gets translated to eg
+
+{:voke.core/foo {:voke.core/bar :voke.core/baz}}
+
+not sure if it gets applied recursively, so it might just be
+
+{:voke.core/foo {:bar :baz}}
+
+yeah, doesn't get applied recursively:
+
+user=> (= #:foo{:bar {:baz :quux}} {:foo/bar {:foo/baz :quux}})
+false
+user=> (= #:foo{:bar {:baz :quux}} {:foo/bar {:baz :quux}})
+true
+
+documented in https://groups.google.com/forum/#!topic/clojure-dev/8tHLCm8LpyU
+
+interesting discussion on that thread
+
+back to the spec guide, this paragraph is probably super important, on entity maps:
+
+Clojure programs rely heavily on passing around maps of data. A common approach in other
+libraries is to describe each entity type, combining both the keys it contains and the structure
+of their values. Rather than define attribute (key+value) specifications in the scope of
+the entity (the map), specs assign meaning to individual attributes, then collect them into
+maps using set semantics (on the keys). This approach allows us to start assigning (and sharing)
+semantics at the attribute level across our libraries and applications.
+
+so i guess what they're saying here is that instead of doing this throughout your application:
+
+(def Card {:name str? :mana-cost int?})
+
+you should instead be doing something like (unsure of the syntax here, making up this map-of function)
+
+(def Card (map-of [::name ::mana-cost]))
+
+i guess that makes sense!
+
+ok, apparently the (s/keys) macro is what i was looking for
+
+http://clojure.github.io/clojure/branch-master/clojure.spec-api.html#clojure.spec/keys
+
+(s/def ::person (s/keys :req [::first-name ::last-name ::email]
+                        :opt [::phone]))
+
+"The map spec never specifies the value spec for the attributes, only what attributes are required or optional."
+
+"Much existing Clojure code does not use maps with namespaced keys and so keys can also specify
+:req-un and :opt-un for required and optional unqualified keys."
+
+"Unqualified keys can also be used to validate record attributes"
+
+i don't really understand what's up with keys* - it talks about how it "can be embedded inside
+a sequential regex structure". what's that?
+
+gives as example:
+
+(s/def ::server (s/keys* :req [::id ::host] :opt [::port]))
+(s/conform ::server [::id :s1 ::host "example.com" ::port 5555])
+
+hm ok i guess - so keys* is for validating kwargs for functions?
+
+s/merge is for combining entity maps
+
+this focus on use of namespaced registered keywords is interesting - it's basically equivalent to just
+doing regular defs, like (def Foo {:bar :baz}), and just passing Foo around, but instead
+we're doing (s/def ::foo {:bar :baz}) and referring to ::foo everywhere. wonder what that buys us?
+
+is it mainly for performance reasons (not passing around tons of data, if that even matters),
+or is this nice for some other reason?
+
+maybe it's nice because you don't have to actually import voke.specs to refer to ::voke.specs/foo,
+as seen below:
+
+user=> :foo.bar/baz
+:foo.bar/baz
+user=> ::foo
+:user/foo
+user=> :user/foo
+:user/foo
+user=> (= :user/foo ::foo)
+true
+
+that does seem like a pretty compelling reason; i had trouble avoiding circular-import errors
+when using Schema and doing the passing-around-Foo-everywhere style mentioned above. cool neat
+
+ok also yeah uh there is the obvious bit where namespaced keywords are good map keys
+
+right so in schema land, you're usually doing things like {:foo Foo}, and also referring directly
+to Foo throughout your code; but in spec-land, ::foo serves both of those purposes (?)

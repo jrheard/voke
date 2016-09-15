@@ -33,9 +33,10 @@
                                    (new-center :x)))
         y-distance (js/Math.abs (- (get-in entity [:shape :center :y])
                                    (new-center :y)))]
-    (when (or (> x-distance 20)
-              (> y-distance 20))
-      (js/console.log "SOMETHING BAD HAS HAPPENED")))
+    (when (or (> x-distance 10)
+              (> y-distance 10))
+      (js/console.log "SOMETHING BAD HAS HAPPENED")
+      (js-debugger)))
 
   ; XXXXX orientation is never threaded this far! orientation never gets updated!!!
   (-update-entity-center (entity :id) new-center)
