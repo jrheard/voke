@@ -3310,9 +3310,34 @@ lein repl
 
 once all that's done, i get dirac and figwheel and things are mostly groovy.
 
+this is obviously somewhat cumbersome though
+
 i still need to solidify my understanding of this whole system, i'm kinda just flailing atm
 in particular, i need to set up cursive integration per
 https://github.com/binaryage/dirac/blob/master/docs/integration.md
 
 and also need to figure out why my code isn't being run when you load the html page any more
 complains about `voke` being undefined, even though `voke.core` has been goog.require'd
+
+ok, connecting cursive to dirac was really easy, not sure exactly what it buys us quite yet
+
+@smw in #dirac says that boot has really simple tooling around auto code reloading
+gives this snippet:
+
+(deftask dev-cljs-repl
+  "Run a restartable system in the Repl"
+  []
+  (comp
+   (environ :env {:http-port "3300" :dev true})
+   (watch :verbose true)
+   (system :sys #'dev-system :auto true :files ["handler.clj"])
+   (reload :port 55554)
+   (cljs-repl)
+   (cljs)
+   (speak)))
+
+will have to take a look at that in the future
+
+https://github.com/adzerk-oss/boot-reload
+https://github.com/adzerk-oss/boot-cljs-repl
+https://github.com/boot-clj/boot-cljs-devtools
