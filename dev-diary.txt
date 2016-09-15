@@ -3299,4 +3299,20 @@ ok anyway i'm trying to set up dirac, a tool for debugging cljs
 
 https://github.com/binaryage/dirac/blob/master/docs/installation.md
 
+ok so things are kinda broken but kinda working
 
+in order to get dirac and figwheel to happen at the same time, i do this:
+(per https://github.com/bhauman/lein-figwheel/wiki/Using-the-Figwheel-REPL-within-NRepl )
+
+lein repl
+(use 'figwheel-sidecar.repl-api)
+(start-figwheel!)
+
+once all that's done, i get dirac and figwheel and things are mostly groovy.
+
+i still need to solidify my understanding of this whole system, i'm kinda just flailing atm
+in particular, i need to set up cursive integration per
+https://github.com/binaryage/dirac/blob/master/docs/integration.md
+
+and also need to figure out why my code isn't being run when you load the html page any more
+complains about `voke` being undefined, even though `voke.core` has been goog.require'd

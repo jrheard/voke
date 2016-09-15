@@ -4,18 +4,18 @@
   :license {:name "DO WHAT THE FUCK YOU WANT TO BUT IT'S NOT MY FAULT PUBLIC LICENSE"
             :url  "https://raw.githubusercontent.com/adversary-org/wtfnmf/c7b46d8114e3b3adcd9198e635b43f511c7c803d/COPYING.WTFNMFPL"}
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.170"]
-                 [org.clojure/core.async "0.2.374"
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.9.229"]
+                 [org.clojure/core.async "0.2.391"
                   :exclusions [org.clojure/tools.reader]]
-                 [binaryage/dirac "RELEASE"]
-                 [figwheel-sidecar "0.5.0"]
-                 [http-kit "2.1.18"]
-                 [prismatic/plumbing "0.5.2"]
-                 [prismatic/schema "1.0.4"]
-                 [cljsjs/pixi "3.0.7-0"]]
+                 [binaryage/dirac "0.6.6"]
+                 [figwheel-sidecar "0.5.7"]
+                 [prismatic/plumbing "0.5.3"]
+                 [prismatic/schema "1.1.3"]
+                 [cljsjs/pixi "3.0.10-0"]]
 
-  :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]]
+  :plugins [[lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
+            [lein-figwheel "0.5.4-7"]]
 
   :source-paths ["src"]
 
@@ -30,8 +30,7 @@
   :cljsbuild {:builds
               [{:id           "dev"
                 :source-paths ["src"]
-                :figwheel     {:on-jsload "voke.core/main"
-                               :repl false}
+                :figwheel     {:on-jsload "voke.core/main"}
                 :compiler     {:main                 voke.core
                                :preloads             [dirac.runtime.preload]
                                :asset-path           "js/compiled/out"
@@ -49,4 +48,5 @@
                                :externs       ["externs/collision.js"]
                                :pretty-print  false}}]}
 
-  :figwheel {:css-dirs ["resources/public/css"]})
+  :figwheel {:css-dirs         ["resources/public/css"]
+             :repl             false})
