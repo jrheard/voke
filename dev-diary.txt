@@ -3576,3 +3576,87 @@ to generate the set of symbols naming vars in the namespace"
 double-neat!
 
 wonder if that works on `instrument`
+
+http://blog.cognitect.com/blog/2016/9/15/works-on-my-machine-understanding-var-bindings-and-roots
+explains what the term "root" means in the context of vars
+
+explains difference between (binding) and (with-redefs) - the former alters a dynamic var's bindings
+/ frames, the latter temporarily alters a var's root
+
+"Var roots are global. Var dynamic bindings are thread-local, and dynamically scoped."
+
+=========
+
+9/16/16
+
+http://leeorengel.com/from-schema-to-spec/
+
+acknowledges that spec is noticeably more verbose than schema
+
+i skimmed the parts where he's actually writing test.check tests, but this looks like a
+useful resource to go back to when i'm interested in actually doing that stuff
+
+"Compared to spec, schema felt a bit more natural to me at first coming from a more strongly
+typed background as the schema information is right there next to what it is specifying."
+
+same here, minus the strongly typed background
+
+says spec is "more composable" and "feels like it fits into the language more naturally",
+which i do also have to agree with
+
+"I’ve seen some debate about where the best place to put specs are; to me it seems pretty
+logical to co-locate them directly with the code they spec."
+
+that's what i would do in schema if i didn't have to worry about circular imports so often
+so i'll probably eventually go back to doing this
+right now i think everything's in voke.schema
+
+anyway good article, well written
+
+http://www.lispcast.com/clojure.spec-vs-schema
+
+"The library is a collection of small tools that do different jobs that can be used together.
+There is a tool for maps (called keys) that checks for the presence of required and optional
+keys and checks that their values conform to the named attribute. There is a tool for sequences
+that uses regular expression operators."
+
+good point yeah - in spec, maps -> (keys), sequences -> regex operators
+
+"The keys function takes a list of required keywords which must be namespaced. Those keywords
+play double-duty. They check for the presence of required keys and they name the spec that
+the value must conform to."
+
+http://gigasquidsoftware.com/blog/2016/05/29/one-fish-spec-fish/
+
+is fine
+
+http://derek.troywest.com/articles/the-elements-of-style
+
+"If you find a pure function named this-and-that refactor `this` and `that` and compose elsewhere."
+
+https://github.com/bbatsov/clojure-style-guide/issues/124
+
+"We will not be adding any other "-" forms to core. I think perhaps if we could do it over,
+defn- would not be added either, but we're not going to take it away."
+
+interesting
+
+https://stuartsierra.com/2015/05/10/clojure-namespace-aliases is good
+
+https://stuartsierra.com/2015/08/25/clojure-donts-lazy-effects
+***** i like this
+
+"Never mix side effects with lazy operations."
+
+https://github.com/jonase/kibit
+
+TODO set up kibit
+
+https://github.com/tolitius/boot-check is a boot analog
+
+okok
+darwin recommends installing https://github.com/binaryage/cljs-devtools , taking a look
+
+note that https://github.com/boot-clj/boot-cljs-devtools exists
+
+

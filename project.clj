@@ -9,6 +9,7 @@
                  [org.clojure/core.async "0.2.391"
                   :exclusions [org.clojure/tools.reader]]
                  [binaryage/dirac "0.6.6"]
+                 [binaryage/devtools "0.8.2"]
                  [figwheel-sidecar "0.5.7"]
                  [prismatic/plumbing "0.5.3"]
                  [prismatic/schema "1.1.3"]
@@ -32,10 +33,12 @@
                 :source-paths ["src"]
                 :figwheel     {:on-jsload "voke.core/main"}
                 :compiler     {:main                 voke.core
-                               :preloads             [dirac.runtime.preload]
+                               :preloads             [devtools.preload
+                                                      dirac.runtime.preload]
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/voke.js"
                                :output-dir           "resources/public/js/compiled/out"
+                               :source-map true
                                :source-map-timestamp true}}
                {:id           "min"
                 :source-paths ["src"]
@@ -48,5 +51,5 @@
                                :externs       ["externs/collision.js"]
                                :pretty-print  false}}]}
 
-  :figwheel {:css-dirs         ["resources/public/css"]
-             :repl             false})
+  :figwheel {:css-dirs ["resources/public/css"]
+             :repl     false})
