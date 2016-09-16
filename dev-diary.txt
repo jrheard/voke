@@ -3475,3 +3475,104 @@ ok also yeah uh there is the obvious bit where namespaced keywords are good map 
 
 right so in schema land, you're usually doing things like {:foo Foo}, and also referring directly
 to Foo throughout your code; but in spec-land, ::foo serves both of those purposes (?)
+
+not sure how i feel about multi-spec, wonder if anyone uses it
+
+"The multi-spec approach allows us to create an open system for spec validation, just like
+multimethods and protocols. New event types can be added later by just extending the event-type multimethod."
+
+special collection functions:
+coll-of, tuple, map-of
+
+"Both coll-of and map-of will conform all of their elements, which may make them unsuitable
+for large collections. In that case, consider every or for maps every-kv." hm
+
+on s/cat vs s/tuple:
+"The choice between a regular expression and tuple here is to some degree a matter of taste,
+possibly informed by whether you expect either the tagged return values or error output to
+be better with one or the other."
+
+"Spec also defines one additional regex operator, &, which takes a regex operator and constrains
+it with one or more additional predicates."
+
+(s/assert) exists, asserts are off by default but can be toggled on
+
+(s/fdef) is the good shit, lets you spec a function.
+interesting that rather than going the route schema did and providing an alternate implementation
+of `defn` that has new syntax, they prefer to do this:
+
+(defn foo [etc] bar)
+
+(s/fdef foo :args something :ret bla)
+
+it makes sense - these guys want to keep the language's syntax as simple as possible - it's just interesting
+
+"Because the args are sequential and the args are positional fields, they are almost always
+described using a regex op, like cat, alt, or *."
+
+s/fspec for higher order functions
+
+there's a typo on the guide -
+"so often it’s not helpful to spec the :ret value of a function (as it’s just code)."
+should read
+" so often it’s not helpful to spec the :ret value of a macro (as it’s just code)."
+
+might be fun to figure out how to contribute a fix
+
+"The Clojure macroexpander will look for and conform :args specs registered for macros at
+macro expansion time (not runtime!)."
+
+that's neat
+
+fdef still feels kinda clumsy to me - eg
+:args (s/cat :game ::game)
+
+vs
+
+[game :- Game]
+
+again, i get that they don't want to introduce new syntax, but i hope that there's some sort
+of nice sugar so you don't have to always do (s/cat :foo ::foo :bar ::bar)
+
+i wonder if fdef's :fn ever gets used, seems like a nice-to-have that nobody would use in practice
+
+submitting a PR to the spec guide was really easy, https://github.com/clojure/clojure-site/pull/139
+gj github, nice simple UI flow for the whole process
+
+"The s/gen function can be used to obtain the generator for any spec."
+
+(s/exercise-fn) looks pretty neat! the example usage looks like this:
+
+(s/exercise-fn `ranged-rand)
+
+i'm not sure what the backtick quote is for in this context?
+
+"Instrument takes a fully-qualified symbol so we use ` here to resolve it in the context
+of the current namespace."
+
+...huh. hm. what?
+i guess this is the var equivalent of doing ::a-keyword
+ok i guess
+
+"Spec does not trust custom generators and any values they produce will also be checked
+by their associated spec to guarantee they pass conformance."
+
+nice
+
+gen/fmap looks neat, very useful in the examples they give for custom generator use cases
+
+**************
+"We mentioned earlier that clojure.spec.test provides tools for automatically testing functions.
+When functions have specs, we can use check, to automatically generate tests that check the
+function using the specs."
+
+neat!
+
+"To test all of the spec’ed functions in a namespace (or multiple namespaces), use enumerate-namespace
+to generate the set of symbols naming vars in the namespace"
+
+(-> (stest/enumerate-namespace 'user) stest/check)
+
+double-neat!
+
+wonder if that works on `instrument`
