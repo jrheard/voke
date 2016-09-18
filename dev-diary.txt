@@ -3659,4 +3659,66 @@ darwin recommends installing https://github.com/binaryage/cljs-devtools , taking
 
 note that https://github.com/boot-clj/boot-cljs-devtools exists
 
+https://github.com/binaryage/cljs-oops looks useful
 
+apparently a way of not having to deal with externs files
+
+"Instead of (.-nativeProp obj) write (aget obj "nativeProp") which compiles to obj["nativeProp"]"
+
+TODO take a look at cljs-oops next time i have to deal with anything related to externs files
+
+=======
+
+9/17/16
+
+https://www.youtube.com/watch?v=VNTQ-M_uSo8
+
+https://www.youtube.com/watch?v=dSqLt8BgbRQ
+
+i like his bit about how when you're changing code, you're changing your mental model of the
+system first, and then serializing that change back out into code, around 9 minute mark
+
+cute idea - use code coverage tools to reduce a function into just the lines that actually
+get executed by running your test case, calls it a program slice
+
+https://www.youtube.com/watch?v=_9RgHXqH8J0
+****** good talk on graphql
+
+https://www.youtube.com/watch?v=mty0RwkPmE8&list=PLetHPRQvX4a_jQjvn54Q-d1WYZ52nDfnT&index=11
+history of clojurescript
+
+=======
+
+9/18/16
+
+right - the whole point of connecting intellij to your dirac repl (or to whatever other repl you're using)
+is so that you can get vim-fireplace-like behavior in intellij, by using cmd-shift-p / etc to evaluate
+forms, and play around with things that way. right right.
+
+https://medium.freecodecamp.com/javascript-modules-a-beginner-s-guide-783f7d7a5fcc#.g2dt5cawr
+*****
+super good article on js modules
+
+https://medium.freecodecamp.com/a-beginner-friendly-introduction-to-containers-vms-and-docker-79a9e3e119b#.kpqslvqr1
+great intro to docker
+
+https://www.youtube.com/watch?v=33mTFjPIN10&list=PLetHPRQvX4a_jQjvn54Q-d1WYZ52nDfnT&index=7
+this guy's totally in love with klipse, an in-browser clojurescript/python/ruby/etc repl
+
+looks neat
+apparently a main selling point is that it's super-live, and also that it's totally clientside,
+you just add a <script> tag to your page (blog post, etc) and it's there, no need
+to worry about eg uploading something to gist.github.com and then including an iframe or whatever, etc
+https://github.com/viebel/klipse
+
+https://github.com/aengelberg/loco
+constraint based programming
+looks like it'd be useful for project euler
+
+https://github.com/sbelak/huri
+library for data science
+http://viewer.gorilla-repl.org/view.html?source=github&user=sbelak&repo=huri&path=examples/examples.cljw neat examples
+
+http://gorilla-repl.org/ hadn't heard of this before
+clojure notebook repl
+https://github.com/JonyEpsilon/lein-gorilla
