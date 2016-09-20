@@ -3722,3 +3722,27 @@ http://viewer.gorilla-repl.org/view.html?source=github&user=sbelak&repo=huri&pat
 http://gorilla-repl.org/ hadn't heard of this before
 clojure notebook repl
 https://github.com/JonyEpsilon/lein-gorilla
+
+https://news.ycombinator.com/item?id=11991479
+one repo vs many repos
+google has one giant repo (?!?!?!?!?!)
+https://www.youtube.com/watch?v=W71BTkUbdqE
+*****
+
+https://www.youtube.com/watch?v=Rzdxgx3RC0Q
+caching at netflix
+some of this went over my head, not too much tho
+https://github.com/Netflix/rend
+good narrative documentation
+
+=========
+
+9/19/16
+
+https://www.youtube.com/watch?v=6IYm34nDL64
+clojurescript + react native + mobile apps
+
+https://www.youtube.com/watch?v=Oh5oC98ztvI
+great behind-the-scenes talk on graphql + its history
+
+
