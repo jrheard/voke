@@ -3845,6 +3845,114 @@ ok, we're in resolve-diagonal-collision - this is probably where the teleportati
 seeing more cljs-devtools formatting errors - i see 4 things named entity, for instance; ugh
 definitely gonna have to look into this and see if i can fix it... anyway
 
+here are our variables:
+https://www.evernote.com/shard/s11/sh/f17d497f-b8ba-43f7-95b0-25f04e151219/e6cbbf0e8fab51ab
+https://www.evernote.com/shard/s11/sh/8159036c-5fe7-4e8b-b4d3-eeae24593851/2606d4892fec8781
 
+so again, entity is our bad guy, and he's got a
+position of (398.2, 252.05)
+velocity of (0, -3.2)
 
+and he's colliding with the good guy, who's got a
+position of (373.27, 232.48)
+velocity of (-0.065, -4.8)
 
+and these guys are 25px by 25px
+so currently their centers are 24.93px apart on the x axis
+and 19.57px apart on the y axis
+
+that doesn't seem right
+ok cool, rounding error on my part just now - they're actually 25.01px apart on the x axis
+but definitely only 19.57px apart on the y axis
+but that part doesn't matter, because they're > 25px apart on the x axis, so they are currently not overlapping
+so that's cool
+
+so wait - if they're currently not overlapping because they're >25px apart on the x axis,
+and their x axes are moving _away_ from each other (good guy is moving slightly to the left, and is
+to the left of the bad guy)
+then why the hell are we in resolve-diagonal-collision in the first place?
+
+time to go up the call stack
+this cljs devtools naming issue is really frustrating
+also i can't seem to evaluate arbitrary expressions at breakpoint time, like i can't put a watch on
+(finder :x), etc
+
+i bet that's what dirac would be useful for - having a repl available right now
+
+ok so anyway new-center is (397.3, 248.853)
+new-velocity is (-0.97, -3.2)
+that's interesting - so the monster is trying to move left after all! that actually makes a lot of sense
+let's go back down the callstack again
+
+yeah ok right - i was looking at `velocity` earlier but i should have been looking at `new-velocity`
+still, though, is this really a diagonal collision? feels like this is a straightforward situation
+where the monster is trying to move up and left, and up is clear but left is not clear,
+and so it should be allowed to move up but not left
+
+i wonder if this has to do with the 0.1px no-man's-land spacing between entities
+back up the call stack
+
+so in move-to-closest-clear-spot, we have
+new-center (397.3, 248.85)
+new-velocity (-0.97, -3.2)
+x-position, x-velocity (397.3, -0.97)
+y-position, y-velocity (248.85, -3.2)
+
+i don't get why new-center's x and x-position's x are the same
+shouldn't new-center's x be something invalid, inside the good guy?
+
+ok so the bad guy's center is currently (398.284, 252.05)
+...and it's trying to move -0.97 pixels to the left, which puts it at 397.3px as the new x position
+
+and it just so happens that good guy's x center is (373.274445, 232.48)
+
+and 373.274445 + 12.5px is. 385.774
+and that plus 12.5px is 398.274
+
+and anyway so it just happens that.. what exactly?
+
+incidentally, good guy is moving 0.06538px to the left on the x axis atm
+which means that good guy's new x position (which we can't see atm) is 373.20462
+and that plus 25px is 398.20462
+
+ok let's recap
+we have the bad guy, and he's trying to move up and to the left
+he is currently touching the good guy on his left side, and his y-center is a little bit below good guy's
+
+so is he clear to move to the left?
+well, he's at 398.284445 right now
+and he's trying to move to 397.3097869
+and that _is_ indeed clear
+wait is it
+
+ok ONE MORE TIME
+good guy's right edge is at x = 385.774445
+bad guy's left edge is at x = 385.784445
+bad guy has an x velocity of -0.97465
+meaning that he wants to move his left edge so that it's at 384.809795
+and that's no good
+
+ugh but why have i been focusing so much on x position? of *course* bad guy wants to move to the left,
+into good guy, and of *course* that isn't clear
+
+well, i've been focused on this because i'm in move-to-nearest-clear-spot, and the way it works is by saying:
+we've got an entity!
+it's trying to move to new-center!
+it's collided with one or more other entities!
+what happens if we move it just vertically? was that successful?
+what happens if we move it just horizontally? was that successful?
+if both of those appear to have been successful, then we know it's a corner collision - handle that
+if just one of them was successful, then go ahead and just apply that single-axis movement
+
+and so in our situation it tries to move the entity vertically, and that succeeds
+(y-position is equal to (new-center :y), y-velocity to (new-velocity :y)
+
+and it tries to move the entity horizontally, and that *appears* to succeed
+(x-position is equal to (new-center :x), x-velocity to (new-velocity :x))
+
+but that's fucked up! moving the entity horizontally should not succeed
+so what's going on in this call to (find-new-position-and-velocity-on-axis) ?
+i think it might be too late to find that out since i don't have a working repl since we're in a breakpoint
+
+that function has a call to find-cosest-clear-spot, which has a ton of scary comments in it
+so that's probably where we're fucking up atm
