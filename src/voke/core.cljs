@@ -52,5 +52,3 @@
 
       (reset! animation-frame-request-id
               (js/window.requestAnimationFrame process-frame)))))
-
-(main)

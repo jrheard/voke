@@ -3745,4 +3745,43 @@ clojurescript + react native + mobile apps
 https://www.youtube.com/watch?v=Oh5oC98ztvI
 great behind-the-scenes talk on graphql + its history
 
+https://www.youtube.com/watch?v=Elg17s_nwDg
+great talk on the cljs compiler
+******* really good talk
 
+========
+
+9/20/16
+
+https://www.youtube.com/watch?v=_1rh_s1WmRA
+ztellman on a frontend server he built at fitbit
+pumpkin carver parable
+"in every case, having many many people serving one queue will give you the best behavior
+under adverse conditions" - money quote
+*****************
+talks about load balancing approaches
+round robin, least in flight
+"you improve what you measure" -> "everything you ignore will get worse"
+good shit
+for his frontend server, it makes more sense to track _overhead_ as opposed to total latency
+makes sense
+his key metrics: p999 overhead, request rate, error rate
+
+https://www.youtube.com/watch?v=n7aE6k8o_BU
+pattern matching
+i like his bit about the start/work/end pattern in recursion, around the 36:00 mark
+
+https://www.youtube.com/watch?v=0rmR80neExo&list=PLNoHgLVTxtaqo1c_V2I-8wkDrCGImb9v5&index=4
+datomic in production
+great speaker
+
+http://patrickgombert.github.io/2015/datomic-performance/
+datomic perf notes, bit over my head atm since i've never used it
+
+http://www.learndatalogtoday.org/
+datalog tutorial - looks really cool actually
+
+https://github.com/lambdaisland/thirdpartyjs
+how to use third party js libraries in cljs
+
+https://betterexplained.com/articles/matrix-multiplication/
