@@ -33,8 +33,8 @@
                                    (new-center :x)))
         y-distance (js/Math.abs (- (get-in entity [:shape :center :y])
                                    (new-center :y)))]
-    (when (or (> x-distance 5)
-              (> y-distance 5))
+    (when (or (> x-distance 10)
+              (> y-distance 10))
       (js/console.log "SOMETHING BAD HAS HAPPENED")
       (js-debugger)))
 

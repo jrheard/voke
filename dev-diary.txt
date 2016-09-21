@@ -3785,3 +3785,66 @@ https://github.com/lambdaisland/thirdpartyjs
 how to use third party js libraries in cljs
 
 https://betterexplained.com/articles/matrix-multiplication/
+
+ok so anyway
+i was super confused for like two weeks because i thought dirac was necessary for debugging cljs
+turns out you can just call (js-debugger) and use chrome devtools
+i used to know this, but had completely forgotten it because i put programming down for like six months
+
+so i'm trying to figure out why sometimes you (or the monster) teleport
+
+i have a sneaking suspicion that it's related to the fact that there's this JS collision system,
+and it's always 100% kept up-to-date with every entity's location + bounding box and is updated multiple
+times per tick,
+and there's the list of cljs entities that we're processing this tick, and they're updated a total of
+once per tick
+and so these two sources of truth can get out of sync with one another, and anyway that seems like
+a potentially super bad situation
+also, i could swear i've seen at least one xxx comment saying "diagonal collision resolution will need this info"
+which seems relevant
+
+trying to get the issue to repro now, so i can verify that regular chrome devtools (plus cljs-devtools)
+is all you need to debug cljs
+
+this is super difficult to repro, so what i really need is a reliable failing test case / reproduction
+
+ok, got a repro
+
+new-center: 10.446 (that seems really low, wtf)
+ok this is weird, here's what i'm looking at:
+https://www.evernote.com/shard/s11/sh/edad4953-6aa4-4011-a59b-fa265ab2f6b2/6e46cf56db9cff72
+
+i'm seeing two different values for new-center, one's 10.4, the other's a map
+some sort of weird artifact with cljs-devtools?
+ignoring the first one for now - i think that's supposed to be x-distance, not new-center
+
+yeah, and here where it says "voke.events/publish-event", i think it should say "entity"
+if i could repro *that*, could contribute a fix to the cljs-devtools project
+but let's put that aside for now and focus on the bug in my app
+
+ok so entity is the monster, and looks like this:
+https://www.evernote.com/shard/s11/sh/ba234b99-1298-45a4-9f88-e8605e2f3379/5108c7f256f8b026
+(cljs-devtools map formatting is actually really good, nice)
+
+so new-center is (408.7, 257.6)
+new-velocity is (0, 0)
+current center is (398.2, 252)
+current velocity is (0, -3.2)
+
+seems odd that x velocity is 0
+it looks like this atm
+https://www.evernote.com/shard/s11/sh/326d398d-9154-4561-9b88-064ae36a41bf/8830244b7113be66
+its left side is stuck up against the player, and it's trying to move up, so the current velocity
+actually makes a lot of sense
+
+so if the current velocity is (0, -3.2), then why are we trying to move this thing to the
+right by ten pixels? that would indicate of a velocity of (10, -3.2), which we are *not* seeing
+so let's go up the callstack
+
+ok, we're in resolve-diagonal-collision - this is probably where the teleportation bug is!
+seeing more cljs-devtools formatting errors - i see 4 things named entity, for instance; ugh
+definitely gonna have to look into this and see if i can fix it... anyway
+
+
+
+
