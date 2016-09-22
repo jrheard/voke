@@ -33,8 +33,9 @@
                                    (new-center :x)))
         y-distance (js/Math.abs (- (get-in entity [:shape :center :y])
                                    (new-center :y)))]
-    (when (or (> x-distance 10)
-              (> y-distance 10))
+    (js/console.log x-distance y-distance)
+    (when (or (> x-distance 5)
+              (> y-distance 5))
       (js/console.log "SOMETHING BAD HAS HAPPENED")
       (js-debugger)))
 
@@ -55,7 +56,7 @@
 
 (sm/defn remove-entity!
   "Wrapper around voke.state/remove-entity! so that we can keep track of which entities have been destroyed
-  by us during this frame."
+  by us during this tick."
   [entity :- Entity]
   ; The collision system should only be killing :destroyed-on-contact entities.
   (assert (get-in entity [:collision :destroyed-on-contact]))

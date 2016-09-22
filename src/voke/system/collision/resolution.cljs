@@ -40,11 +40,6 @@
    axis :- Axis
    new-velocity :- s/Num
    contacted-entities :- [Entity]]
-  ; xxxxx seeing some fuckery likely related to this function
-  ; if the monster is to your left, and moving to its right to chase you
-  ; and you're firing to your left, at the monster
-  ; and you're moving up and down
-  ; sometimes you get teleported way far away from where you should be
   (let [closest-entity (find-closest-contacted-entity axis new-velocity contacted-entities)
         shape1 (entity :shape)
         possibly-out-of-date-shape2 (closest-entity :shape)
@@ -56,10 +51,6 @@
                                :keywordize-keys true))
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)]
-    ; hm - is this equation always correct?
-    ; what if we're moving to the right and run into something on our right?
-    ; it probably handles that fine, haven't checked yet though
-    ; but - what if we're moving right and something on our left is moving right *faster* than us, and runs into us?
     (arithmetic-fn (get-in shape2 [:center axis])
                    (/ (shape2 field) 2)
                    (/ (shape1 field) 2)
@@ -73,12 +64,12 @@
    axis :- Axis
    remaining-contacted-entities :- [Entity]
    all-entities :- [Entity]]
-  (let [all-contacted-entities (find-contacting-entities entity
-                                                         (assoc (get-in entity [:shape :center])
-                                                                axis
-                                                                new-center)
-                                                         all-entities)
-        contacted-entities (intersection (set all-contacted-entities)
+  (let [entities-contacted-on-this-axis (find-contacting-entities entity
+                                                                  (assoc (get-in entity [:shape :center])
+                                                                         axis
+                                                                         new-center)
+                                                                  all-entities)
+        contacted-entities (intersection (set entities-contacted-on-this-axis)
                                          (set remaining-contacted-entities))]
     (if (seq contacted-entities)
       [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
@@ -124,6 +115,7 @@
   [entity :- Entity
    new-velocity :- Vector2
    remaining-contacted-entities :- [Entity]]
+  ; XXXXX give this next line everyone's most up-to-date centers from the js system
   (let [lines (mapcat entity-to-lines remaining-contacted-entities)
         velocity-line-slope (/ (new-velocity :y) (new-velocity :x))
         ; y = mx + b, so b = y - mx
@@ -137,6 +129,15 @@
                                     intersections)
         x-operation (if (pos? (new-velocity :x)) - +)
         y-operation (if (pos? (new-velocity :y)) - +)]
+    (js/console.log "diagonal")
+    (js/console.log "lines" lines)
+    (js/console.log "velocity slope" velocity-line-slope)
+    (js/console.log "intercept" velocity-line-intercept)
+    (js/console.log "intersections" intersections)
+    (js/console.log "closest" closest-intersection)
+    (js/console.log "x-op" x-operation)
+    (js/console.log "y-op" y-operation)
+
     (apply-movement entity
                     {:x (x-operation (closest-intersection :x)
                                      (/ (get-in entity [:shape :width]) 2)

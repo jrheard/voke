@@ -97,6 +97,7 @@ var Collision = {
         return shape.center.y + (shape.height / 2);
     },
 
+// shouldn't this be EntityIDs?
     findContactingEntityID: function(entityID, newCenter) {
         var movingEntity = entitiesByID[entityID];
 

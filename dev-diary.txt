@@ -3956,3 +3956,84 @@ i think it might be too late to find that out since i don't have a working repl 
 
 that function has a call to find-cosest-clear-spot, which has a ton of scary comments in it
 so that's probably where we're fucking up atm
+
+=======
+
+9/21/16
+
+ok so where were we
+
+so the issue is that we're in move-to-nearest-clear-spot, and we're trying to move bad guy up and to the left
+he's clear if he moves straight up, but not clear if he moves to the left
+right now, (move-to-nearest-clear-spot) calls (find-new-position-and-velocity-on-axis) in order to see if we're
+clear on each axis.
+that function returns a 2-tuple of [axis-clear-position axis-new-velocity]
+and so what move-to-nearest-clear-spot does is: it checks on both x and y axes, and sees if those return values
+are the same as the values that the entity is already trying to use to move.
+so like let's say you're at x=10 and trying to move right by 1px;
+you're trying to set yourself to x=11, and you're trying to set your new velocity to be ~1.
+if find-new-position-and-velocity-on-axis returns [11 ~1], then that indicates that you're clear to move right
+if it returns [10.5 0], though, that indicates that you ran into something
+
+and so the issue is that bad guy is trying to move left, and it's *not* clear to move left, but
+find-new-position-and-velocity-on-axis is reporting that it *is* clear to move left. so something
+in that function's callstack is buggy.
+
+so that function is basically a wrapper around find-closest-clear-spot
+
+i can't figure out the best way of setting a breakpoint in there that only gets triggered when the issue happens
+so i guess we'll just leave the current breakpoint as-is, add some logging to this function, and try
+to repro again
+
+notes from find-closest-clear-spot:
+
+; ok so
+; bad guy is at 398.284445
+; good guy is at 373.27445
+; the js collision system says that good guy's *actually* at 373.2221
+; bad guy is trying to move to 397.30978
+; bad guy's new velocity is -0.97465
+
+; so arithmetic-fn is +
+; shape2 center axis is 373.2221
+; so the thing should be running (+ 373.2221 12.5 12.5 0.01)
+; which is 398.2321
+; which seems correct. but that's not what find-new-position-and-velocity-on-axis is returning
+; so maybe this function isn't being called after all
+
+i think that find-new-position-and-velocity-on-axis might not even be calling this function after all
+
+ok so find-closest-clear-spot is exonerated, because if it were being used, the x-velocity that
+find-new-position-etc returns would be 0. but it's not 0!
+so something's going wrong with this set intersection.
+
+blat blat blat blat blat
+
+added some print statements
+
+seems like the reason this is so hard to repro is that it has something to do with timing, not sure why
+
+so i have a repro here that looks like we actually sincerely do have a corner-only collision
+
+good guy is at (455.293, 125.876), velocity (-2.250, 0)
+bad guy is at (478.340, 150.886), attempting to move to (477.169, 150.585)
+so good guy's _actual_ x position is currently 452.8927
+
+anyway so he's clear to move on the x, and he's clear to move on the y
+so we try to resolve the corner collision
+
+and it turns out that the corner collision algo tries to move him to (480.393, 160.778)
+which is super incorrect - he's getting teleported 10px down for no reason
+
+anyway now that i know this is a corner collision bug, i should be able to just find a repro
+by putting good guy and bad guy at specific positions that trigger this bug
+
+ok, added some more logging to resolve-diagonal
+
+maybe it has something to do with the fact that we're basing these equations on the shape's
+center, rather than its leading corner, which is what we _actually_ want to position?
+
+
+good guy at (723.624, 196.997)
+bad guy at (700.7, 222)
+bad guy being moved to (698.524, 232.200) by resolve-diagonal
