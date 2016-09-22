@@ -29,8 +29,8 @@
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2]
-  ; Queue an update to this entity's center; these updates get run in a single batch at the
-  ; end of this tick, so that all entities in cljs-land have their centers updated at once.
+  ; Queue an update to this entity's center and velocity; these updates get run in a single batch at the
+  ; end of this tick, so that all entities in cljs-land have their centers+velocities updated at once.
   (update-entity! (entity :id)
                   :collision-system
                   (fn [entity]
@@ -45,7 +45,7 @@
   ; In order to be correct, the voke collision system needs to maintain this invariant:
   ; at all times, no two entities are occuping the same space.
   ; By updating the JS-land collision system multiple times per tick, we maintain this invariant.
-  ; if we did not do this, two entities moving toward each other could both end up occuping
+  ; If we did not do this, two entities moving toward each other could both end up occuping
   ; the same space.
   (-update-entity-center (entity :id) new-center)
 
@@ -66,7 +66,7 @@
 
 (sm/defn get-updated-entity-center :- Entity
   "Returns the given entity, with its most up-to-date center value spliced in.
-  See `apply-movement`."
+  See `apply-movement` for an explanation of why the js-land collision system has more up-to-date center values."
   [entity :- Entity]
   (assoc-in entity
             [:shape :center]
