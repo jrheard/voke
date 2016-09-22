@@ -29,19 +29,11 @@
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2]
-  (let [x-distance (js/Math.abs (- (get-in entity [:shape :center :x])
-                                   (new-center :x)))
-        y-distance (js/Math.abs (- (get-in entity [:shape :center :y])
-                                   (new-center :y)))]
-    (js/console.log (int x-distance) (int y-distance))
-    (when (or (> x-distance 5)
-              (> y-distance 5))
-      (js/console.log "SOMETHING BAD HAS HAPPENED")
-      (js-debugger)))
-
   ; XXXXX orientation is never threaded this far! orientation never gets updated!!!
-  (-update-entity-center (entity :id) new-center)
+  ; do we even use orientation?
 
+  ; Queue an update to this entity's center; these updates get run in a single batch at the
+  ; end of this tick, so that all entities in cljs-land have their centers updated at once.
   (update-entity! (entity :id)
                   :collision-system
                   (fn [entity]
@@ -49,6 +41,16 @@
                     (-> entity
                         (assoc-in [:shape :center] new-center)
                         (assoc-in [:motion :velocity] new-velocity))))
+
+  ; *Immediately* register the entity's new center with the JS-land collision system, though,
+  ; so that it always has the most up-to-date view possible of where each entity is.
+  ;
+  ; In order to be correct, the voke collision system needs to maintain this invariant:
+  ; at all times, no two entities are occuping the same space.
+  ; By updating the JS-land collision system multiple times per tick, we maintain this invariant.
+  ; if we did not do this, two entities moving toward each other could both end up occuping
+  ; the same space.
+  (-update-entity-center (entity :id) new-center)
 
   (publish-event {:type       :movement
                   :entity-id  (entity :id)
@@ -66,6 +68,8 @@
     (voke.state/remove-entity! (entity :id) :collision-system)))
 
 (sm/defn get-updated-entity-center :- Entity
+  "Returns the given entity, with its most up-to-date center value spliced in.
+  See `apply-movement`."
   [entity :- Entity]
   (assoc-in entity
             [:shape :center]
@@ -85,7 +89,6 @@
       (let [entity-ids (set (js->clj contacting-entity-ids))]
         (keep (fn [entity]
                 (when (contains? entity-ids (entity :id))
-                  ; XXXX DOCUMENT WHY THIS IS NECESSARY
                   (get-updated-entity-center entity)))
               all-entities))
       [])))

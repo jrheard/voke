@@ -4088,3 +4088,11 @@ i think the program has gotten big enough that there's value in that sort of thi
 
 ok, cool
 so let's start with giving the resolution system the most up-to-date view of the relevant collided entities
+
+ok that was easier than expected
+and i did the leading corner stuff to resolve-diagonal-collision
+
+so i think we're more stable now
+i did see one bizarre situation where it looked like there was a ghost player/monster-sized square
+i'm going to hope that that was just an artifact from a weird figwheel reload
+if i see it again in a non-figwheel situation then i can worry about it
