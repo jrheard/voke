@@ -4085,3 +4085,6 @@ avoided. so that's cool
 
 i'm also going to start using github issues to track things i want to work on, because again
 i think the program has gotten big enough that there's value in that sort of thing
+
+ok, cool
+so let's start with giving the resolution system the most up-to-date view of the relevant collided entities

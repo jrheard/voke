@@ -42,13 +42,7 @@
    contacted-entities :- [Entity]]
   (let [closest-entity (find-closest-contacted-entity axis new-velocity contacted-entities)
         shape1 (entity :shape)
-        possibly-out-of-date-shape2 (closest-entity :shape)
-        shape2 (assoc possibly-out-of-date-shape2
-                      :center
-                      ; XXXXX DIAGONAL WILL NEED THIS INFO TOO I BET
-                      ; FUCK
-                      (js->clj (js/Collision.getEntityCenter (closest-entity :id))
-                               :keywordize-keys true))
+        shape2 (closest-entity :shape)
         arithmetic-fn (if (pos? new-velocity) - +)
         field (if (= axis :x) :width :height)]
     (arithmetic-fn (get-in shape2 [:center axis])
@@ -129,14 +123,6 @@
                                     intersections)
         x-operation (if (pos? (new-velocity :x)) - +)
         y-operation (if (pos? (new-velocity :y)) - +)]
-    (js/console.log "diagonal")
-    (js/console.log "lines" lines)
-    (js/console.log "velocity slope" velocity-line-slope)
-    (js/console.log "intercept" velocity-line-intercept)
-    (js/console.log "intersections" intersections)
-    (js/console.log "closest" closest-intersection)
-    (js/console.log "x-op" x-operation)
-    (js/console.log "y-op" y-operation)
 
     (apply-movement entity
                     {:x (x-operation (closest-intersection :x)

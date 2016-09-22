@@ -29,7 +29,7 @@
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2]
-  (let [x-distance (js/Math.abs (- (get-in entity [:shape :center :x])
+  #_(let [x-distance (js/Math.abs (- (get-in entity [:shape :center :x])
                                    (new-center :x)))
         y-distance (js/Math.abs (- (get-in entity [:shape :center :y])
                                    (new-center :y)))]
@@ -65,6 +65,13 @@
     (swap! dead-entities conj (entity :id))
     (voke.state/remove-entity! (entity :id) :collision-system)))
 
+(sm/defn get-updated-entity-center :- Entity
+  [entity :- Entity]
+  (assoc-in entity
+            [:shape :center]
+            (js->clj (js/Collision.getEntityCenter (entity :id))
+                     :keywordize-keys true)))
+
 (sm/defn find-contacting-entities :- [Entity]
   "Takes an Entity (one you're trying to move from one place to another) and a list of all of the
   Entities in the game. Returns a (possibly empty) list of all of the other entities that `entity` would collide
@@ -78,6 +85,6 @@
       (let [entity-ids (set (js->clj contacting-entity-ids))]
         (keep (fn [entity]
                 (when (contains? entity-ids (entity :id))
-                  entity))
+                  (get-updated-entity-center entity)))
               all-entities))
       [])))
