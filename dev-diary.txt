@@ -2809,3 +2809,1290 @@ transducers can buy you a lot of performance there.
 
 but in my situation, i tend to have some inputs and i want to apply all of them to a particular single
 map, and vanilla reduce seems to be about as good as it's possible to get
+
+ok started work on ai movement
+the monster trundles along after the player
+but if both of them move into each other, weird shit happens in collision resolution
+if player is above and monster is below, and they move toward each other vertically, player's x-position gets
+nudged so that it's to the right of the monster
+
+i'll deal with it tomorrow
+
+to make things simpler, have the monster always move up very slowly
+
+====
+
+3/30/16
+
+this situation is a bit difficult to debug / reason about. i wonder if it would be helpful to slow things to
+like 5fps and to add a pause button - so if you hit P, time stops. that could be useful
+
+anyway so what's happening?
+
+player is 0, moving down
+monster is 5, moving up
+
+A:
+system resolves for 0
+nothing contacted in x direction
+contacted 5 in y direction
+0's bottom is moved to be right above 5's top (todo confirm this is working correctly)
+
+B:
+system resolves for 5
+nothing in x direction
+contacted 0 in y direction
+5's top is moved to be right below 0's bottom
+
+at this point 0 has y 291.01412121520923
+5 has y 315.61896848408577
+
+the difference between those two numbers is 24.60484726887654
+
+so the resolution system puts 0 and y too close together!
+
+...hm i think this is happening because step B isn't aware that step A has happened and 0's position has shifted
+0 starts at y=290.608 and is moved to y=291.014
+5 starts at 316.024 and is moved to y=315.618
+
+yeah
+
+well, why is B happening?
+
+0 is moving down
+5 is moving up
+
+0 attempts to move
+A happens
+0 is nudged to be in a good spot so it's right above 5
+js system's state is updated to reflect this
+
+5 attempts to move
+B happens because 0 is *right* above 5
+cljs system is using out-of-date center for 0, moves 5 to the wrong spot
+
+one resolution: have cljs system ask for most up-to-date position of 0 before moving 5
+
+ok i did that
+
+still a few lingering problems
+
+sometimes the player teleports in.. certain situations. not sure which. particularly if it's chasing you
+and you stop moving (?)
+also if you're shooting a bunch of bullets and it collides with you as a bullet's dying, sometimes it crashes?
+not sure what's going on in either situation
+
+ok i fixed the second of thsoe two things
+haven't started on the first yet
+
+ok, what's happening here
+can't really reproduce it reliably
+it seems to happen when the monster catches up to you - diagonally - as you're slowing to a stop
+
+resolving for 5 -> no further logging?!
+
+is it the situation where an entity's corner precisely collides with your corner?
+
+yeah i think it might be
+
+we handle a collision for 5
+we check each axis to see if 5 is clear to move on that axis
+and it *is* clear to move on both axes
+but then we move it and bad shit happens
+
+======
+
+3/31/16
+
+ok i did some thinking about this corner collision situation
+
+so the problem is that we're in a situation where you're clear if you *just* move laterally, and clear if you
+*just* move vertically, but if you actually apply both axes' movement direction, you collide with something
+
+right now, the resolution system's like "cool you're clear on top and clear on the right so go ahead and
+move up and right", and then you're in an invalid place and things get a little fucked up
+
+so i think the right way to solve this is to detect when we're in this situation (pretty easy: when we've
+been asked to resolve a collision, but we appear to be clear vertically and horizontally)
+
+and when that happens:
+
+take the list of entities that we know we've collided with
+break them down into all of their component lines
+  so eg an entity with width 10 height 10 that's at x=20 y=40 would have 4 lines
+  x=10, x=30, y=30, y=40
+
+take the line that the moving entity is traveling on - figure out a way to express it, we have its position
+and its direction so it should be easy to turn that into a line; call that L or whatever
+
+then, for each of our collided entities' lines, calculate the point at which line L intersects with it
+so now we have a set of points
+then all you do is figure out which of those points is closest, and - say the entity is moving up+right - you
+just move its top-right corner to be at (or slightly slightly before) that point
+
+i think i have a little more hammering out to do, but that sounds like a reasonable way of solving the problem
+
+======
+
+4/4/16
+
+http://www.eff-lang.org/ looks neat, found via an article pwrice sent me
+
+which was https://codewords.recurse.com/issues/six/immutability-is-not-enough , which i thought was good
+
+======
+
+4/5/16
+
+garrick says his game state handling works similarly to voke.state, except with a priority int as well,
+to determine the order in which updates are applied. interesting
+
+ok well let's try this line stuff
+
+======
+
+8/30/16
+
+whoops it's been a while
+
+reading through some links from http://www-cs-students.stanford.edu/~amitp/gameprog.html
+
+http://intrinsicalgorithm.com/IAonAI/2012/11/ai-architectures-a-culinary-guide-gdmag-article/ talks about finite
+state machines vs behavior trees vs planners
+
+i really like amit's aside on AI systems:
+
+In choosing a technique for AI in your games, keep it as simple as possible; read this. If you know the
+answer, put the answer into the program. If you know how to compute the answer, put the algorithm for
+computing it into the program. Only if you don’t know the answer, and don’t even know how to compute the
+answer, should you resort to complex techniques that can learn how to find the answer. These complex
+techniques can come at a high price, in terms of programming time, game performance, difficulty of
+debugging, and lack of control.
+
+the "lack of control" bit was non-obvious to me, and is echoed in this "culinary guide" article when he talks
+about planners:
+
+"""
+From an implementation standpoint, a major plus of the planner is that a new action can be dropped into the game
+and the planner architecture will know how to use it. This speeds up development time markedly. All the author says
+is, “here are the potential things you could do… go forth and do things.”
+
+Of course, a drawback of this is that authorial control is diminished. In a FSM or BT, creative, “outside the box”
+solutions were the exception from the predictable, hand-authored systems. In a planner, the scripted, predictable moments
+are the exception; you must specifically override or trick the planning system to say, “no… I really want you to do
+this exact thing at this moment.”
+"""
+
+according to this taco guy, behavior trees are more common than planners, but FEAR used a planner:
+http://alumni.media.mit.edu/~jorkin/goap.html
+
+`While utility-based systems can be used in many types of games, they are more appropriate in situations where there
+are a large number of potentially competing actions the AI can take—often with no obvious “right answer.”`
+
+http://alumni.media.mit.edu/~jorkin/gdc2006_orkin_jeff_fear.pdf
+
+`If the audience of GDC was polled to list the most common A.I. techniques applied to games,
+undoubtedly the top two answers would be A* and Finite State Machines (FSMs). Nearly
+every game that exhibits any A.I. at all uses some form of an FSM to control character
+behavior, and A* to plan paths.`
+
+so i will probably be using FSMs and A* when it comes time for monster behavior
+
+i guess monsters can have states like
+
+idle
+pursuit
+combat
+leash
+
+etc
+
+"As much as we like to pat ourselves on the back, and talk about how smart our A.I. are, the
+reality is that all A.I. ever do is move around and play animations! Think about it. An A.I. going
+for cover is just moving to some position, and then playing a duck or lean animation. An A.I.
+attacking just loops a firing animation. Sure there are some implementation details; we
+assume the animation system has key frames which may have embedded messages that tell
+the audio system to play a footstep sound, or the weapon system to start and stop firing, but as
+far as the A.I.’s decision-making is concerned, he is just moving around or playing an
+animation."
+
+"The previous case study illustrates the first of three benefits of a planning system. The first
+benefit is the ability to decouple goals and actions, to allow different types of characters to
+satisfy goals in different ways. The second benefit of a planning system is facilitation of
+layering simple behaviors to produce complex observable behavior. The third benefit is
+empowering characters with dynamic problem solving abilities."
+
+perhaps overkill for our purposes in voke, but cool to read about
+
+..."This dynamic behavior arises out of re-planning while taking into account knowledge gained
+through previous failures. In our previous discussion of decoupling goals and actions, we saw
+how knowledge can be centralized in shared working memory. As the A.I. discovers obstacles
+that invalidate his plan, such as the blocked door, he can record this knowledge in working
+memory, and take it into consideration when re-planning to find alternative solutions to the
+KillEnemy goal."
+
+http://aigamedev.com/open/review/planning-in-games/
+
+"In the cases of action/combat games, we can easily build robust AI that looks deliberate using
+simple reactive techniques like behavior trees. In fact, it's difficult to tell the difference
+for such applications between the behavior generated by a planner compared to more reactive
+approaches, yet the planning process will be noticeably slower at runtime and require more development time."
+
+https://archives.nucl.ai/recording/building-a-galaxy-procedural-generation-in-no-mans-sky/
+"we're building a game, not a tech demo" - har har
+
+http://aigamedev.com/open/article/hfsm-gist/ heirarchical FSMs
+
+http://aigamedev.com/open/article/bt-overview/ behavior trees
+
+==========
+
+9/3/16
+
+http://gamesfromwithin.com/data-oriented-design
+
+"Programming, by definition, is about transforming data: It’s the act of creating a sequence
+of machine instructions describing how to process the input data and create some specific output data"
+
+"In general, the ideal data is in a format that we can use with the least amount of effort"
+"In any case, the goal is to minimize the amount of transformations, and whenever possible,
+you should bake your data into this ideal format offline, during your asset-building process."
+
+"To achieve the best possible data layout, it’s helpful to break down each object into the
+different components, and group components of the same type together in memory, regardless of
+what object they came from. This organization results in large blocks of homogeneous data,
+which allow us to process the data sequentially"
+
+http://buildnewgames.com/particle-systems/
+** good article
+
+object pooling makes a lot of sense in particle systems
+
+"Instead what we need is a pool of particles. When we want to fire a particle out, we will
+grab an available one from the pool. When a particle dies, it will be returned to the pool
+to be recycled later."
+
+=========
+
+9/4/16
+
+http://norvig.com/lispy.html
+
+http://norvig.com/lispy2.html
+
+http://www.redblobgames.com/pathfinding/a-star/introduction.html
+***** great
+
+"Dijkstra’s Algorithm can find paths to all locations; A* finds paths to one location."
+
+super fuckin great article
+
+a* is djikstra + greedy best first search
+
+"If you want to find paths from or to all all locations, use Breadth First Search or Dijkstra’s Algorithm.
+  Use Breadth First Search if movement costs are all the same; use Dijkstra’s Algorithm if movement costs vary.
+
+If you want to find paths to one location, use Greedy Best First Search or A*. Prefer A* in most cases."
+
+"A* is guaranteed to find the shortest path if the heuristic is never larger than the true distance.
+As the heuristic becomes smaller, A* turns into Dijkstra’s Algorithm.
+As the heuristic becomes larger, A* turns into Greedy Best First Search."
+
+"What about performance? The best thing to do is to eliminate unnecessary locations in your graph."
+recommends reading http://www.redblobgames.com/pathfinding/grids/algorithms.html if using a grid
+
+"I’ve not needed any of these optimizations in my own projects." interesting
+quadtrees are mentioned
+
+http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
+
+http://theory.stanford.edu/~amitp/GameProgramming/UserExperience.html
+
+"Making units too smart is almost as bad as making units too dumb. If the player has to deal
+with fog of war but the pathfinder has access to the entire map, the units will mysteriously
+know where to go even though the user does not. That’s a clear sign to the user that something
+odd is going on. On the other hand, it gives better paths. A compromise is to scale up the
+movement costs on unexplored areas."
+
+http://theory.stanford.edu/~amitp/GameProgramming/MapRepresentations.html
+
+"The most common alternative to grids is to use a polygonal representation. If the movement cost
+across large areas is uniform, and if your units can move in straight lines instead of following
+a grid, you may want to use a non-grid representation."
+
+"In many grid games, there are large areas of maps that have uniform movement costs. A* doesn’t
+“know” this, and wastes effort exploring them. Creating a simpler graph (navigation mesh,
+visibility graph, or hierarchical representation of the grid map) can help A*."
+
+https://web.archive.org/web/20110723003329/http://www.ai-blog.net/archives/000152.html
+
+this guy really likes navigation meshes
+
+=========
+
+9/5/16
+
+http://www.redblobgames.com/pathfinding/grids/graphs.html
+
+"Graph search algorithms like Dijkstra’s Algorithm and A* work on weighted directed graphs,
+sets of nodes connected by edges that have numeric weights (movement costs) attached to them."
+
+http://www.redblobgames.com/pathfinding/a-star/implementation.html
+
+just implements a Graph, which is a set of (directed) locations and edges, no Node class
+
+http://aigamedev.com/open/article/bt-overview/
+
+pretty bad article
+
+http://www.gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php
+
+"a behaviour tree is a tree of hierarchical nodes that control the flow of decision making
+of an AI entity. At the extents of the tree, the leaves, are the actual commands that control
+the AI entity, and forming the branches are various types of utility nodes that control the
+AI’s walk down the trees to reach the sequences of commands best suited to the situation."
+
+"A core aspect of Behavior Trees is that unlike a method within your codebase, a particular
+node or branch in the tree may take many ticks of the game to complete."
+
+hm
+makes sense, interesting tho
+
+so i guess the idea is that a particular node on an entity's behavior tree is active at
+any given point in time, and it can have a certain state associated with it -
+example states are success, failure, and running
+
+it keeps talking about how nodes can return a value to their parent - eg:
+
+"A composite node is a node that can have one or more children. They will process one or
+more of these children [...] and at some stage will consider their processing complete
+and pass either success or failure to their parent, often determined by the success or failure
+of the child nodes. During the time they are processing children, they will continue to return
+Running to the parent."
+
+not sure i 100% follow this
+
+i guess the idea is that one way of using a BT is to:
+every tick, walk each npc's BT to see if any states have completed
+for each active node: check all of its active children and see their statuses
+if a child node is Running, then ignore it / let it continue
+if it's marked as Success, then do something about that
+if it's marked as Failure, then do something about that
+
+this article is pretty solid; it makes BTs sound way more complicated than i'll ever need
+in any game i'm likely to build, though; cool concept, but more useful in complex FPS/RPG games
+where you really want to have rich/complex NPC behavior
+
+my dudes are only ever gonna be idle, chasing, attacking, healing, or leashing, and probably
+not ever really anything else to speak of
+
+looks like BTs are actually most useful in a context where you've got some sort of GUI
+tool that you've built to allow your characters' BTs to be manipulated, and you have some
+sort of established library of Node classes, and so you're not actually writing code when
+you're manipulating a character's behavior, you're just using this tool and dragging Nodes around
+
+ok fuck it let's try to read the re-frame screed
+
+https://github.com/Day8/re-frame
+
+"we believe in one-way data flow"
+
+"Although app-db is a Reagent atom (hereafter ratom), I'd encourage you to think of it as
+an in-memory database. It will contain structured data. You will need to query that data.
+You will perform CRUD and other transformations on it. You'll often want to transact on this
+database atomically, etc."
+
+ok, the history-lesson portion is all pretty straightforward
+
+talks about `subscription`s, which appear to be a tool that you can use to have your component
+functions query app-db (rather than just having them directly do like (:b @app-db) or whatever)
+
+"subscription handlers" - functions that do a named query
+
+"components never source data directly from app-db, and instead, they use a subscription."
+"subscriptions are only ever used by components (they are never used in, say, event handlers)."
+
+   (subscribe  [query-id some optional query parameters])
+
+(register-sub) function hooks up query IDs to query functions
+
+so far, it just seems like we've added a layer of indirection between component functions
+and the app-db atom; hasn't yet been explained what this buys us
+
+"We don't want to perform this computationally expensive re-sort each time something unrelated in app-db changes."
+
+"Luckily, we can easily fix that up by tweaking our subscription function so that it chains reactions"
+
+********
+"That 3rd, expensive reaction will be re-run when either one of its two input Signals change,
+right? Not quite. reaction will only re-run the computation when one of the inputs has _changed in value_."
+********
+
+this seems to be the main point of the discussion so far - using chained reactions so that
+you only do expensive recomputations when you actually *have* to, rather than redoing them
+every time the db changes in any way
+
+"An application has many handlers, and collectively they represent the control layer of the application."
+
+events are just data, like [:header-button-clicked :about] or whatever
+
+you fire events with (dispatch)
+
+event handlers take a) the value of @app-db and b) an event (a vector), and return the
+new value which should be reset! into @app-db
+
+(reg-event-db) is used to register events
+
+"It is almost like app-db is the temporary place where this imagined perpetual reduce stores its on-going reduction."
+cute
+
+i wonder if multiple handlers can subscribe to the same event?
+
+eg he keeps talking about how there's this stream of all events that have happened
+how do you actually record that stream? can you make a handler that subscribes to all events
+and just conjes them onto a list?
+
+anyway reframe seems good, just like a good base common vocabulary for writing apps using reagent
+
+=======
+
+9/6/16
+
+https://www.youtube.com/watch?v=fU9hR3kiOK0
+samza
+
+good talk, bit general but good intro to why streams / idempotence / etc are good in db-land
+
+=======
+
+9/7/16
+
+ok cool
+
+so what was i working on six months ago, anyway?
+
+the last thing i wrote was "let's try this line stuff" - what the hell does that mean?
+
+looks like i was tinkering around in collision.resolution, something to do with corner collisions
+
+i should really start by going through and resolving every TODO i find in the codebase
+
+the "line stuff" seems to refer to my notes from 3/31/16
+
+=====
+
+9/14/16
+
+did some reading on kubernetes for no reason, that was fun
+
+https://youtu.be/9MKY4KypBzg?t=52m22s has a good bit on coordinated omission
+"when you see a vertical rise in a percentile chart, you should be extremely suspicious
+of the input: your data is probably wrong."
+
+recommends that you test your measurement system. seems like a good idea
+
+always measure max time, can be a hint re: coordinated omission
+
+https://www.usenix.org/system/files/conference/atc14/atc14-paper-ongaro.pdf raft paper
+
+ok anyway i'm trying to set up dirac, a tool for debugging cljs
+
+https://github.com/binaryage/dirac/blob/master/docs/installation.md
+
+ok so things are kinda broken but kinda working
+
+in order to get dirac and figwheel to happen at the same time, i do this:
+(per https://github.com/bhauman/lein-figwheel/wiki/Using-the-Figwheel-REPL-within-NRepl )
+
+lein repl
+(use 'figwheel-sidecar.repl-api)
+(start-figwheel!)
+
+once all that's done, i get dirac and figwheel and things are mostly groovy.
+
+this is obviously somewhat cumbersome though
+
+i still need to solidify my understanding of this whole system, i'm kinda just flailing atm
+in particular, i need to set up cursive integration per
+https://github.com/binaryage/dirac/blob/master/docs/integration.md
+
+and also need to figure out why my code isn't being run when you load the html page any more
+complains about `voke` being undefined, even though `voke.core` has been goog.require'd
+
+ok, connecting cursive to dirac was really easy, not sure exactly what it buys us quite yet
+
+@smw in #dirac says that boot has really simple tooling around auto code reloading
+gives this snippet:
+
+(deftask dev-cljs-repl
+  "Run a restartable system in the Repl"
+  []
+  (comp
+   (environ :env {:http-port "3300" :dev true})
+   (watch :verbose true)
+   (system :sys #'dev-system :auto true :files ["handler.clj"])
+   (reload :port 55554)
+   (cljs-repl)
+   (cljs)
+   (speak)))
+
+will have to take a look at that in the future
+
+https://github.com/adzerk-oss/boot-reload
+https://github.com/adzerk-oss/boot-cljs-repl
+https://github.com/boot-clj/boot-cljs-devtools
+
+====
+
+9/15/16
+
+https://github.com/adzerk-oss/boot-test
+
+http://tech.adstage.io/2016/09/12/how-we-test-full-stack-clojure.html
+
+http://clojure.org/guides/spec
+
+so apparently a big part of spec is this concept of a central registry, so you do things like
+
+(s/def ::date inst?)
+(s/def ::suit #{:club :diamond :heart :spade})
+
+(s/valid? ::date (Date.))
+;;=> true
+(s/conform ::suit :club)
+;;=> :club
+
+but is it not clumsy to have to do stuff like constantly referring to voke.specs/foo, voke.specs/bar, etc?
+
+because like 99% of the time you're not going to be in the `voke.specs` ns
+
+"You will see later that registered specs can (and should) be used anywhere we compose specs."
+
+"When an or is conformed, it returns a vector with the tag name and conformed value:"
+(s/def ::name-or-id (s/or :name string? :id int?))
+(s/conform ::name-or-id "abc")
+;;=> [:name "abc"]
+(s/conform ::name-or-id 100)
+;;=> [:id 100]
+
+s/nilable exists:
+(s/valid? string? nil)
+;;=> false
+(s/valid? (s/nilable string?) nil)
+;;=> true
+
+interesting - spec guide mentions #: syntax for auto-namespaced map keys, like this:
+
+#:{ :foo {:bar :baz}}
+
+apparently gets translated to eg
+
+{:voke.core/foo {:voke.core/bar :voke.core/baz}}
+
+not sure if it gets applied recursively, so it might just be
+
+{:voke.core/foo {:bar :baz}}
+
+yeah, doesn't get applied recursively:
+
+user=> (= #:foo{:bar {:baz :quux}} {:foo/bar {:foo/baz :quux}})
+false
+user=> (= #:foo{:bar {:baz :quux}} {:foo/bar {:baz :quux}})
+true
+
+documented in https://groups.google.com/forum/#!topic/clojure-dev/8tHLCm8LpyU
+
+interesting discussion on that thread
+
+back to the spec guide, this paragraph is probably super important, on entity maps:
+
+Clojure programs rely heavily on passing around maps of data. A common approach in other
+libraries is to describe each entity type, combining both the keys it contains and the structure
+of their values. Rather than define attribute (key+value) specifications in the scope of
+the entity (the map), specs assign meaning to individual attributes, then collect them into
+maps using set semantics (on the keys). This approach allows us to start assigning (and sharing)
+semantics at the attribute level across our libraries and applications.
+
+so i guess what they're saying here is that instead of doing this throughout your application:
+
+(def Card {:name str? :mana-cost int?})
+
+you should instead be doing something like (unsure of the syntax here, making up this map-of function)
+
+(def Card (map-of [::name ::mana-cost]))
+
+i guess that makes sense!
+
+ok, apparently the (s/keys) macro is what i was looking for
+
+http://clojure.github.io/clojure/branch-master/clojure.spec-api.html#clojure.spec/keys
+
+(s/def ::person (s/keys :req [::first-name ::last-name ::email]
+                        :opt [::phone]))
+
+"The map spec never specifies the value spec for the attributes, only what attributes are required or optional."
+
+"Much existing Clojure code does not use maps with namespaced keys and so keys can also specify
+:req-un and :opt-un for required and optional unqualified keys."
+
+"Unqualified keys can also be used to validate record attributes"
+
+i don't really understand what's up with keys* - it talks about how it "can be embedded inside
+a sequential regex structure". what's that?
+
+gives as example:
+
+(s/def ::server (s/keys* :req [::id ::host] :opt [::port]))
+(s/conform ::server [::id :s1 ::host "example.com" ::port 5555])
+
+hm ok i guess - so keys* is for validating kwargs for functions?
+
+s/merge is for combining entity maps
+
+this focus on use of namespaced registered keywords is interesting - it's basically equivalent to just
+doing regular defs, like (def Foo {:bar :baz}), and just passing Foo around, but instead
+we're doing (s/def ::foo {:bar :baz}) and referring to ::foo everywhere. wonder what that buys us?
+
+is it mainly for performance reasons (not passing around tons of data, if that even matters),
+or is this nice for some other reason?
+
+maybe it's nice because you don't have to actually import voke.specs to refer to ::voke.specs/foo,
+as seen below:
+
+user=> :foo.bar/baz
+:foo.bar/baz
+user=> ::foo
+:user/foo
+user=> :user/foo
+:user/foo
+user=> (= :user/foo ::foo)
+true
+
+that does seem like a pretty compelling reason; i had trouble avoiding circular-import errors
+when using Schema and doing the passing-around-Foo-everywhere style mentioned above. cool neat
+
+ok also yeah uh there is the obvious bit where namespaced keywords are good map keys
+
+right so in schema land, you're usually doing things like {:foo Foo}, and also referring directly
+to Foo throughout your code; but in spec-land, ::foo serves both of those purposes (?)
+
+not sure how i feel about multi-spec, wonder if anyone uses it
+
+"The multi-spec approach allows us to create an open system for spec validation, just like
+multimethods and protocols. New event types can be added later by just extending the event-type multimethod."
+
+special collection functions:
+coll-of, tuple, map-of
+
+"Both coll-of and map-of will conform all of their elements, which may make them unsuitable
+for large collections. In that case, consider every or for maps every-kv." hm
+
+on s/cat vs s/tuple:
+"The choice between a regular expression and tuple here is to some degree a matter of taste,
+possibly informed by whether you expect either the tagged return values or error output to
+be better with one or the other."
+
+"Spec also defines one additional regex operator, &, which takes a regex operator and constrains
+it with one or more additional predicates."
+
+(s/assert) exists, asserts are off by default but can be toggled on
+
+(s/fdef) is the good shit, lets you spec a function.
+interesting that rather than going the route schema did and providing an alternate implementation
+of `defn` that has new syntax, they prefer to do this:
+
+(defn foo [etc] bar)
+
+(s/fdef foo :args something :ret bla)
+
+it makes sense - these guys want to keep the language's syntax as simple as possible - it's just interesting
+
+"Because the args are sequential and the args are positional fields, they are almost always
+described using a regex op, like cat, alt, or *."
+
+s/fspec for higher order functions
+
+there's a typo on the guide -
+"so often it’s not helpful to spec the :ret value of a function (as it’s just code)."
+should read
+" so often it’s not helpful to spec the :ret value of a macro (as it’s just code)."
+
+might be fun to figure out how to contribute a fix
+
+"The Clojure macroexpander will look for and conform :args specs registered for macros at
+macro expansion time (not runtime!)."
+
+that's neat
+
+fdef still feels kinda clumsy to me - eg
+:args (s/cat :game ::game)
+
+vs
+
+[game :- Game]
+
+again, i get that they don't want to introduce new syntax, but i hope that there's some sort
+of nice sugar so you don't have to always do (s/cat :foo ::foo :bar ::bar)
+
+i wonder if fdef's :fn ever gets used, seems like a nice-to-have that nobody would use in practice
+
+submitting a PR to the spec guide was really easy, https://github.com/clojure/clojure-site/pull/139
+gj github, nice simple UI flow for the whole process
+
+"The s/gen function can be used to obtain the generator for any spec."
+
+(s/exercise-fn) looks pretty neat! the example usage looks like this:
+
+(s/exercise-fn `ranged-rand)
+
+i'm not sure what the backtick quote is for in this context?
+
+"Instrument takes a fully-qualified symbol so we use ` here to resolve it in the context
+of the current namespace."
+
+...huh. hm. what?
+i guess this is the var equivalent of doing ::a-keyword
+ok i guess
+
+"Spec does not trust custom generators and any values they produce will also be checked
+by their associated spec to guarantee they pass conformance."
+
+nice
+
+gen/fmap looks neat, very useful in the examples they give for custom generator use cases
+
+**************
+"We mentioned earlier that clojure.spec.test provides tools for automatically testing functions.
+When functions have specs, we can use check, to automatically generate tests that check the
+function using the specs."
+
+neat!
+
+"To test all of the spec’ed functions in a namespace (or multiple namespaces), use enumerate-namespace
+to generate the set of symbols naming vars in the namespace"
+
+(-> (stest/enumerate-namespace 'user) stest/check)
+
+double-neat!
+
+wonder if that works on `instrument`
+
+http://blog.cognitect.com/blog/2016/9/15/works-on-my-machine-understanding-var-bindings-and-roots
+explains what the term "root" means in the context of vars
+
+explains difference between (binding) and (with-redefs) - the former alters a dynamic var's bindings
+/ frames, the latter temporarily alters a var's root
+
+"Var roots are global. Var dynamic bindings are thread-local, and dynamically scoped."
+
+=========
+
+9/16/16
+
+http://leeorengel.com/from-schema-to-spec/
+
+acknowledges that spec is noticeably more verbose than schema
+
+i skimmed the parts where he's actually writing test.check tests, but this looks like a
+useful resource to go back to when i'm interested in actually doing that stuff
+
+"Compared to spec, schema felt a bit more natural to me at first coming from a more strongly
+typed background as the schema information is right there next to what it is specifying."
+
+same here, minus the strongly typed background
+
+says spec is "more composable" and "feels like it fits into the language more naturally",
+which i do also have to agree with
+
+"I’ve seen some debate about where the best place to put specs are; to me it seems pretty
+logical to co-locate them directly with the code they spec."
+
+that's what i would do in schema if i didn't have to worry about circular imports so often
+so i'll probably eventually go back to doing this
+right now i think everything's in voke.schema
+
+anyway good article, well written
+
+http://www.lispcast.com/clojure.spec-vs-schema
+
+"The library is a collection of small tools that do different jobs that can be used together.
+There is a tool for maps (called keys) that checks for the presence of required and optional
+keys and checks that their values conform to the named attribute. There is a tool for sequences
+that uses regular expression operators."
+
+good point yeah - in spec, maps -> (keys), sequences -> regex operators
+
+"The keys function takes a list of required keywords which must be namespaced. Those keywords
+play double-duty. They check for the presence of required keys and they name the spec that
+the value must conform to."
+
+http://gigasquidsoftware.com/blog/2016/05/29/one-fish-spec-fish/
+
+is fine
+
+http://derek.troywest.com/articles/the-elements-of-style
+
+"If you find a pure function named this-and-that refactor `this` and `that` and compose elsewhere."
+
+https://github.com/bbatsov/clojure-style-guide/issues/124
+
+"We will not be adding any other "-" forms to core. I think perhaps if we could do it over,
+defn- would not be added either, but we're not going to take it away."
+
+interesting
+
+https://stuartsierra.com/2015/05/10/clojure-namespace-aliases is good
+
+https://stuartsierra.com/2015/08/25/clojure-donts-lazy-effects
+***** i like this
+
+"Never mix side effects with lazy operations."
+
+https://github.com/jonase/kibit
+
+TODO set up kibit
+
+https://github.com/tolitius/boot-check is a boot analog
+
+okok
+darwin recommends installing https://github.com/binaryage/cljs-devtools , taking a look
+
+note that https://github.com/boot-clj/boot-cljs-devtools exists
+
+https://github.com/binaryage/cljs-oops looks useful
+
+apparently a way of not having to deal with externs files
+
+"Instead of (.-nativeProp obj) write (aget obj "nativeProp") which compiles to obj["nativeProp"]"
+
+TODO take a look at cljs-oops next time i have to deal with anything related to externs files
+
+=======
+
+9/17/16
+
+https://www.youtube.com/watch?v=VNTQ-M_uSo8
+
+https://www.youtube.com/watch?v=dSqLt8BgbRQ
+
+i like his bit about how when you're changing code, you're changing your mental model of the
+system first, and then serializing that change back out into code, around 9 minute mark
+
+cute idea - use code coverage tools to reduce a function into just the lines that actually
+get executed by running your test case, calls it a program slice
+
+https://www.youtube.com/watch?v=_9RgHXqH8J0
+****** good talk on graphql
+
+https://www.youtube.com/watch?v=mty0RwkPmE8&list=PLetHPRQvX4a_jQjvn54Q-d1WYZ52nDfnT&index=11
+history of clojurescript
+
+=======
+
+9/18/16
+
+right - the whole point of connecting intellij to your dirac repl (or to whatever other repl you're using)
+is so that you can get vim-fireplace-like behavior in intellij, by using cmd-shift-p / etc to evaluate
+forms, and play around with things that way. right right.
+
+https://medium.freecodecamp.com/javascript-modules-a-beginner-s-guide-783f7d7a5fcc#.g2dt5cawr
+*****
+super good article on js modules
+
+https://medium.freecodecamp.com/a-beginner-friendly-introduction-to-containers-vms-and-docker-79a9e3e119b#.kpqslvqr1
+great intro to docker
+
+https://www.youtube.com/watch?v=33mTFjPIN10&list=PLetHPRQvX4a_jQjvn54Q-d1WYZ52nDfnT&index=7
+this guy's totally in love with klipse, an in-browser clojurescript/python/ruby/etc repl
+
+looks neat
+apparently a main selling point is that it's super-live, and also that it's totally clientside,
+you just add a <script> tag to your page (blog post, etc) and it's there, no need
+to worry about eg uploading something to gist.github.com and then including an iframe or whatever, etc
+https://github.com/viebel/klipse
+
+https://github.com/aengelberg/loco
+constraint based programming
+looks like it'd be useful for project euler
+
+https://github.com/sbelak/huri
+library for data science
+http://viewer.gorilla-repl.org/view.html?source=github&user=sbelak&repo=huri&path=examples/examples.cljw neat examples
+
+http://gorilla-repl.org/ hadn't heard of this before
+clojure notebook repl
+https://github.com/JonyEpsilon/lein-gorilla
+
+https://news.ycombinator.com/item?id=11991479
+one repo vs many repos
+google has one giant repo (?!?!?!?!?!)
+https://www.youtube.com/watch?v=W71BTkUbdqE
+*****
+
+https://www.youtube.com/watch?v=Rzdxgx3RC0Q
+caching at netflix
+some of this went over my head, not too much tho
+https://github.com/Netflix/rend
+good narrative documentation
+
+=========
+
+9/19/16
+
+https://www.youtube.com/watch?v=6IYm34nDL64
+clojurescript + react native + mobile apps
+
+https://www.youtube.com/watch?v=Oh5oC98ztvI
+great behind-the-scenes talk on graphql + its history
+
+https://www.youtube.com/watch?v=Elg17s_nwDg
+great talk on the cljs compiler
+******* really good talk
+
+========
+
+9/20/16
+
+https://www.youtube.com/watch?v=_1rh_s1WmRA
+ztellman on a frontend server he built at fitbit
+pumpkin carver parable
+"in every case, having many many people serving one queue will give you the best behavior
+under adverse conditions" - money quote
+*****************
+talks about load balancing approaches
+round robin, least in flight
+"you improve what you measure" -> "everything you ignore will get worse"
+good shit
+for his frontend server, it makes more sense to track _overhead_ as opposed to total latency
+makes sense
+his key metrics: p999 overhead, request rate, error rate
+
+https://www.youtube.com/watch?v=n7aE6k8o_BU
+pattern matching
+i like his bit about the start/work/end pattern in recursion, around the 36:00 mark
+
+https://www.youtube.com/watch?v=0rmR80neExo&list=PLNoHgLVTxtaqo1c_V2I-8wkDrCGImb9v5&index=4
+datomic in production
+great speaker
+
+http://patrickgombert.github.io/2015/datomic-performance/
+datomic perf notes, bit over my head atm since i've never used it
+
+http://www.learndatalogtoday.org/
+datalog tutorial - looks really cool actually
+
+https://github.com/lambdaisland/thirdpartyjs
+how to use third party js libraries in cljs
+
+https://betterexplained.com/articles/matrix-multiplication/
+
+ok so anyway
+i was super confused for like two weeks because i thought dirac was necessary for debugging cljs
+turns out you can just call (js-debugger) and use chrome devtools
+i used to know this, but had completely forgotten it because i put programming down for like six months
+
+so i'm trying to figure out why sometimes you (or the monster) teleport
+
+i have a sneaking suspicion that it's related to the fact that there's this JS collision system,
+and it's always 100% kept up-to-date with every entity's location + bounding box and is updated multiple
+times per tick,
+and there's the list of cljs entities that we're processing this tick, and they're updated a total of
+once per tick
+and so these two sources of truth can get out of sync with one another, and anyway that seems like
+a potentially super bad situation
+also, i could swear i've seen at least one xxx comment saying "diagonal collision resolution will need this info"
+which seems relevant
+
+trying to get the issue to repro now, so i can verify that regular chrome devtools (plus cljs-devtools)
+is all you need to debug cljs
+
+this is super difficult to repro, so what i really need is a reliable failing test case / reproduction
+
+ok, got a repro
+
+new-center: 10.446 (that seems really low, wtf)
+ok this is weird, here's what i'm looking at:
+https://www.evernote.com/shard/s11/sh/edad4953-6aa4-4011-a59b-fa265ab2f6b2/6e46cf56db9cff72
+
+i'm seeing two different values for new-center, one's 10.4, the other's a map
+some sort of weird artifact with cljs-devtools?
+ignoring the first one for now - i think that's supposed to be x-distance, not new-center
+
+yeah, and here where it says "voke.events/publish-event", i think it should say "entity"
+if i could repro *that*, could contribute a fix to the cljs-devtools project
+but let's put that aside for now and focus on the bug in my app
+
+ok so entity is the monster, and looks like this:
+https://www.evernote.com/shard/s11/sh/ba234b99-1298-45a4-9f88-e8605e2f3379/5108c7f256f8b026
+(cljs-devtools map formatting is actually really good, nice)
+
+so new-center is (408.7, 257.6)
+new-velocity is (0, 0)
+current center is (398.2, 252)
+current velocity is (0, -3.2)
+
+seems odd that x velocity is 0
+it looks like this atm
+https://www.evernote.com/shard/s11/sh/326d398d-9154-4561-9b88-064ae36a41bf/8830244b7113be66
+its left side is stuck up against the player, and it's trying to move up, so the current velocity
+actually makes a lot of sense
+
+so if the current velocity is (0, -3.2), then why are we trying to move this thing to the
+right by ten pixels? that would indicate of a velocity of (10, -3.2), which we are *not* seeing
+so let's go up the callstack
+
+ok, we're in resolve-diagonal-collision - this is probably where the teleportation bug is!
+seeing more cljs-devtools formatting errors - i see 4 things named entity, for instance; ugh
+definitely gonna have to look into this and see if i can fix it... anyway
+
+here are our variables:
+https://www.evernote.com/shard/s11/sh/f17d497f-b8ba-43f7-95b0-25f04e151219/e6cbbf0e8fab51ab
+https://www.evernote.com/shard/s11/sh/8159036c-5fe7-4e8b-b4d3-eeae24593851/2606d4892fec8781
+
+so again, entity is our bad guy, and he's got a
+position of (398.2, 252.05)
+velocity of (0, -3.2)
+
+and he's colliding with the good guy, who's got a
+position of (373.27, 232.48)
+velocity of (-0.065, -4.8)
+
+and these guys are 25px by 25px
+so currently their centers are 24.93px apart on the x axis
+and 19.57px apart on the y axis
+
+that doesn't seem right
+ok cool, rounding error on my part just now - they're actually 25.01px apart on the x axis
+but definitely only 19.57px apart on the y axis
+but that part doesn't matter, because they're > 25px apart on the x axis, so they are currently not overlapping
+so that's cool
+
+so wait - if they're currently not overlapping because they're >25px apart on the x axis,
+and their x axes are moving _away_ from each other (good guy is moving slightly to the left, and is
+to the left of the bad guy)
+then why the hell are we in resolve-diagonal-collision in the first place?
+
+time to go up the call stack
+this cljs devtools naming issue is really frustrating
+also i can't seem to evaluate arbitrary expressions at breakpoint time, like i can't put a watch on
+(finder :x), etc
+
+i bet that's what dirac would be useful for - having a repl available right now
+
+ok so anyway new-center is (397.3, 248.853)
+new-velocity is (-0.97, -3.2)
+that's interesting - so the monster is trying to move left after all! that actually makes a lot of sense
+let's go back down the callstack again
+
+yeah ok right - i was looking at `velocity` earlier but i should have been looking at `new-velocity`
+still, though, is this really a diagonal collision? feels like this is a straightforward situation
+where the monster is trying to move up and left, and up is clear but left is not clear,
+and so it should be allowed to move up but not left
+
+i wonder if this has to do with the 0.1px no-man's-land spacing between entities
+back up the call stack
+
+so in move-to-closest-clear-spot, we have
+new-center (397.3, 248.85)
+new-velocity (-0.97, -3.2)
+x-position, x-velocity (397.3, -0.97)
+y-position, y-velocity (248.85, -3.2)
+
+i don't get why new-center's x and x-position's x are the same
+shouldn't new-center's x be something invalid, inside the good guy?
+
+ok so the bad guy's center is currently (398.284, 252.05)
+...and it's trying to move -0.97 pixels to the left, which puts it at 397.3px as the new x position
+
+and it just so happens that good guy's x center is (373.274445, 232.48)
+
+and 373.274445 + 12.5px is. 385.774
+and that plus 12.5px is 398.274
+
+and anyway so it just happens that.. what exactly?
+
+incidentally, good guy is moving 0.06538px to the left on the x axis atm
+which means that good guy's new x position (which we can't see atm) is 373.20462
+and that plus 25px is 398.20462
+
+ok let's recap
+we have the bad guy, and he's trying to move up and to the left
+he is currently touching the good guy on his left side, and his y-center is a little bit below good guy's
+
+so is he clear to move to the left?
+well, he's at 398.284445 right now
+and he's trying to move to 397.3097869
+and that _is_ indeed clear
+wait is it
+
+ok ONE MORE TIME
+good guy's right edge is at x = 385.774445
+bad guy's left edge is at x = 385.784445
+bad guy has an x velocity of -0.97465
+meaning that he wants to move his left edge so that it's at 384.809795
+and that's no good
+
+ugh but why have i been focusing so much on x position? of *course* bad guy wants to move to the left,
+into good guy, and of *course* that isn't clear
+
+well, i've been focused on this because i'm in move-to-nearest-clear-spot, and the way it works is by saying:
+we've got an entity!
+it's trying to move to new-center!
+it's collided with one or more other entities!
+what happens if we move it just vertically? was that successful?
+what happens if we move it just horizontally? was that successful?
+if both of those appear to have been successful, then we know it's a corner collision - handle that
+if just one of them was successful, then go ahead and just apply that single-axis movement
+
+and so in our situation it tries to move the entity vertically, and that succeeds
+(y-position is equal to (new-center :y), y-velocity to (new-velocity :y)
+
+and it tries to move the entity horizontally, and that *appears* to succeed
+(x-position is equal to (new-center :x), x-velocity to (new-velocity :x))
+
+but that's fucked up! moving the entity horizontally should not succeed
+so what's going on in this call to (find-new-position-and-velocity-on-axis) ?
+i think it might be too late to find that out since i don't have a working repl since we're in a breakpoint
+
+that function has a call to find-cosest-clear-spot, which has a ton of scary comments in it
+so that's probably where we're fucking up atm
+
+=======
+
+9/21/16
+
+ok so where were we
+
+so the issue is that we're in move-to-nearest-clear-spot, and we're trying to move bad guy up and to the left
+he's clear if he moves straight up, but not clear if he moves to the left
+right now, (move-to-nearest-clear-spot) calls (find-new-position-and-velocity-on-axis) in order to see if we're
+clear on each axis.
+that function returns a 2-tuple of [axis-clear-position axis-new-velocity]
+and so what move-to-nearest-clear-spot does is: it checks on both x and y axes, and sees if those return values
+are the same as the values that the entity is already trying to use to move.
+so like let's say you're at x=10 and trying to move right by 1px;
+you're trying to set yourself to x=11, and you're trying to set your new velocity to be ~1.
+if find-new-position-and-velocity-on-axis returns [11 ~1], then that indicates that you're clear to move right
+if it returns [10.5 0], though, that indicates that you ran into something
+
+and so the issue is that bad guy is trying to move left, and it's *not* clear to move left, but
+find-new-position-and-velocity-on-axis is reporting that it *is* clear to move left. so something
+in that function's callstack is buggy.
+
+so that function is basically a wrapper around find-closest-clear-spot
+
+i can't figure out the best way of setting a breakpoint in there that only gets triggered when the issue happens
+so i guess we'll just leave the current breakpoint as-is, add some logging to this function, and try
+to repro again
+
+notes from find-closest-clear-spot:
+
+; ok so
+; bad guy is at 398.284445
+; good guy is at 373.27445
+; the js collision system says that good guy's *actually* at 373.2221
+; bad guy is trying to move to 397.30978
+; bad guy's new velocity is -0.97465
+
+; so arithmetic-fn is +
+; shape2 center axis is 373.2221
+; so the thing should be running (+ 373.2221 12.5 12.5 0.01)
+; which is 398.2321
+; which seems correct. but that's not what find-new-position-and-velocity-on-axis is returning
+; so maybe this function isn't being called after all
+
+i think that find-new-position-and-velocity-on-axis might not even be calling this function after all
+
+ok so find-closest-clear-spot is exonerated, because if it were being used, the x-velocity that
+find-new-position-etc returns would be 0. but it's not 0!
+so something's going wrong with this set intersection.
+
+blat blat blat blat blat
+
+added some print statements
+
+seems like the reason this is so hard to repro is that it has something to do with timing, not sure why
+
+so i have a repro here that looks like we actually sincerely do have a corner-only collision
+
+good guy is at (455.293, 125.876), velocity (-2.250, 0)
+bad guy is at (478.340, 150.886), attempting to move to (477.169, 150.585)
+so good guy's _actual_ x position is currently 452.8927
+
+anyway so he's clear to move on the x, and he's clear to move on the y
+so we try to resolve the corner collision
+
+and it turns out that the corner collision algo tries to move him to (480.393, 160.778)
+which is super incorrect - he's getting teleported 10px down for no reason
+
+anyway now that i know this is a corner collision bug, i should be able to just find a repro
+by putting good guy and bad guy at specific positions that trigger this bug
+
+ok, added some more logging to resolve-diagonal
+
+maybe it has something to do with the fact that we're basing these equations on the shape's
+center, rather than its leading corner, which is what we _actually_ want to position?
+
+good guy at (723.624, 196.997)
+bad guy at (700.7, 222)
+bad guy wants to move to (702, 221)
+bad guy being moved to (698.524, 232.200) by resolve-diagonal
+
+ok i did some math on paper
+and i'm pretty convinced that the issue is that we're basing this line math on the entity's center
+rather than its leading corner
+
+so TODO:
+
+1) make the math be based on its leading corner rather than its center
+2) make sure resolve-diagonal gets up-to-date colliding-entity centers from the js collision system
+   before it breaks them into lines
+
+i'll deal with that stuff tomorrow
+
+=======
+
+9/22/16
+
+ok, here's where i'm at
+
+i think that the teleportation bug is caused by resolve-diagonal-collision using the center of
+the moving entity, rather than its leading corner, as a basis for its math
+
+so i'm going to change that and see if it fixes things
+
+i also think that resolve-diagonal-collision needs to be given an up-to-date view of all of the relevant
+collided entities' positions from the js collision system
+
+i should make that change first, before the leading corner change, and see if there's a way to make this happen
+at the top of the collision resolution system, rather than at leaf functions like resolve-diagonal and
+find-closest-clear-spot
+
+this bug took a long time to track down (assuming that i actually _have_ tracked it down).
+
+i think that there are a few reasons for that, aside from me having forgotten how to program over the past
+six months or so
+
+the foremost one is that i had absolutely no intuition about what parts of the system were good and what
+parts might be buggy. this is because there aren't any tests, at all, for any of this code. i think the
+program is now big enough that it merits tests, so that future bug hunts don't take this long.
+
+also the bug was somewhat difficult to figure out how to reproduce reliably - but (and again, this is assuming
+that i'm correct about the bug being in resolve-diagonal-collision) after all, though, it was in a big function
+that had been added to the system extremely recently and had no tests, and so if the function *were*
+tested when it were written, it would have been obvious that it was buggy, and all of this could have been
+avoided. so that's cool
+
+i'm also going to start using github issues to track things i want to work on, because again
+i think the program has gotten big enough that there's value in that sort of thing
+
+ok, cool
+so let's start with giving the resolution system the most up-to-date view of the relevant collided entities
+
+ok that was easier than expected
+and i did the leading corner stuff to resolve-diagonal-collision
+
+so i think we're more stable now
+i did see one bizarre situation where it looked like there was a ghost player/monster-sized square
+i'm going to hope that that was just an artifact from a weird figwheel reload
+if i see it again in a non-figwheel situation then i can worry about it

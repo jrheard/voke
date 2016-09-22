@@ -83,7 +83,6 @@
               (-collides-with entity)
               (safe-get-in entity [:weapon :projectile-shape])
               (safe-get-in entity [:weapon :projectile-color])
-              (safe-get-in entity [:shape :orientation])
               (shot-speed entity :x)
               (shot-speed entity :y)))
 

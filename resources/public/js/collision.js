@@ -49,6 +49,10 @@ var Collision = {
         this.insertIntoTree(entitiesByID[entityID]);
     },
 
+    getEntityCenter: function(entityID) {
+        return entitiesByID[entityID].shape.center;
+    },
+
     removeEntity: function(entityID) {
         this.removeFromTree(entitiesByID[entityID]);
         delete entitiesByID[entityID];
@@ -92,7 +96,7 @@ var Collision = {
         return shape.center.y + (shape.height / 2);
     },
 
-    findContactingEntityID: function(entityID, newCenter) {
+    findContactingEntityIDs: function(entityID, newCenter) {
         var movingEntity = entitiesByID[entityID];
 
         var newShape = this.shallowCopy(movingEntity.shape);

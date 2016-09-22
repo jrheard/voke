@@ -13,7 +13,11 @@
 (def move-key-mappings {KeyCodes.W :up
                         KeyCodes.A :left
                         KeyCodes.S :down
-                        KeyCodes.D :right})
+                        KeyCodes.D :right
+                        ; carmen asked me to add dvorak support
+                        KeyCodes.COMMA :up
+                        KeyCodes.O :down
+                        KeyCodes.E :right})
 (def fire-key-mappings {KeyCodes.DOWN  :down
                         KeyCodes.LEFT  :left
                         KeyCodes.UP    :up
