@@ -4049,3 +4049,39 @@ so TODO:
    before it breaks them into lines
 
 i'll deal with that stuff tomorrow
+
+=======
+
+9/22/16
+
+ok, here's where i'm at
+
+i think that the teleportation bug is caused by resolve-diagonal-collision using the center of
+the moving entity, rather than its leading corner, as a basis for its math
+
+so i'm going to change that and see if it fixes things
+
+i also think that resolve-diagonal-collision needs to be given an up-to-date view of all of the relevant
+collided entities' positions from the js collision system
+
+i should make that change first, before the leading corner change, and see if there's a way to make this happen
+at the top of the collision resolution system, rather than at leaf functions like resolve-diagonal and
+find-closest-clear-spot
+
+this bug took a long time to track down (assuming that i actually _have_ tracked it down).
+
+i think that there are a few reasons for that, aside from me having forgotten how to program over the past
+six months or so
+
+the foremost one is that i had absolutely no intuition about what parts of the system were good and what
+parts might be buggy. this is because there aren't any tests, at all, for any of this code. i think the
+program is now big enough that it merits tests, so that future bug hunts don't take this long.
+
+also the bug was somewhat difficult to figure out how to reproduce reliably - but (and again, this is assuming
+that i'm correct about the bug being in resolve-diagonal-collision) after all, though, it was in a big function
+that had been added to the system extremely recently and had no tests, and so if the function *were*
+tested when it were written, it would have been obvious that it was buggy, and all of this could have been
+avoided. so that's cool
+
+i'm also going to start using github issues to track things i want to work on, because again
+i think the program has gotten big enough that there's value in that sort of thing
