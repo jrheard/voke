@@ -9,6 +9,7 @@
                                 first)
                     player-center (get-in player [:shape :center])
                     entities-with-ai (filter #(contains? % :ai) entities)]
+
                 (for [entity entities-with-ai]
                   (let [entity-center (get-in entity [:shape :center])]
                     (assoc-in entity
@@ -16,8 +17,4 @@
                               (Math/atan2 (- (player-center :y)
                                              (entity-center :y))
                                           (- (player-center :x)
-                                             (entity-center :x)))))
-
-                  )
-                )
-              )})
+                                             (entity-center :x))))))))})

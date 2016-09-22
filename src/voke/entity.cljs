@@ -38,12 +38,11 @@
     {:shape       {:width       25
                    :height      25
                    :type        :rectangle
-                   :orientation 0
                    :center      {:x x :y y}}
      :motion      {:velocity             {:x 0 :y 0}
                    :affected-by-friction true
                    :direction            nil
-                   :max-acceleration                        0.75 ; 2.0
+                   :max-acceleration     2.0
                    :max-speed            11}
      :collision   {:type :good-guy}
      :render-info {:fill 0x333333}
@@ -56,16 +55,15 @@
     {:shape       {:width       25
                    :height      25
                    :type        :rectangle
-                   :orientation 0
                    :center      {:x x :y y}}
      :motion      {:velocity             {:x 0 :y 0}
                    :affected-by-friction true
                    :direction            nil
-                   :max-acceleration                        0.5;1.5
+                   :max-acceleration     1.5
                    :max-speed            4}
      :collision   {:type :bad-guy}
      :weapon      nil #_(make-weapon (- (/ Math/PI 2))
-                               0xFF0A00)
+                                     0xFF0A00)
      :ai          {:movement :basic
                    :attack   :basic}
      :render-info {:fill 0xB22822}}))
@@ -76,16 +74,14 @@
     {:shape       {:width       width
                    :height      height
                    :type        :rectangle
-                   :orientation 0
                    :center      {:x x :y y}}
      :collision   {:type :obstacle}
      :render-info {:fill 0x333333}}))
 
 (sm/defn projectile :- Entity
-  [owner-id position collides-with projectile-shape projectile-color orientation x-velocity y-velocity]
+  [owner-id position collides-with projectile-shape projectile-color x-velocity y-velocity]
   (make-entity
     {:shape       (assoc projectile-shape
-                         :orientation orientation
                          :center position)
      :owner-id    owner-id
      :collision   {:type                 :projectile

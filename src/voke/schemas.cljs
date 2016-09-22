@@ -14,12 +14,11 @@
 
 (sm/defschema Shape {:type        (s/enum :rectangle :circle)
                      :center      Vector2
-                     :orientation s/Num                     ; Orientation in radians
                      s/Any        s/Any})
 
 (def Direction (s/maybe s/Num))
 
-(sm/defschema ProjectileShape (dissoc Shape :orientation :center))
+(sm/defschema ProjectileShape (dissoc Shape :center))
 
 (sm/defschema Motion {:velocity             Vector2
                       :direction            Direction

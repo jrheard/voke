@@ -29,9 +29,6 @@
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2]
-  ; XXXXX orientation is never threaded this far! orientation never gets updated!!!
-  ; do we even use orientation?
-
   ; Queue an update to this entity's center; these updates get run in a single batch at the
   ; end of this tick, so that all entities in cljs-land have their centers updated at once.
   (update-entity! (entity :id)
@@ -84,7 +81,7 @@
   [entity :- Entity
    new-center :- Vector2
    all-entities :- [Entity]]
-  (let [contacting-entity-ids (js/Collision.findContactingEntityID (entity :id) (vector2->js new-center))]
+  (let [contacting-entity-ids (js/Collision.findContactingEntityIDs (entity :id) (vector2->js new-center))]
     (if (> (.-length contacting-entity-ids) 0)
       (let [entity-ids (set (js->clj contacting-entity-ids))]
         (keep (fn [entity]

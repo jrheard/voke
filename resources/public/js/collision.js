@@ -49,7 +49,6 @@ var Collision = {
         this.insertIntoTree(entitiesByID[entityID]);
     },
 
-// XX document
     getEntityCenter: function(entityID) {
         return entitiesByID[entityID].shape.center;
     },
@@ -97,8 +96,7 @@ var Collision = {
         return shape.center.y + (shape.height / 2);
     },
 
-// shouldn't this be EntityIDs?
-    findContactingEntityID: function(entityID, newCenter) {
+    findContactingEntityIDs: function(entityID, newCenter) {
         var movingEntity = entitiesByID[entityID];
 
         var newShape = this.shallowCopy(movingEntity.shape);
