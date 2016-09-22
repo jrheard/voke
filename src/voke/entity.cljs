@@ -64,6 +64,7 @@
      :collision   {:type :bad-guy}
      :weapon      nil #_(make-weapon (- (/ Math/PI 2))
                                      0xFF0A00)
+     ; xxx not schema'd / standardized yet, these are just some example values
      :ai          {:movement :basic
                    :attack   :basic}
      :render-info {:fill 0xB22822}}))

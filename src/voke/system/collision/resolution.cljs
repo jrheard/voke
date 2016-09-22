@@ -17,6 +17,9 @@
 (defn bottom-edge-y [rect] (+ (get-in rect [:center :y])
                               (/ (rect :height) 2)))
 
+;;;;;
+; Single-axis-handling logic
+
 (sm/defn find-closest-contacted-entity
   ; TODO test this!!! it rarely gets executed because contacted-entities is almost always a list of 1 item
   ; and so reduce just picks that one item without executing the reducing function
@@ -51,7 +54,8 @@
                    0.01)))
 
 (sm/defn find-new-position-and-velocity-on-axis :- [(s/one s/Num "new-position")
-                                                    (s/one s/Num "new-velocity")]
+                                                    (s/one s/Num "new-velocity")
+                                                    (s/one s/Bool "clear on this axis")]
   [entity :- Entity
    new-center :- s/Num
    new-velocity :- s/Num
@@ -66,8 +70,12 @@
         contacted-entities (intersection (set entities-contacted-on-this-axis)
                                          (set remaining-contacted-entities))]
     (if (seq contacted-entities)
-      [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0]
-      [new-center new-velocity])))
+      [(find-closest-clear-spot entity axis new-velocity contacted-entities) 0 false]
+      [new-center new-velocity true])))
+
+
+;;;;;
+; Corner-collision-handling logic
 
 ; We only support axis-aligned bounding boxes, so entities' component lines always look like
 ; y = 4 or x = -2.021, etc.
@@ -149,6 +157,11 @@
    new-velocity :- Vector2
    remaining-contacted-entities :- [Entity]
    all-entities :- [Entity]]
+  ; We start by checking on the :x and :y axes, one at a time, to see if it's possible
+  ; for this entity to make its intended movement on that single axis without colliding
+  ; with anything. This is what lets us support behavior where the player's right side
+  ; is touching a wall, and they're holding up+right, and they expect to be able to
+  ; go up even though they're blocked on their right side.
   (let [finder (fn [axis]
                  (find-new-position-and-velocity-on-axis entity
                                                          (new-center axis)
@@ -156,11 +169,14 @@
                                                          axis
                                                          remaining-contacted-entities
                                                          all-entities))
-        [x-position x-velocity] (finder :x)
-        [y-position y-velocity] (finder :y)
+        [x-position x-velocity x-axis-clear] (finder :x)
+        [y-position y-velocity y-axis-clear] (finder :y)
         nearest-clear-spot {:x x-position
                             :y y-position}]
-    (if (= nearest-clear-spot new-center)
+    (if (and x-axis-clear y-axis-clear)
+      ; If we've gotten here, then each individual axis _appears_ to be clear; but since we're
+      ; handling a collision in the first place, we know that `new-center` is absolutely not a valid place
+      ; to move to. We've got a corner collision, so let's go ahead and handle that specially.
       (resolve-diagonal-collision entity
                                   new-velocity
                                   remaining-contacted-entities)
