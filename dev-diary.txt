@@ -4033,7 +4033,19 @@ ok, added some more logging to resolve-diagonal
 maybe it has something to do with the fact that we're basing these equations on the shape's
 center, rather than its leading corner, which is what we _actually_ want to position?
 
-
 good guy at (723.624, 196.997)
 bad guy at (700.7, 222)
+bad guy wants to move to (702, 221)
 bad guy being moved to (698.524, 232.200) by resolve-diagonal
+
+ok i did some math on paper
+and i'm pretty convinced that the issue is that we're basing this line math on the entity's center
+rather than its leading corner
+
+so TODO:
+
+1) make the math be based on its leading corner rather than its center
+2) make sure resolve-diagonal gets up-to-date colliding-entity centers from the js collision system
+   before it breaks them into lines
+
+i'll deal with that stuff tomorrow
