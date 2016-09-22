@@ -123,17 +123,28 @@
                      (/ (get-in entity [:shape :height]) 2))}))
 
 (sm/defn resolve-diagonal-collision
-  "TODO document me - translate 3/31 notes into documentation"
   [entity :- Entity
    new-velocity :- Vector2
    remaining-contacted-entities :- [Entity]]
+  ; If you're invoking this function, you've found yourself in a situation where you've got
+  ; an entity that's trying to move diagonally but has collided with one or more other entities.
+
+  ; We start by breaking down those other entities into their component AxisAlignedLines.
   (let [lines (mapcat entity-to-lines remaining-contacted-entities)
-        velocity-line-slope (/ (new-velocity :y) (new-velocity :x))
+
+        ; We then find the leading corner of the entity you're trying to move
+        ; - so if it's trying to move up and to the right, that's its top-right corner -
+        ; and then we find the line described by that corner's position and the direction it's moving in.
         leading-corner (get-leading-corner entity new-velocity)
+        velocity-line-slope (/ (new-velocity :y) (new-velocity :x))
         ; y = mx + b, so b = y - mx
         velocity-line-intercept (- (leading-corner :y)
                                    (* velocity-line-slope
                                       (leading-corner :x)))
+
+        ; Now, all we have to do is take that line, find all of the places where it intersects with
+        ; the other entities' AxisAlignedLines, and find the closest of those intersections.
+        ; That's the closest spot that it's safe for us to move this entity's leading corner to.
         intersections (map (partial find-intersection velocity-line-slope velocity-line-intercept)
                            lines)
         closest-intersection (apply min-key
@@ -170,19 +181,18 @@
                                                          remaining-contacted-entities
                                                          all-entities))
         [x-position x-velocity x-axis-clear] (finder :x)
-        [y-position y-velocity y-axis-clear] (finder :y)
-        nearest-clear-spot {:x x-position
-                            :y y-position}]
+        [y-position y-velocity y-axis-clear] (finder :y)]
     (if (and x-axis-clear y-axis-clear)
       ; If we've gotten here, then each individual axis _appears_ to be clear; but since we're
-      ; handling a collision in the first place, we know that `new-center` is absolutely not a valid place
+      ; handling a collision in the first place, we know that `new-center` is absolutely _not_ a valid place
       ; to move to. We've got a corner collision, so let's go ahead and handle that specially.
       (resolve-diagonal-collision entity
                                   new-velocity
                                   remaining-contacted-entities)
 
       (apply-movement entity
-                      nearest-clear-spot
+                      {:x x-position
+                       :y y-position}
                       {:x x-velocity
                        :y y-velocity}))))
 
