@@ -29,11 +29,11 @@
   [entity :- Entity
    new-center :- Vector2
    new-velocity :- Vector2]
-  #_(let [x-distance (js/Math.abs (- (get-in entity [:shape :center :x])
+  (let [x-distance (js/Math.abs (- (get-in entity [:shape :center :x])
                                    (new-center :x)))
         y-distance (js/Math.abs (- (get-in entity [:shape :center :y])
                                    (new-center :y)))]
-    (js/console.log x-distance y-distance)
+    (js/console.log (int x-distance) (int y-distance))
     (when (or (> x-distance 5)
               (> y-distance 5))
       (js/console.log "SOMETHING BAD HAS HAPPENED")
@@ -85,6 +85,7 @@
       (let [entity-ids (set (js->clj contacting-entity-ids))]
         (keep (fn [entity]
                 (when (contains? entity-ids (entity :id))
+                  ; XXXX DOCUMENT WHY THIS IS NECESSARY
                   (get-updated-entity-center entity)))
               all-entities))
       [])))

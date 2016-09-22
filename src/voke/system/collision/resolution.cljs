@@ -104,22 +104,32 @@
                 (Math/pow (- (a :y) (b :y))
                           2))))
 
+(sm/defn get-leading-corner :- Vector2
+  [entity :- Entity
+   new-velocity :- Vector2]
+  (let [x-operation (if (pos? (new-velocity :x)) + -)
+        y-operation (if (pos? (new-velocity :y)) + -)]
+    {:x (x-operation (get-in entity [:shape :center :x])
+                     (/ (get-in entity [:shape :width]) 2))
+     :y (y-operation (get-in entity [:shape :center :y])
+                     (/ (get-in entity [:shape :height]) 2))}))
+
 (sm/defn resolve-diagonal-collision
   "TODO document me - translate 3/31 notes into documentation"
   [entity :- Entity
    new-velocity :- Vector2
    remaining-contacted-entities :- [Entity]]
-  ; XXXXX give this next line everyone's most up-to-date centers from the js system
   (let [lines (mapcat entity-to-lines remaining-contacted-entities)
         velocity-line-slope (/ (new-velocity :y) (new-velocity :x))
+        leading-corner (get-leading-corner entity new-velocity)
         ; y = mx + b, so b = y - mx
-        velocity-line-intercept (- (get-in entity [:shape :center :y])
+        velocity-line-intercept (- (leading-corner :y)
                                    (* velocity-line-slope
-                                      (get-in entity [:shape :center :x])))
+                                      (leading-corner :x)))
         intersections (map (partial find-intersection velocity-line-slope velocity-line-intercept)
                            lines)
         closest-intersection (apply min-key
-                                    (partial distance-between-points (get-in entity [:shape :center]))
+                                    (partial distance-between-points leading-corner)
                                     intersections)
         x-operation (if (pos? (new-velocity :x)) - +)
         y-operation (if (pos? (new-velocity :y)) - +)]
