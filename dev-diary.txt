@@ -4096,3 +4096,44 @@ so i think we're more stable now
 i did see one bizarre situation where it looked like there was a ghost player/monster-sized square
 i'm going to hope that that was just an artifact from a weird figwheel reload
 if i see it again in a non-figwheel situation then i can worry about it
+
+ok, all done! merged the branch into master
+
+time to start on tests first, i think. let's just get something super super simple running
+
+howwww do i test cljs again
+
+http://www.agynamix.de/posts/2015-09-22-doo-and-figwheel.html
+this guy's creating a runner.js file by hand which he uses to make phantom run his tests
+i don't think he knows about doo
+
+https://github.com/bensu/doo/wiki/End-to-end-testing-example cool info on running full end-to-end tests
+with a clojurescript frontend and a clj backend with just a single `lein test` command
+
+http://www.lispcast.com/testing-clojurescript
+***** ok this is super super super good
+great context / narrative
+
+http://www.agynamix.de/posts/2015-09-22-doo-and-figwheel.html documents an issue i remember running into actually
+good job to this guy
+hopefully figwheel's fixed its error since then though
+
+========
+
+9/23/16
+
+https://gist.github.com/alandipert/4669472
+interesting pattern for using a particular type of macro in cljs - guy's interested in locality,
+so in the same cljs file where the macro is used, you can see what it's actually doing
+i guess you could do this for lots of different kinds of macros, as long as you don't need access
+to macros' ability to suppress/delay the evaluation of their inputs
+
+travis or circleci?
+travis seems more popular, have already used it with cljstone
+https://mediocre.com/forum/topics/a-tale-of-two-ci-tools-differentiating-travis-and-circleci
+these guys did a pretty exhaustive comparison, and circleci comes out sounding better
+plus they use clojure, so what the hell, let's give 'em a shot
+if i hate it, i can always switch to travis really easily
+meh fuck it let's stick with travis, circleci doesn't seem to notice the doo plugin even though
+it's defined clearly in my project.clj
+...oh right, wrong branch

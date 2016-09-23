@@ -16,3 +16,5 @@ pom.xml.asc
 resources/public/js/compiled/
 figwheel_server.log
 .DS_Store
+test_resources/
+out/
