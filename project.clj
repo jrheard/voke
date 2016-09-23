@@ -14,11 +14,12 @@
                  [prismatic/schema "1.1.3"]
                  [cljsjs/pixi "3.0.10-0"]]
 
-  :plugins [[lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]]
+  :plugins [[lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
+            [lein-doo "0.1.7" :exclusions [[org.clojure/clojurescript]]]]
 
   :source-paths ["src"]
 
-  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
+  :clean-targets ^{:protect false} ["resources/public/js/compiled" "target" "out"]
 
   :cljsbuild {:builds
               [{:id           "dev"
@@ -29,7 +30,7 @@
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/voke.js"
                                :output-dir           "resources/public/js/compiled/out"
-                               :source-map true
+                               :source-map           true
                                :source-map-timestamp true}}
                {:id           "min"
                 :source-paths ["src"]
@@ -40,6 +41,11 @@
                                :asset-path    "js/compiled/out-min"
                                :source-map    "resources/public/js/compiled/voke.js.map"
                                :externs       ["externs/collision.js"]
-                               :pretty-print  false}}]}
+                               :pretty-print  false}}
+               {:id           "test"
+                :source-paths ["src" "test"]
+                :compiler     {:output-to     "test_resources/test.js"
+                               :main          voke.runner
+                               :optimizations :none}}]}
 
   :figwheel {:css-dirs ["resources/public/css"]})

@@ -4096,3 +4096,24 @@ so i think we're more stable now
 i did see one bizarre situation where it looked like there was a ghost player/monster-sized square
 i'm going to hope that that was just an artifact from a weird figwheel reload
 if i see it again in a non-figwheel situation then i can worry about it
+
+ok, all done! merged the branch into master
+
+time to start on tests first, i think. let's just get something super super simple running
+
+howwww do i test cljs again
+
+http://www.agynamix.de/posts/2015-09-22-doo-and-figwheel.html
+this guy's creating a runner.js file by hand which he uses to make phantom run his tests
+i don't think he knows about doo
+
+https://github.com/bensu/doo/wiki/End-to-end-testing-example cool info on running full end-to-end tests
+with a clojurescript frontend and a clj backend with just a single `lein test` command
+
+http://www.lispcast.com/testing-clojurescript
+***** ok this is super super super good
+great context / narrative
+
+http://www.agynamix.de/posts/2015-09-22-doo-and-figwheel.html documents an issue i remember running into actually
+good job to this guy
+hopefully figwheel's fixed its error since then though
