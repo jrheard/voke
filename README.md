@@ -1,6 +1,7 @@
 # voke
 
 [![CircleCI](https://circleci.com/gh/jrheard/voke.svg?style=svg)](https://circleci.com/gh/jrheard/voke)
+[![Dependencies Status](https://jarkeeper.com/jrheard/voke/status.svg)](https://jarkeeper.com/jrheard/voke)
 
 a roguelike
 
