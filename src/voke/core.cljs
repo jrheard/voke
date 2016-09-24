@@ -30,7 +30,7 @@
   ; TODO: tear down and rebuild the JS-land collision system registry
   (js/window.cancelAnimationFrame @animation-frame-request-id)
   (voke.events/unsub-all!)
-  (voke.state/flush!)
+  (voke.state/flush! @game-state)
   (initialize-systems! @game-state (player :id))
   (reset! last-frame-time (js/performance.now)))
 
@@ -45,7 +45,7 @@
       (while (>= @time-accumulator timestep)
         (add-time! timestep)
         (swap! game-state process-a-tick)
-        (swap! game-state (voke.state/flush!))
+        (swap! game-state voke.state/flush!)
 
         (swap! time-accumulator - timestep))
 

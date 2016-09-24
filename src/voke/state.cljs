@@ -1,7 +1,7 @@
 (ns voke.state
   "Contains functions that let Systems express an intent to modify the state of the game.
 
-  Systems can call update-entiy! and remove-entity! in their tick functions / event handlers.
+  Systems can call add-entity!, update-entity!, and remove-entity! in their tick functions / event handlers.
   These updates/removes will be queued, and will be processed by the core game loop in voke.core
   at the end of every frame."
   (:require [schema.core :as s]
@@ -64,23 +64,21 @@
                         entities))})
 
 (sm/defn flush!
-  "Resets @buffer to [].
+  "Takes a GameState and returns a GameState to which all queued
+  :add, :update, and :remove events have been applied.
 
-  Returns a function that <takes a GameState and returns a GameState to which all queued
-  :update and :remove events have been applied>."
-  []
+  Resets @buffer to []."
+  [state :- GameState]
   (let [buffer-contents @buffer
         add-events (filter #(= (% :type) :add) buffer-contents)
         update-events (filter #(= (% :type) :update) buffer-contents)
         remove-events (filter #(= (% :type) :remove) buffer-contents)]
     (reset! buffer [])
 
-    (fn buffer-runner
-      [state]
-      (-> state
-          (process-add-events add-events)
-          (process-update-events update-events)
-          (process-remove-events remove-events)))))
+    (-> state
+        (process-add-events add-events)
+        (process-update-events update-events)
+        (process-remove-events remove-events))))
 
 ;; Public
 
@@ -99,7 +97,7 @@
   [entity-id :- EntityID
    origin :- s/Keyword
    update-fn]
-  ; this swap! call takes a bit onger than i'd like, shows up in profiles at around 3% of
+  ; this swap! call takes a bit longer than i'd like, shows up in profiles at around 3% of
   ; the time we spend. consider replacing the buffer with (gasp) a regular js array. not worth it yet though
   (swap! buffer conj {:type      :update
                       :origin    origin

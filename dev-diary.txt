@@ -4137,3 +4137,57 @@ if i hate it, i can always switch to travis really easily
 meh fuck it let's stick with travis, circleci doesn't seem to notice the doo plugin even though
 it's defined clearly in my project.clj
 ...oh right, wrong branch
+
+========
+
+9/24/16
+
+https://jstaffans.github.io/2015/11/19/fun-with-specter.html
+**** dece
+
+https://github.com/technomancy/leiningen/blob/stable/doc/TUTORIAL.md#checkout-dependencies this exists
+
+spent a few minutes thinking about a workflow for automatically running tests (easy with doo)
+so that i can immediately see their output in the browser (via figwheel) or in the editor (with cursive)
+ended up just going with this super simple approach:
+use the Terminal intellij plugin (accessible via hovering over the bottom left corner of the editor and clicking
+Terminal) and just run `lein doo phantom test` in there
+good to go
+i wonder if there's a way to colorize the output from this command?
+
+http://blog.venanti.us/ultra/
+https://github.com/greglook/whidbey/ - repl colorization, doesn't do anything for tests though
+installed it, repl colorization is nice, neat
+https://github.com/brentonashworth/lein-difftest exists but just for clojure and is super old
+https://github.com/greglook/puget - looks like it's clj-only atm
+
+might have to make a lein plugin myself that does this, or fork doo to add support
+i don't know anything about terminal colors
+but http://blog.jayfields.com/2012/05/clojure-expectations-colorized.html seems like a good jumping-off point
+
+i tried out specter briefly in state-test; i don't think it buys us anything over (get-in) in this particular
+situation, but it might become useful for transforms or more complicated selects if i run into situations
+where i have those. had a little trouble figuring out the relevant ns form - wasn't immediately clear
+what the relevant namespaces were, what's a macro, what's not a macro, how do i require macros again, etc -
+so i'm just jotting down what that ended up looking like here
+
+(ns voke.state-test
+  (:require [cljs.test :refer [deftest is testing]]
+            [com.rpl.specter :refer [ALL]]
+            [voke.state :as state])
+  (:require-macros [com.rpl.specter :refer [select]]))
+
+(def blank-game-state (state/make-game-state []))
+
+(deftest adding-entities
+  (with-redefs [state/buffer (atom [])]
+    (state/add-entity! {:id 0 :renderable false} :combat-system)
+
+    (print (select ALL blank-game-state))
+
+    (let [updated-state ((state/flush!) blank-game-state)]
+
+      (print (select ALL updated-state))
+      (print (select [:entities 0] updated-state))
+      (is (= (get-in updated-state [:entities 0])
+             {:id 0 :renderable false})))))
