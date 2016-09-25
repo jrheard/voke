@@ -108,8 +108,8 @@
 
     (go-loop []
       (let [msg (<! event-chan)]
-        (when (not= (msg :type)
-                    :stop)
+        (if (= (msg :type) :noop)
+          (recur)
 
           (let [direction (msg :direction)
                 update-entity-args (case (msg :type)

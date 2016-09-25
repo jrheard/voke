@@ -44,34 +44,57 @@
       (done))))
 
 (deftest handle-keyboard-events
-  (async done
-    (go
-      (let [stub-event-chan (atom nil)
-            game-state (-> blank-game-state
-                           (assoc-in [:entities 0 :input]
-                                     {:intended-move-direction #{}
-                                      :intended-fire-direction []}))]
-        (with-redefs [input/listen-to-keyboard-inputs (fn [event-chan]
-                                                        (reset! stub-event-chan event-chan))]
-          (input/handle-keyboard-events 0)
+  (testing "movement key events"
+    (async done
+      (go
+        (let [stub-event-chan (atom nil)
+              game-state (-> blank-game-state
+                             (assoc-in [:entities 0 :input]
+                                       {:intended-move-direction #{}
+                                        :intended-fire-direction []}))]
+          (with-redefs [input/listen-to-keyboard-inputs (fn [event-chan]
+                                                          (reset! stub-event-chan event-chan))]
+            (input/handle-keyboard-events 0)
 
-          (>! @stub-event-chan {:type      :move-key-down
+            ; press down+right
+            (>! @stub-event-chan {:type      :move-key-down
                                   :direction :down})
-          (>! @stub-event-chan {:type      :move-key-down
+            (>! @stub-event-chan {:type      :move-key-down
                                   :direction :right})
+            (>! @stub-event-chan {:type :noop})
 
-          (>! @stub-event-chan {:type :stop})
+            (let [game-state (state/flush! game-state)]
+              (is (= (get-in game-state [:entities 0 :input :intended-move-direction])
+                     #{:down :right}))
 
-          (let [updated-game-state (state/flush! game-state)]
-            (is (= (get-in updated-game-state [:entities 0 :input :intended-move-direction])
-                   #{:down :right}))
+              (is (= (get-in game-state [:entities 0 :motion :direction])
+                     (input/intended-directions->angle #{:down :right})))
 
-            ;(print (get-in updated-game-state [:entities 0]))
+              ; let go of down
+              (>! @stub-event-chan {:type      :move-key-up
+                                    :direction :down})
+              (>! @stub-event-chan {:type :noop})
 
-            )
-          ; figure out what's going on with :input vs :motion :direction
-          ))
-      (done)
-      )
-    )
-  )
+              (let [game-state (state/flush! game-state)]
+                (is (= (get-in game-state [:entities 0 :input :intended-move-direction])
+                       #{:right}))
+
+                (is (= (get-in game-state [:entities 0 :motion :direction])
+                       (input/intended-directions->angle #{:right})))
+
+                ; let go of right
+                (>! @stub-event-chan {:type      :move-key-up
+                                      :direction :right})
+                (>! @stub-event-chan {:type :noop})
+
+                (let [game-state (state/flush! game-state)]
+                  (is (= (get-in game-state [:entities 0 :input :intended-move-direction])
+                         #{}))
+
+                  (is (= (get-in game-state [:entities 0 :motion :direction])
+                         nil)))))))
+        (done)))))
+
+
+; test handle-conflicting
+; test intended->angle
