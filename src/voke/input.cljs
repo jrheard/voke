@@ -109,6 +109,7 @@
     (go-loop []
       (let [msg (<! event-chan)]
         (if (= (msg :type) :noop)
+          ; noop events are used by tests in order to coordinate with this go block; skip 'em
           (recur)
 
           (let [direction (msg :direction)
