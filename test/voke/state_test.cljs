@@ -1,11 +1,7 @@
 (ns voke.state-test
   (:require [cljs.test :refer [deftest is testing]]
-            [voke.state :as state]))
-
-(def blank-game-state (state/make-game-state []))
-(def game-state-with-an-entity (assoc-in blank-game-state
-                                         [:entities 0]
-                                         {:id 0 :renderable false}))
+            [voke.state :as state]
+            [voke.test-utils :refer [blank-game-state game-state-with-an-entity]]))
 
 (deftest adding-entities
   (with-redefs [state/buffer (atom [])]

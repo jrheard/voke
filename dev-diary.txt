@@ -4191,3 +4191,22 @@ so i'm just jotting down what that ended up looking like here
       (print (select [:entities 0] updated-state))
       (is (= (get-in updated-state [:entities 0])
              {:id 0 :renderable false})))))
+
+====
+
+9/25/16
+
+ok, i've been working on testing handle-keyboard-events
+
+it's pretty straightforward, except for two things:
+1) can't figure out an elegant way to wait for the implementation of handle-keyboard-events
+   to actually do its work, since it happens in a go block. i've got a (<! (timeout 100))
+   using the implementation provided in https://gist.github.com/swannodette/5882703 , and that's
+   working fine, but it's obviously gross and potentially flaky.
+2) this function manipulates both the :input and the :motion components, which i guess makes sense
+   but for some reason i thought it was only the :input component. seems to have a write-only relationship
+   with the :motion component.
+
+re: colorization in cljs.test output, @pat says:
+@jrheard assuming you are using a unix terminal you will have to create a custom report
+function that uses ansi escape codes; Figwheel uses ansi colors, id look there

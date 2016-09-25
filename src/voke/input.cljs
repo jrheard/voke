@@ -1,5 +1,6 @@
 (ns voke.input
   (:require [clojure.set :refer [intersection difference]]
+            [clojure.string :refer [starts-with?]]
             [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
             [plumbing.core :refer [safe-get-in]]
@@ -10,14 +11,14 @@
   (:require-macros [cljs.core.async.macros :refer [go-loop]]
                    [schema.core :as sm]))
 
-(def move-key-mappings {KeyCodes.W :up
-                        KeyCodes.A :left
-                        KeyCodes.S :down
-                        KeyCodes.D :right
+(def move-key-mappings {KeyCodes.W     :up
+                        KeyCodes.A     :left
+                        KeyCodes.S     :down
+                        KeyCodes.D     :right
                         ; carmen asked me to add dvorak support
                         KeyCodes.COMMA :up
-                        KeyCodes.O :down
-                        KeyCodes.E :right})
+                        KeyCodes.O     :down
+                        KeyCodes.E     :right})
 (def fire-key-mappings {KeyCodes.DOWN  :down
                         KeyCodes.LEFT  :left
                         KeyCodes.UP    :up
@@ -98,32 +99,36 @@
 
 ;;; Public
 
-(defn handle-keyboard-events [player-id]
+(defn handle-keyboard-events
   "Listens to keyboard events, and queues modifications to the `player-id` entity
   whenever a move key or fire key is pressed/raised."
+  [player-id]
   (let [event-chan (chan)]
     (listen-to-keyboard-inputs event-chan)
 
     (go-loop []
-      (let [msg (<! event-chan)
-            direction (msg :direction)
-            update-entity-args (case (msg :type)
-                                 :move-key-down [[:input :intended-move-direction] conj direction]
-                                 :move-key-up [[:input :intended-move-direction] disj direction]
-                                 :fire-key-down [[:input :intended-fire-direction]
-                                                 (fn [fire-directions]
-                                                   (if (in? fire-directions direction)
-                                                     fire-directions
-                                                     (conj fire-directions direction)))]
-                                 :fire-key-up [[:input :intended-fire-direction]
-                                               (fn [fire-directions]
-                                                 (filterv #(not= direction %) fire-directions))])]
+      (let [msg (<! event-chan)]
+        (when (not= (msg :type)
+                    :stop)
 
-        (update-entity! player-id
-                        :keyboard-input
-                        (fn [entity]
-                          (let [entity (apply update-in entity update-entity-args)]
-                            (if (.startsWith (name (msg :type)) "fire")
-                              (update-fire-direction entity)
-                              (update-move-direction entity)))))
+          (let [direction (msg :direction)
+                update-entity-args (case (msg :type)
+                                     :move-key-down [[:input :intended-move-direction] conj direction]
+                                     :move-key-up [[:input :intended-move-direction] disj direction]
+                                     :fire-key-down [[:input :intended-fire-direction]
+                                                     (fn [fire-directions]
+                                                       (if (in? fire-directions direction)
+                                                         fire-directions
+                                                         (conj fire-directions direction)))]
+                                     :fire-key-up [[:input :intended-fire-direction]
+                                                   (fn [fire-directions]
+                                                     (filterv #(not= direction %) fire-directions))])]
+
+            (update-entity! player-id
+                            :keyboard-input
+                            (fn [entity]
+                              (let [entity (apply update-in entity update-entity-args)]
+                                (if (starts-with? (name (msg :type)) "fire")
+                                  (update-fire-direction entity)
+                                  (update-move-direction entity)))))))
         (recur)))))
