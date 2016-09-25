@@ -143,6 +143,24 @@
                        nil)))))))
       (done))))
 
+(deftest remove-conflicting-directions
+  (is (= (input/remove-conflicting-directions #{:down :left :right})
+         #{:down}))
+  (is (= (input/remove-conflicting-directions #{:down :left :right :up})
+         #{}))
+  (is (= (input/remove-conflicting-directions #{:down})
+         #{:down}))
+  (is (= (input/remove-conflicting-directions #{:down :up})
+         #{}))
+  (is (= (input/remove-conflicting-directions #{})
+         #{})))
 
-; test handle-conflicting
-; test intended->angle
+(deftest intended-directions->angle
+  (is (= (input/intended-directions->angle [:left])
+         Math/PI))
+  (is (= (input/intended-directions->angle [:right])
+         0))
+  (is (= (input/intended-directions->angle [:up :right])
+         (- (/ Math/PI 4))))
+  (is (= (input/intended-directions->angle [:down :left])
+         (/ (* 3 Math/PI) 4))))
