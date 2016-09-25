@@ -11,30 +11,36 @@
     (go
       (let [event-chan (chan)
             event-handlers (atom [])]
-
         (with-redefs [events/listen (fn [_ _ event-handler-fn]
                                       (swap! event-handlers conj event-handler-fn))]
           (input/listen-to-keyboard-inputs event-chan)
 
           (let [[down-handler up-handler] @event-handlers
-                call-handler (fn [handler key-code]
+                send-event-to-handler (fn [handler key-code]
                                (handler #js {:keyCode        key-code
-                                             :preventDefault (fn [])}))
+                                             :preventDefault (fn [])})) ]
 
-                _ (call-handler down-handler KeyCodes.W)
+                (testing "basic keydown functionality"
+                  (send-event-to-handler down-handler KeyCodes.W)
+                  (send-event-to-handler down-handler KeyCodes.A)
+                  (is (= (<! event-chan)
+                           {:type      :move-key-down
+                            :direction :up}))
+                  (is (= (<! event-chan)
+                           {:type      :move-key-down
+                            :direction :left})))
 
-                voke-input-event (<! event-chan)]
-            (is (= voke-input-event
-                   {:type      :move-key-down
-                    :direction :up})))))
-
-      (done))
-    )
-
-
-  )
+                (testing "basic keyup functionality"
+                  (send-event-to-handler up-handler KeyCodes.W)
+                  (send-event-to-handler up-handler KeyCodes.A)
+                  (is (= (<! event-chan)
+                           {:type      :move-key-up
+                            :direction :up}))
+                  (is (= (<! event-chan)
+                           {:type      :move-key-up
+                            :direction :left}))))))
+      (done))))
 
 
 (deftest handle-keyboard-events
-
   )
