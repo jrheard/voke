@@ -25,27 +25,34 @@
 
 (deftest move-system-tick
   (testing "the movement system should call attempt-to-move! once per each relevant moving entity"
-    (let [tick-fn (system-to-tick-fn movement/move-system)]
-      (let [initial-state (-> blank-game-state
-                              (assoc-in [:entities 0]
-                                        {:id     0
-                                         :shape  {:center {:x 10 :y 10}}
-                                         :motion {:direction        0
-                                                  :velocity         {:x 0 :y 0}
-                                                  :max-acceleration 1
-                                                  :max-speed        10}})
-                              (assoc-in [:entities 1]
-                                        {:id 1 :motion {:direction nil}})
-                              (assoc-in [:entities 2]
-                                        {:id 2 :foo :bar}))
-            attempt-to-move-args (atom [])]
+    (let [pi-over-4 (/ Math/PI 4)
+          tick-fn (system-to-tick-fn movement/move-system)
+          initial-state (-> blank-game-state
+                            (assoc-in [:entities 0]
+                                      {:id     0
+                                       :shape  {:center {:x 10 :y 10}}
+                                       :motion {:direction        pi-over-4
+                                                :velocity         {:x 0 :y 0}
+                                                :max-acceleration 1
+                                                :max-speed        1}})
+                            (assoc-in [:entities 1]
+                                      {:id 1 :motion {:direction nil}})
+                            (assoc-in [:entities 2]
+                                      {:id 2 :foo :bar}))
+          attempt-to-move-args (atom [])]
 
-        (with-redefs [collision/attempt-to-move! (fn [& args]
-                                                   (swap! attempt-to-move-args conj args))]
-          (tick-fn initial-state)
+      (with-redefs [collision/attempt-to-move! (fn [& args]
+                                                 (swap! attempt-to-move-args conj args))]
+        (tick-fn initial-state)
 
-          (is (= (count @attempt-to-move-args) 1))
+        (is (= (count @attempt-to-move-args) 1))
 
-          (let [[_ new-center new-velocity _] (first @attempt-to-move-args)]
-            (is (= new-center {:x 11 :y 10}))
-            (is (= new-velocity {:x 1 :y 0}))))))))
+        (let [[_ new-center new-velocity _] (first @attempt-to-move-args)]
+          (is (= (.toFixed 4 (new-center :x))
+                 (.toFixed 4 (+ 10 (/ 1 (Math/sqrt 2))))))
+          (is (= (.toFixed 4 (new-center :y))
+                 (.toFixed 4 (+ 10 (/ 1 (Math/sqrt 2))))))
+          (is (= (.toFixed 4 (new-velocity :x))
+                 (.toFixed 4 (/ 1 (Math/sqrt 2)))))
+          (is (= (.toFixed 4 (new-velocity :y))
+                 (.toFixed 4 (/ 1 (Math/sqrt 2))))))))))

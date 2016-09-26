@@ -4216,8 +4216,8 @@ cool, been doing lots of testing, that's been going pretty well.
 things left to test:
 
 voke.system.core (done)
-ai system
+ai system (do this later)
 collision system
-attack system
-movement system
+attack system (do this later)
+movement system (done)
 rendering system (nah)

@@ -2,8 +2,7 @@
   (:require [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Axis Direction Entity GameState System]]
-            [voke.system.collision.system :refer [attempt-to-move!]]
-            [voke.util :refer [bound-between]])
+            [voke.system.collision.system :refer [attempt-to-move!]])
   (:require-macros [schema.core :as sm]))
 
 ; A dumb-as-rocks velocity/acceleration system.
@@ -43,21 +42,34 @@
   (let [axis-velocity (get-in entity [:motion :velocity axis])
         new-velocity (+ axis-velocity
                         (* (get-acceleration entity)
-                           (trig-fn (get-in entity [:motion :direction]))))
-        max-speed (get-in entity [:motion :max-speed])
-        ; XXXXXXX TOTAL VELOCITY SHOULD BE CAPPED, NOT JUST AXIS
-        ; OTHERWISE ENTITIES TRAVEL FASTER IF THEY'RE MOVING IN BOTH X AND Y DIRECTIONS
-        capped-velocity (bound-between new-velocity (- max-speed) max-speed)]
-    (if (> (Math/abs capped-velocity) min-velocity)
-      (assoc-in entity [:motion :velocity axis] capped-velocity)
+                           (trig-fn (get-in entity [:motion :direction]))))]
+    (if (> (Math/abs new-velocity) min-velocity)
+      (assoc-in entity [:motion :velocity axis] new-velocity)
       (assoc-in entity [:motion :velocity axis] 0))))
+
+(sm/defn cap-velocity :- Entity
+  [entity :- Entity]
+  (let [velocity (get-in entity [:motion :velocity])
+        x-velocity (velocity :x)
+        y-velocity (velocity :y)
+        max-speed (get-in entity [:motion :max-speed])
+        amplitude (Math/sqrt (+ (* x-velocity x-velocity)
+                                (* y-velocity y-velocity)))
+        multiplier (if (> amplitude max-speed)
+                     (/ max-speed amplitude)
+                     1)]
+    (assoc-in entity
+              [:motion :velocity]
+              {:x (* x-velocity multiplier)
+               :y (* y-velocity multiplier)})))
 
 (sm/defn update-velocity :- Entity
   [entity :- Entity]
   (if (should-update-velocity? entity)
     (-> entity
         (-update-axis-velocity :x Math/cos)
-        (-update-axis-velocity :y Math/sin))
+        (-update-axis-velocity :y Math/sin)
+        cap-velocity)
     entity))
 
 (sm/defn apply-friction :- Entity
