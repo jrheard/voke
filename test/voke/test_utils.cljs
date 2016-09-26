@@ -6,8 +6,3 @@
                                          [:entities 0]
                                          {:id 0 :renderable false}))
 
-(defn truthy? [x]
-  (if x true false))
-
-(defn falsy? [x]
-  (if x false true))
