@@ -4210,3 +4210,14 @@ it's pretty straightforward, except for two things:
 re: colorization in cljs.test output, @pat says:
 @jrheard assuming you are using a unix terminal you will have to create a custom report
 function that uses ansi escape codes; Figwheel uses ansi colors, id look there
+
+cool, been doing lots of testing, that's been going pretty well.
+
+things left to test:
+
+voke.system.core
+ai system
+collision system
+attack system
+movement system
+rendering system (?)
