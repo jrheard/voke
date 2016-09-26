@@ -4,6 +4,7 @@
             [voke.events-test]
             [voke.system.collision-test]
             [voke.system.core-test]
+            [voke.system.movement-test]
             [voke.state-test]
             [voke.util-test]))
 
@@ -11,5 +12,6 @@
            'voke.events-test
            'voke.system.collision-test
            'voke.system.core-test
+           'voke.system.movement-test
            'voke.state-test
            'voke.util-test)

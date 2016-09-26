@@ -14,6 +14,7 @@
 ;
 ; This system was easy to implement and I don't need all the bells/whistles in the linear-algebra-based
 ; articles, though, so I don't feel *too* bad.
+; May have made collision resolution a bit more fiddly / less elegant than it could have been, though.
 
 (def friction-value 0.80)
 (def min-velocity 0.05)

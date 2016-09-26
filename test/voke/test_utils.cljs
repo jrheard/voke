@@ -5,3 +5,6 @@
 (def game-state-with-an-entity (assoc-in blank-game-state
                                          [:entities 0]
                                          {:id 0 :renderable false}))
+
+(defn truthy? [x]
+  (if x true false))
