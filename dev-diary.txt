@@ -4215,7 +4215,7 @@ cool, been doing lots of testing, that's been going pretty well.
 
 things left to test:
 
-voke.system.core
+voke.system.core (done)
 ai system
 collision system
 attack system

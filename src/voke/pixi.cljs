@@ -17,21 +17,20 @@
     (.addChild stage graphics)
     stage))
 
-; does it make sense to have these be atoms?
-(defonce renderer (atom (make-renderer 1000 700 (js/document.getElementById "screen"))))
-(defonce graphics (atom (js/PIXI.Graphics.)))
-(defonce stage (atom (make-stage @graphics)))
+(defonce renderer (make-renderer 1000 700 (js/document.getElementById "screen")))
+(defonce graphics (js/PIXI.Graphics.))
+(defonce stage (make-stage graphics))
 
 (defonce graphics-data-by-entity-id (atom {}))
 
 ; TODO borders
 (defn rectangle
   [x y w h color]
-  (doto @graphics
+  (doto graphics
     (.beginFill color)
     (.drawRect 0 0 w h)
     (.endFill))
-  (let [graphics-data-list (aget @graphics "graphicsData")
+  (let [graphics-data-list (aget graphics "graphicsData")
         graphics-data (aget graphics-data-list
                             (- (.-length graphics-data-list)
                                1))]
@@ -67,7 +66,7 @@
 (defn remove-entity!
   [entity-id]
   (let [graphics-data (@graphics-data-by-entity-id entity-id)
-        graphics-data-list (aget @graphics "graphicsData")
+        graphics-data-list (aget graphics "graphicsData")
         index (.indexOf graphics-data-list graphics-data)]
 
     (when (> index -1)
@@ -80,4 +79,4 @@
                               entities))
   ; TODO update entity visibility
   ; TODO something something camera
-  (.render @renderer @stage))
+  (.render renderer stage))
