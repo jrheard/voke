@@ -48,8 +48,11 @@
         (is (= (count @attempt-to-move-args) 1))
 
         (let [[_ new-center new-velocity _] (first @attempt-to-move-args)]
-          (is (= new-center {:x 11 :y 10}))
-          (is (= new-velocity {:x (/ 1 (Math/sqrt 2))
-                               :y (/ 1 (Math/sqrt 2))})))))))
-
-; TODO test that total velocity is capped, not just velocity on each axis
+          (is (= (.toFixed 4 (new-center :x))
+                 (.toFixed 4 (+ 10 (/ 1 (Math/sqrt 2))))))
+          (is (= (.toFixed 4 (new-center :y))
+                 (.toFixed 4 (+ 10 (/ 1 (Math/sqrt 2))))))
+          (is (= (.toFixed 4 (new-velocity :x))
+                 (.toFixed 4 (/ 1 (Math/sqrt 2)))))
+          (is (= (.toFixed 4 (new-velocity :y))
+                 (.toFixed 4 (/ 1 (Math/sqrt 2))))))))))
