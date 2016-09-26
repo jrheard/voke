@@ -1,10 +1,10 @@
 (ns voke.system.collision.state
   "Contains atoms used to track the collision system's internal state.
-  The contents of these atoms are reset at the beginning of every frame.")
+  The contents of these atoms are reset at the beginning of every tick.")
 
 ; A set of entity IDs. When a :destroyed-on-contact entity is involved in a collision,
-; its ID is stored in this set so that the collision system knows to discard any (attempt-to-move!) calls
-; related to this entity for the rest of the frame.
+; its ID is stored in this set so that the collision system knows e.g. to discard any
+; (attempt-to-move!) calls related to this entity for the rest of the frame.
 (defonce dead-entities (atom #{}))
 
 ; A set of pairs of entity IDs. When a :contact event is fired to record that two entities have touched
