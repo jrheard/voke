@@ -16,6 +16,9 @@
                :center {:x x :y y}}})
 
 (defn prepare-for-collision-test [entities collision-events-atom]
+  ; can't *completely* set up the state of the world, because with-redefs is a macro
+  ; if we wanted to really DRY up these tests, we'd have to write a clj-land macro
+  ; might end up doing that tbh
   (doseq [entity entities]
     (collision-util/-track-entity entity))
 
@@ -28,7 +31,7 @@
          (into {}
                (map (juxt :id identity) entities))))
 
-(deftest two-entities-moving-into-each-other
+(deftest two-entities-moving-into-each-other-diagonally
   (let [entity-1 (make-entity 1 100 100)
         entity-2 (make-entity 2 115 115)
         collision-events (atom [])
@@ -56,10 +59,37 @@
     (testing "diagonal collision resolution works correctly on corners"
       (is (= @apply-movement-calls
              [[entity-1 {:x 104.9 :y 104.9} {:x 0 :y 0}]
-              [entity-2 {:x 99.9 :y 99.9} {:x 0 :y 0}]])))
+              [entity-2 {:x 99.9 :y 99.9} {:x 0 :y 0}]]))))
 
-    (js/Collision.resetState)))
+  (js/Collision.resetState))
 
-; next up: entity is moving up+right, is next to a wall on its right
+(deftest one-entity-moving-against-another
+  (let [entity-1 (make-entity 1 100 100)
+        entity-2 (make-entity 2 111 100)
+        collision-events (atom [])
+        apply-movement-calls (atom [])
+        game-state (prepare-for-collision-test [entity-1 entity-2] collision-events)]
+
+    (with-redefs [state/contacts-fired (atom #{})
+                  collision-util/apply-movement (fn [& args]
+                                                  (swap! apply-movement-calls conj args))]
+      (system/attempt-to-move! entity-1
+                               {:x 105 :y 103}
+                               {:x 5 :y 3}
+                               (vals (game-state :entities))))
+
+    (is (= @collision-events
+           [{:type     :contact
+             :entities [entity-1 entity-2]}]))
+
+    (testing "two entities next to each other, the left one moving up+right; it should be able to
+      move all the way up and a little bit to the right"
+      (is (= @apply-movement-calls
+             [[entity-1 {:x 100.99 :y 103} {:x 0 :y 3}]]))))
+
+  (js/Collision.resetState))
+
+
+
 ; also test dead entities / projectiles
 ; test that collision type / collides-with works

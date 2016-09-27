@@ -51,6 +51,8 @@
     (arithmetic-fn (get-in shape2 [:center axis])
                    (/ (shape2 field) 2)
                    (/ (shape1 field) 2)
+                   ; XXX - diagonal resolution uses a fudge factor of 0.1,
+                   ; single-axis resolution uses 0.01. standardize
                    0.01)))
 
 (sm/defn find-new-position-and-velocity-on-axis :- [(s/one s/Num "new-position")
