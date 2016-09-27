@@ -4221,3 +4221,13 @@ collision system
 attack system (do this later)
 movement system (done)
 rendering system (nah)
+
+
+
+=====
+
+9/26/16
+
+whooooaaa
+https://github.com/mneise/clojurescript-site/blob/master/content/reference/javascript-module-support.adoc
+seems to exist already, i should check that out

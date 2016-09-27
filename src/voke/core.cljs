@@ -27,8 +27,8 @@
 (defonce time-accumulator (atom 0))
 
 (defn -initialize! []
-  ; TODO: tear down and rebuild the JS-land collision system registry
   (js/window.cancelAnimationFrame @animation-frame-request-id)
+  (js/Collision.resetState)
   (voke.events/unsub-all!)
   (voke.state/flush! @game-state)
   (initialize-systems! @game-state (player :id))
