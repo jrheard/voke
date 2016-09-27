@@ -8,17 +8,19 @@
             [voke.system.collision.util :as collision-util]
             [voke.test-utils :refer [blank-game-state]]))
 
-(defn make-entity [id x y]
-  {:id        id
-   :collision {:type :foo}
-   :shape     {:width  10
-               :height 10
-               :center {:x x :y y}}})
+(defn make-entity
+  ([id x y] (make-entity id x y {:type :foo}))
+  ([id x y collision-component]
+   {:id        id
+    :collision collision-component
+    :shape     {:width  10
+                :height 10
+                :center {:x x :y y}}}))
 
 (defn prepare-for-collision-test [entities collision-events-atom]
   ; can't *completely* set up the state of the world, because with-redefs is a macro
-  ; if we wanted to really DRY up these tests, we'd have to write a clj-land macro
-  ; might end up doing that tbh
+  ; if we wanted to really DRY up these tests, we'd have to write a clj-land macro.
+  ; putting that off for now.
   (doseq [entity entities]
     (collision-util/-track-entity entity))
 
@@ -89,7 +91,44 @@
 
   (js/Collision.resetState))
 
+(deftest projectiles-and-collides-with
+  (let [entity-1 (make-entity 1 100 100 {:type :projectile :collides-with #{:wall} :destroyed-on-contact true})
+        entity-2 (make-entity 2 111 100 {:type :projectile :collides-with #{:wall} :destroyed-on-contact true})
+        entity-3 (make-entity 3 122 100 {:type :wall})
+        collision-events (atom [])
+        apply-movement-calls (atom [])
+        remove-entity-calls (atom [])
+        game-state (prepare-for-collision-test [entity-1 entity-2 entity-3] collision-events)]
 
+    (with-redefs [state/contacts-fired (atom #{})
+                  collision-util/apply-movement (fn [& args]
+                                                  (swap! apply-movement-calls conj args))
+                  collision-util/remove-entity! (fn [& args]
+                                                  (swap! remove-entity-calls conj args))]
+      (system/attempt-to-move! entity-1
+                               {:x 105 :y 100}
+                               {:x 5 :y 0}
+                               (vals (game-state :entities)))
 
-; also test dead entities / projectiles
-; test that collision type / collides-with works
+      ; entities 1 and 2 are projectiles and shouldn't collide with one another
+      (is (= @collision-events []))
+      (is (= @remove-entity-calls []))
+      (is (= @apply-movement-calls
+             [[entity-1 {:x 105 :y 100} {:x 5 :y 0}]]))
+
+      (reset! apply-movement-calls [])
+
+      ; entity 3 is a wall, though, and so entity 1 should collide with it and be destroyed
+      (system/attempt-to-move! entity-1
+                               {:x 120 :y 100}
+                               {:x 15 :y 0}
+                               (vals (game-state :entities)))
+
+      (is (= @collision-events
+             [{:type     :contact
+               :entities [entity-1 entity-3]}]))
+      (is (= @apply-movement-calls []))
+      (is (= @remove-entity-calls
+             [[entity-1]]))))
+
+  (js/Collision.resetState))
