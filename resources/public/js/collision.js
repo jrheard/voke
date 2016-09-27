@@ -38,6 +38,10 @@ var Collision = {
         delete treeItemsByID[entity.id];
     },
 
+    resetState: function() {
+        tree = rbush(15);
+    },
+
     addEntity: function(entity) {
         this.insertIntoTree(entity);
         entitiesByID[entity.id] = entity;
