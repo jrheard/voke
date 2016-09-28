@@ -44,11 +44,9 @@
                 :compiler     {:output-to     "test_resources/test.js"
                                :main          voke.runner
                                :foreign-libs  [{:file        "resources/public/js/rbush.js"
-                                                :provides    ["rbush"]
-                                                :module-type :commonjs}
+                                                :provides    ["rbush"]}
                                                {:file        "resources/public/js/collision.js"
-                                                :provides    ["collision"]
-                                                :module-type :commonjs}]
+                                                :provides    ["js-collision"]}]
                                :optimizations :none}}]}
 
   :figwheel {:css-dirs ["resources/public/css"]}
