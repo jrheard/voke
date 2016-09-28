@@ -1,7 +1,7 @@
 (ns voke.system.collision-test
   (:require [cljs.test :refer [deftest is testing]]
             [rbush]
-            [collision :as collision]
+            [collision :as js-collision]
             [voke.events :as events]
             [voke.system.collision.system :as system]
             [voke.system.collision.state :as state]
@@ -63,7 +63,7 @@
              [[entity-1 {:x 104.9 :y 104.9} {:x 0 :y 0}]
               [entity-2 {:x 99.9 :y 99.9} {:x 0 :y 0}]]))))
 
-  (collision/resetState))
+  (js-collision/resetState))
 
 (deftest one-entity-moving-against-another
   (let [entity-1 (make-entity 1 100 100)
@@ -89,7 +89,7 @@
       (is (= @apply-movement-calls
              [[entity-1 {:x 100.99 :y 103} {:x 0 :y 3}]]))))
 
-  (collision/resetState))
+  (js-collision/resetState))
 
 (deftest projectiles-and-collides-with
   (let [entity-1 (make-entity 1 100 100 {:type :projectile :collides-with #{:wall} :destroyed-on-contact true})
@@ -131,4 +131,4 @@
       (is (= @remove-entity-calls
              [[entity-1]]))))
 
-  (collision/resetState))
+  (js-collision/resetState))
