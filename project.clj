@@ -8,18 +8,11 @@
                  [org.clojure/clojurescript "1.9.229"]
                  [org.clojure/core.async "0.2.391"
                   :exclusions [org.clojure/tools.reader]]
-
-                 ; dev
-                 [binaryage/devtools "0.8.2"]
-                 [figwheel-sidecar "0.5.7"]
-
                  [prismatic/plumbing "0.5.3"]
                  [prismatic/schema "1.1.3"]
                  [cljsjs/pixi "3.0.10-0"]]
 
-  :plugins [[lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]
-            ; dev
-            [lein-doo "0.1.7" :exclusions [[org.clojure/clojurescript]]]]
+  :plugins [[lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]]
 
   :source-paths ["src"]
 
@@ -31,13 +24,6 @@
                 :figwheel     {:on-jsload "voke.core/main"}
                 :compiler     {:main                 voke.core
                                :preloads             [devtools.preload]
-                               :foreign-libs  [{:file     "resources/public/js/rbush.js"
-                                                :provides ["rbush"]
-                                                :module-type :commonjs}
-                                               {:file     "resources/public/js/collision.js"
-                                                :requires ["rbush"]
-                                                :provides ["collision"]
-                                                :module-type :commonjs}]
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/voke.js"
                                :output-dir           "resources/public/js/compiled/out"
@@ -51,25 +37,16 @@
                                :output-dir    "resources/public/js/compiled/out-min"
                                :asset-path    "js/compiled/out-min"
                                :source-map    "resources/public/js/compiled/voke.js.map"
-                               :foreign-libs  [{:file     "resources/public/js/rbush.js"
-                                                :provides ["rbush"]
-                                                :module-type :commonjs}
-                                               {:file     "resources/public/js/collision.js"
-                                                :requires ["rbush"]
-                                                :provides ["collision"]
-                                                :module-type :commonjs}]
                                :pretty-print  false}}
                {:id           "test"
                 :source-paths ["src" "test"]
                 :compiler     {:output-to     "test_resources/test.js"
                                :main          voke.runner
-                               :foreign-libs  [{:file     "resources/public/js/rbush.js"
-                                                :provides ["rbush"]
-                                                :module-type :commonjs}
-                                               {:file     "resources/public/js/collision.js"
-                                                :requires ["rbush"]
-                                                :provides ["collision"]
-                                                :module-type :commonjs}]
+                               :verbose true
                                :optimizations :none}}]}
 
-  :figwheel {:css-dirs ["resources/public/css"]})
+  :figwheel {:css-dirs ["resources/public/css"]}
+
+  :profiles {:dev {:dependencies [[binaryage/devtools "0.8.2"]
+                                  [figwheel-sidecar "0.5.7"]]
+                   :plugins      [[lein-doo "0.1.7" :exclusions [[org.clojure/clojurescript]]]]}})

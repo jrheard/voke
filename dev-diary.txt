@@ -4293,3 +4293,8 @@ is set to :leiningen/default, which is a composite profile with [:base :system :
 in multiple locations, only the profile with the highest "priority"
 is picked – no merging is done. The "priority" is – from highest
 to lowest – profiles.clj, project.clj, user-wide profiles, and finally system-wide profiles."
+
+no, i don't think leiningen profiles are relevant here
+i have some :foreign-libs that i want included in every cljs build
+
+slack says that deps.cljs is the answer
