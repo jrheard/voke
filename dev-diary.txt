@@ -4238,3 +4238,58 @@ syntax i wanted to go with and i'm a big hung over so i'll do it some other time
 
 trying to switch to commonjs modules for our vanilla js files, having a bit of trouble
 http://mneise.github.io/posts/2015-06-08-week-2.html seems relevant
+
+========
+
+9/27/16
+
+modules are working! i think
+
+http://inform-fiction.org/manual/DM4.pdf
+
+ok it's time to figure out what leiningen profiles are, my profile.clj is getting too verbose/repetitive
+also i'm switching to the mit license as long as i'm in here
+
+https://github.com/technomancy/leiningen/blob/master/doc/PROFILES.md
+
+https://www.reddit.com/r/Clojure/comments/54q5ng/newbie_question_passing_around_the_entire_state/
+i really like this discussion
+
+http://frenchy64.github.io/2015/06/19/gradual-typing.html
+
+https://lambdaisland.com/blog/25-04-2016-union-types
+********** super cool post
+
+someday i should read
+https://github.com/lambdaisland/uniontypes/blob/master/src/lambdaisland/uniontypes/core.cljc
+and try to completely understand it
+it looks pretty good
+
+https://github.com/thegeez/clj-board/
+trello clone in clj/s with re-frame
+
+https://github.com/weavejester/ittyon
+state management system for clj games
+
+might be fun to try running https://github.com/weavejester/codox on voke as-is
+heh never mind
+
+ok right right right back to profiles
+https://github.com/technomancy/leiningen/blob/master/doc/PROFILES.md again
+
+"You can place any arbitrary key/value pairs supported by defproject
+into a given profile and they will be merged into the project map when that profile is activated."
+
+"Certain profiles are active by default unless you specify another
+set of profiles using the with-profiles task. Each of the default profiles have different semantics"
+
+"The :default profile specifies the profiles that are active
+by default when running lein tasks. If not overridden, this
+is set to :leiningen/default, which is a composite profile with [:base :system :user :provided :dev]."
+
+:default profile seems pretty relevant - can i just add to it without overriding it?
+
+"Remember that if a profile with the same name is specified
+in multiple locations, only the profile with the highest "priority"
+is picked – no merging is done. The "priority" is – from highest
+to lowest – profiles.clj, project.clj, user-wide profiles, and finally system-wide profiles."
