@@ -27,12 +27,6 @@
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/voke.js"
                                :output-dir           "resources/public/js/compiled/out"
-                               :foreign-libs         [{:file        "resources/public/js/rbush.js"
-                                                       :provides    ["rbush"]
-                                                       :module-type :commonjs}
-                                                      {:file        "resources/public/js/collision.js"
-                                                       :provides    ["collision"]
-                                                       :module-type :commonjs}]
                                :source-map           true
                                :source-map-timestamp true}}
                {:id           "min"
@@ -42,13 +36,8 @@
                                :optimizations :advanced
                                :output-dir    "resources/public/js/compiled/out-min"
                                :asset-path    "js/compiled/out-min"
-                               :foreign-libs  [{:file        "resources/public/js/rbush.js"
-                                                :provides    ["rbush"]
-                                                :module-type :commonjs}
-                                               {:file        "resources/public/js/collision.js"
-                                                :provides    ["collision"]
-                                                :module-type :commonjs}]
                                :source-map    "resources/public/js/compiled/voke.js.map"
+                               :externs       ["externs/collision.js"]
                                :pretty-print  false}}
                {:id           "test"
                 :source-paths ["src" "test"]

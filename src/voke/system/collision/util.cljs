@@ -1,7 +1,5 @@
 (ns voke.system.collision.util
-  (:require [rbush]
-            [collision :as js-collision]
-            [voke.events :refer [publish-event]]
+  (:require [voke.events :refer [publish-event]]
             [voke.schemas :refer [Entity EntityID Vector2]]
             [voke.state :refer [update-entity!]]
             [voke.system.collision.state :refer [dead-entities]])
@@ -16,15 +14,15 @@
   (-> entity
       (select-keys [:id :collision :shape])
       clj->js
-      js-collision/addEntity))
+      js/Collision.addEntity))
 
 (defn -update-entity-center
   [entity-id new-center]
-  (js-collision/updateEntity entity-id (vector2->js new-center)))
+  (js/Collision.updateEntity entity-id (vector2->js new-center)))
 
 (sm/defn -stop-tracking-entity
   [entity-id :- EntityID]
-  (js-collision/removeEntity entity-id))
+  (js/Collision.removeEntity entity-id))
 
 (sm/defn apply-movement
   "Fires events to notify the world that a particular entity should have a new center+velocity."
@@ -72,7 +70,7 @@
   [entity :- Entity]
   (assoc-in entity
             [:shape :center]
-            (js->clj (js-collision/getEntityCenter (entity :id))
+            (js->clj (js/Collision.getEntityCenter (entity :id))
                      :keywordize-keys true)))
 
 (sm/defn find-contacting-entities :- [Entity]
@@ -83,7 +81,7 @@
   [entity :- Entity
    new-center :- Vector2
    all-entities :- [Entity]]
-  (let [contacting-entity-ids (js-collision/findContactingEntityIDs (entity :id) (vector2->js new-center))]
+  (let [contacting-entity-ids (js/Collision.findContactingEntityIDs (entity :id) (vector2->js new-center))]
     (if (> (.-length contacting-entity-ids) 0)
       (let [entity-ids (set (js->clj contacting-entity-ids))]
         (keep (fn [entity]

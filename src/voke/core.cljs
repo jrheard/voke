@@ -1,7 +1,5 @@
 (ns voke.core
-  (:require [rbush]
-            [collision :as js-collision]
-            [voke.entity :as e]
+  (:require [voke.entity :as e]
             [voke.events]
             [voke.clock :refer [add-time!]]
             [voke.state :refer [make-game-state]]
@@ -30,7 +28,7 @@
 
 (defn -initialize! []
   (js/window.cancelAnimationFrame @animation-frame-request-id)
-  (js-collision/resetState)
+  (js/Collision.resetState)
   (voke.events/unsub-all!)
   (voke.state/flush! @game-state)
   (initialize-systems! @game-state (player :id))

@@ -1,42 +1,13 @@
-var rbush = require('./rbush');
+(function(window) {
 
-var collision = (function() {
-    // state
-    var entitiesByID = {};
+var entitiesByID = {};
 
-    var treeItemsByID = {};
+var treeItemsByID = {};
 
-    var tree = rbush(15);
+var tree = rbush(15);
 
-
-    // utility functions
-    var leftEdgeX = function(shape) {
-        return shape.center.x - (shape.width / 2);
-    };
-
-    var rightEdgeX = function(shape) {
-        return shape.center.x + (shape.width / 2);
-    }
-
-    var topEdgeY = function(shape) {
-        return shape.center.y - (shape.height / 2);
-    }
-
-    var bottomEdgeY = function(shape) {
-        return shape.center.y + (shape.height / 2);
-    };
-
-    var shapeToTreeItem = function(shape, entityID) {
-        return [
-            leftEdgeX(shape),
-            topEdgeY(shape),
-            rightEdgeX(shape),
-            bottomEdgeY(shape),
-            {id: entityID}
-        ];
-    };
-
-    var shallowCopy = function(obj) {
+var Collision = {
+    shallowCopy: function(obj) {
         var newObj = {};
         for(var i in obj) {
             if(obj.hasOwnProperty(i)) {
@@ -44,22 +15,56 @@ var collision = (function() {
             }
         }
         return newObj;
-    };
+    },
 
-    var insertIntoTree = function(entity) {
-        var treeItem = (shapeToTreeItem(entity.shape, entity.id));
+    shapeToTreeItem: function(shape, entityID) {
+        return [
+            this.leftEdgeX(shape),
+            this.topEdgeY(shape),
+            this.rightEdgeX(shape),
+            this.bottomEdgeY(shape),
+            {id: entityID}
+        ];
+    },
+
+    insertIntoTree: function(entity) {
+        var treeItem = (this.shapeToTreeItem(entity.shape, entity.id));
         tree.insert(treeItem);
         treeItemsByID[entity.id] = treeItem;
-    };
+    },
 
-    var removeFromTree = function(entity) {
+    removeFromTree: function(entity) {
         tree.remove(treeItemsByID[entity.id]);
         delete treeItemsByID[entity.id];
-    };
+    },
+
+    resetState: function() {
+        tree = rbush(15);
+    },
+
+    addEntity: function(entity) {
+        this.insertIntoTree(entity);
+        entitiesByID[entity.id] = entity;
+    },
+
+    updateEntity: function(entityID, newCenter) {
+        this.removeFromTree(entitiesByID[entityID]);
+        entitiesByID[entityID].shape.center = newCenter;
+        this.insertIntoTree(entitiesByID[entityID]);
+    },
+
+    getEntityCenter: function(entityID) {
+        return entitiesByID[entityID].shape.center;
+    },
+
+    removeEntity: function(entityID) {
+        this.removeFromTree(entitiesByID[entityID]);
+        delete entitiesByID[entityID];
+    },
 
     // NOTE: MAKE SURE COLLISION SYSTEM IS NOTIFIED WHENEVER THE VALUES OF ANY OF THESE FIELDS CHANGE
     // (e.g. if somehow an entity's collides-with list changes mid-game, that's important to know!)
-    var oneWayCollidabilityCheck = function(a, b) {
+    oneWayCollidabilityCheck: function(a, b) {
         if (!a.collision || !b.collision) {
             return false;
         }
@@ -73,61 +78,52 @@ var collision = (function() {
         }
 
         return true;
-    };
+    },
 
-    var entitiesCanCollide = function (a, b) {
-        return oneWayCollidabilityCheck(a, b) && oneWayCollidabilityCheck(b, a);
-    };
+    entitiesCanCollide: function (a, b) {
+        return this.oneWayCollidabilityCheck(a, b) && this.oneWayCollidabilityCheck(b, a);
+    },
 
-    // public API
+    leftEdgeX: function(shape) {
+        return shape.center.x - (shape.width / 2);
+    },
 
-    return {
-        resetState: function() {
-            tree = rbush(15);
-        },
+    rightEdgeX: function(shape) {
+        return shape.center.x + (shape.width / 2);
+    },
 
-        addEntity: function(entity) {
-            insertIntoTree(entity);
-            entitiesByID[entity.id] = entity;
-        },
+    topEdgeY: function(shape) {
+        return shape.center.y - (shape.height / 2);
+    },
 
-        updateEntity: function(entityID, newCenter) {
-            removeFromTree(entitiesByID[entityID]);
-            entitiesByID[entityID].shape.center = newCenter;
-            insertIntoTree(entitiesByID[entityID]);
-        },
+    bottomEdgeY: function(shape) {
+        return shape.center.y + (shape.height / 2);
+    },
 
-        getEntityCenter: function(entityID) {
-            return entitiesByID[entityID].shape.center;
-        },
+    findContactingEntityIDs: function(entityID, newCenter) {
+        var movingEntity = entitiesByID[entityID];
 
-        removeEntity: function(entityID) {
-            removeFromTree(entitiesByID[entityID]);
-            delete entitiesByID[entityID];
-        },
+        var newShape = this.shallowCopy(movingEntity.shape);
+        newShape.center = newCenter;
 
-        findContactingEntityIDs: function(entityID, newCenter) {
-            var movingEntity = entitiesByID[entityID];
+        var relevantTreeItems = tree.search(
+            this.shapeToTreeItem(newShape, entityID)
+        );
 
-            var newShape = shallowCopy(movingEntity.shape);
-            newShape.center = newCenter;
+        var relevantEntityIDs = relevantTreeItems.map(function(aTreeItem) {
+            return aTreeItem[4].id;
+        });
 
-            var relevantTreeItems = tree.search(
-                shapeToTreeItem(newShape, entityID)
-            );
+        return relevantEntityIDs.filter(function(anEntityID) {
+            // XXX HACK - sometimes a figwheel reload will cause situations where
+            // entitiesByID[anEntityID] is null. can't figure out why. :(
+            return entitiesByID[anEntityID] &&
+                this.entitiesCanCollide(movingEntity, entitiesByID[anEntityID]);
+        }.bind(this));
+    }
 
-            var relevantEntityIDs = relevantTreeItems.map(function(aTreeItem) {
-                return aTreeItem[4].id;
-            });
+};
 
-            return relevantEntityIDs.filter(function(anEntityID) {
-                // XXX HACK - sometimes a figwheel reload will cause situations where
-                // entitiesByID[anEntityID] is null. can't figure out why. :(
-                return entitiesByID[anEntityID] &&
-                    entitiesCanCollide(movingEntity, entitiesByID[anEntityID]);
-            }.bind(this));
-        }
-    };
-})();
+window.Collision = Collision;
 
-module.exports = collision;
+})(window);
