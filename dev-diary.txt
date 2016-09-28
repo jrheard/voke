@@ -4298,3 +4298,13 @@ no, i don't think leiningen profiles are relevant here
 i have some :foreign-libs that i want included in every cljs build
 
 slack says that deps.cljs is the answer
+
+seeing errors in closure compiler land when i try using that approach, though:
+https://gist.github.com/jrheard/633ddf58e673ffc663b84401f81abefe
+
+ok fuck this i'm just going to live with having :foreign-libs copypasted in several :builds
+notes for posterity re: deps.cljs:
+https://github.com/clojure/clojurescript/blob/eaebc1cdb39e3fed9e7e36ec1315337b77a0350d/src/main/clojure/cljs/closure.clj#L1746
+https://groups.google.com/forum/#!msg/clojurescript/pJ_EYHkYAUs/mLi8XfiQxZsJ
+https://github.com/clojure/clojurescript/wiki/Dependencies
+
