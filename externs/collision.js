@@ -5,3 +5,4 @@ Collision.getEntityCenter = function(entityID) {};
 Collision.removeEntity = function(entityID) {};
 Collision.findContactingEntityIDs = function(entityID, newCenter) {};
 Collision.resetState = function() {};
+

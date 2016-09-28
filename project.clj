@@ -46,10 +46,14 @@
                 :source-paths ["src" "test"]
                 :compiler     {:output-to     "test_resources/test.js"
                                :main          voke.runner
+                               :verbose true
                                :foreign-libs  [{:file     "resources/public/js/rbush.js"
-                                                :provides ["rbush"]}
+                                                :provides ["rbush"]
+                                                :module-type :commonjs}
                                                {:file     "resources/public/js/collision.js"
-                                                :provides ["js-collision"]}]
+                                                :requires ["rbush"]
+                                                :provides ["collision"]
+                                                :module-type :commonjs}]
                                :optimizations :none}}]}
 
   :figwheel {:css-dirs ["resources/public/css"]})

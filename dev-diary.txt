@@ -4231,3 +4231,10 @@ rendering system (nah)
 whooooaaa
 https://github.com/mneise/clojurescript-site/blob/master/content/reference/javascript-module-support.adoc
 seems to exist already, i should check that out
+
+cool, wrote tests for the collision system, that was satisfying.
+was going to implement a macro that would DRY up the tests a bit more, but i couldn't decide what
+syntax i wanted to go with and i'm a big hung over so i'll do it some other time.
+
+trying to switch to commonjs modules for our vanilla js files, having a bit of trouble
+http://mneise.github.io/posts/2015-06-08-week-2.html seems relevant
