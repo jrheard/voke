@@ -4381,3 +4381,26 @@ and attribute values should be registered under their attribute name keyword."
 i have no fucking idea what this means, asking in slack
 
 anyway overall pretty good document
+
+=========
+
+9/29/16
+
+https://www.youtube.com/watch?v=kb-m2fasdDY
+**** good shit
+on rpc in the context of having a ton of services talking to each other:
+"without types, it's a crazy mess! but it's not immediatley a crazy mess - you're
+borrowing against a _future_ crazy mess when someone will change something, and then
+maybe a couple of hops downstream they were depending on some subtle distinction between
+an empty string and null..."
+"we could have fixed all of this if we just had types"
+around 22:40, talks about standardizing dashboards ****** good shit
+tracing very important when you have a ton of services
+
+on logging in a standard format across all languages in a world where 1000 engineers
+have started within the last six months:
+"mandates are tricky - give them tools that are so obvious and easy to use that they wouldn't
+do it any other way"
+
+later, on mandates: they're bad
+instead: pure carrots, no sticks
