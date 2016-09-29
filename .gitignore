@@ -18,3 +18,4 @@ figwheel_server.log
 .DS_Store
 test_resources/
 out/
+node_modules/

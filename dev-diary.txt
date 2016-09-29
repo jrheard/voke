@@ -4312,3 +4312,72 @@ ugh whatever this commonjs module business just is not working and i don't want 
 in this rabbit hole forever
 
 i'm going to just back out my changes
+
+https://www.youtube.com/watch?v=TW1ie0pIO_E
+*********** good
+oh this is the guy behind chocolatier
+talks about ecs around 7:40
+he uses events too to avoid coupling
+he likes devcards
+around 24:45, he's got some sort of thing where he's extending hashmaps in order to autogenerate
+a reagent component of the game's state?
+talks about using middleware around 25:49
+perf tips:
+* variadic function signatures are slow, use multiple arities instead
+* avoid partials
+* apparently (empty? []) is slow, (seq []) is fast
+* don't use (= :a :a), use (keyword-identical? :a :a)
+* protocols/records/types are fast
+* avoid intermediate collections
+     around 30:43
+     "break it out into a (loop), create a transient accumulator, use recur, maybe even use a plain js array"
+* the ^boolean typehint is apparently actually useful
+* he says that :static-fns can give you a 30-40% speed boost (?!?!?!)
+* also mentions :elide-asserts
+
+https://github.com/arcadia-unity/Arcadia
+
+https://www.youtube.com/watch?v=lql2yFXzKUs&index=22&list=PLZdCLR02grLq4e8-1P2JNHBKUOLFTX3kb
+http://store.steampowered.com/app/411610/
+he likes clojure.zip/zipper
+oh wow yeah this looks perfect for dialogue trees
+down, right, up, edit, etc
+***** around the 18 minute mark he starts talking about using core.async for scripted animations
+
+ok, spec time
+
+http://clojure.org/about/spec
+interesting, hadn't heard of https://github.com/miner/herbert before
+it has a similar conform function
+jesus christ it is super spooky that the library has this like homage/tribute to the specific random
+star trek episode i'm about to go see at the hollywood in like two hours
+what the hell man
+
+anyway back to this document
+it's pretty good
+it's interesting how focused they are on keeping maps' "keysets" separate from their
+key-> value specs, it's not something i would have thought of as a problem
+
+i'm not sure i understand the bit about semantic change and compatibility, i don't see how it's
+relevant to spec from what i've seen of it so far
+
+the "names are important" passage explains why the branches of :ors, etc, are named - makes
+a lot of sense, very smart
+
+interesting passage:
+"Invariably, people will try to use a specification system to
+detail implementation decisions, but they do so to their detriment.
+The best and most useful specs (and interfaces) are related
+to purely information aspects. Only information specs work over
+wires and across systems. We will always prioritize, and where
+there is a conflict, prefer, the information approach."
+
+kind of handwavy, sounds nice but i'm not 100% sure what they mean by it
+
+spec/keys' ::req portion supports (and) and (or), didn't know that
+
+"By convention, specs for data should be registered under keywords
+and attribute values should be registered under their attribute name keyword."
+i have no fucking idea what this means, asking in slack
+
+anyway overall pretty good document
