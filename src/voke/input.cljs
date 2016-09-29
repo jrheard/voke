@@ -1,5 +1,6 @@
 (ns voke.input
-  (:require [clojure.set :refer [intersection difference]]
+  (:require [cljs.spec :as s]
+            [clojure.set :refer [intersection difference]]
             [clojure.string :refer [starts-with?]]
             [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]

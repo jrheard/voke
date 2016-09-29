@@ -1,5 +1,6 @@
 (ns voke.schemas
-  (:require [schema.core :as s])
+  (:require [cljs.spec :as sp]
+            [schema.core :as s])
   (:require-macros [schema.core :as sm]))
 
 (sm/defschema EntityID s/Int)
@@ -18,13 +19,13 @@
 
 (def Direction (s/maybe s/Num))
 
-(sm/defschema ProjectileShape (dissoc Shape :center))
-
 (sm/defschema Motion {:velocity             Vector2
                       :direction            Direction
                       :affected-by-friction s/Bool
                       :max-speed            s/Num
                       :max-acceleration     s/Num})
+
+(sm/defschema ProjectileShape (dissoc Shape :center))
 
 (sm/defschema Weapon {:last-attack-timestamp s/Int
                       :fire-direction        Direction

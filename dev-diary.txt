@@ -4404,3 +4404,11 @@ do it any other way"
 
 later, on mandates: they're bad
 instead: pure carrots, no sticks
+
+starting on the transition to spec
+some parts are straightforward, some are not
+do i use namespaced keywords that match my project's namespaces, like :voke.system.collision/foo?
+or do i use namespaces that are concepts, like :collision/foo?
+asking in slack
+
+wow http://www.clojure-toolbox.com/ has a ton more stuff on it than the last time i looked

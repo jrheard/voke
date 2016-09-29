@@ -4,7 +4,8 @@
   Systems can call add-entity!, update-entity!, and remove-entity! in their tick functions / event handlers.
   These updates/removes will be queued, and will be processed by the core game loop in voke.core
   at the end of every frame."
-  (:require [schema.core :as s]
+  (:require [cljs.spec :as sp]
+            [schema.core :as s]
             [voke.events :refer [publish-event]]
             [voke.schemas :refer [Entity EntityID GameState]])
   (:require-macros [schema.core :as sm]))
