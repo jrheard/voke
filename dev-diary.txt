@@ -4468,3 +4468,9 @@ i need to sit down and take some time to understand the semantics of `:kind` and
 
 interesting - in http://tales.sveri.de/posts/2016-05-28-clojure-spec.html , he has his
 (s/fdef) calls *above* his (defn)s. wonder if that works, and if so how
+
+ok anyway i fixed a lot of tests and i think the game is working again
+i am so glad i wrote all these tests
+they were really really really really useful just now
+
+ok now let's set up instrumentation and generative testing

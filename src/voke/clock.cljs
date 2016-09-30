@@ -10,4 +10,5 @@
   (swap! clock + dt))
 
 (s/fdef add-time!
-  :args (s/cat :dt number?))
+  :args (s/and (s/cat :dt number?)
+               #(pos? (% :dt))))

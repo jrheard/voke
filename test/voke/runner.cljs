@@ -1,6 +1,7 @@
 (ns voke.runner
   (:require [cljs.spec.test :as stest]
             [doo.runner :refer-macros [doo-tests]]
+            [voke.clock-test]
             [voke.input-test]
             [voke.events-test]
             [voke.system.collision-test]
@@ -11,7 +12,8 @@
 
 ;(stest/instrument)
 
-(doo-tests 'voke.input-test
+(doo-tests 'voke.clock-test
+           'voke.input-test
            'voke.events-test
            'voke.system.collision-test
            'voke.system.core-test
