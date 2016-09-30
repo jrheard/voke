@@ -1,7 +1,6 @@
 (ns voke.system.rendering
-  (:require [voke.pixi :refer [render! update-entity-position! remove-entity!]]
-            [voke.schemas :refer [Entity GameState System]])
-  (:require-macros [schema.core :as sm]))
+  (:require [cljs.spec :as s]
+            [voke.pixi :refer [render! update-entity-position! remove-entity!]]))
 
 ; TODO not yet implemented: removing entities (eg dead monsters, collided bullets, etc)
 ; TODO also what about when entities are no longer visible? should we remove their objects?
@@ -15,18 +14,20 @@
 
 ;; Public
 
-(sm/defn render-tick
-  [state :- GameState]
-  (let [relevant-entities (filter #(and
-                                    (contains? % :shape)
-                                    (contains? % :render-info))
-                                  (vals (state :entities)))]
+(defn render-tick
+  [state]
+  (let [relevant-entities (filter #(and (contains? % :component/shape)
+                                        (contains? % :component/render))
+                                  (vals (state :game-state/entities)))]
     (render! relevant-entities)))
+
+(s/fdef render-tick
+  :args (s/cat :state :game-state/game-state))
 
 ;; System definition
 
-(sm/def render-system :- System
-  {:event-handlers [{:event-type :movement
-                     :fn         handle-movement-event}
-                    {:event-type :entity-removed
-                     :fn         handle-remove-entity-event}]})
+(def render-system
+  {:system/event-handlers [{:event/type              :movement
+                            :system/event-handler-fn handle-movement-event}
+                           {:event/type              :entity-removed
+                            :system/event-handler-fn handle-remove-entity-event}]})

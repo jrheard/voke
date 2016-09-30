@@ -138,15 +138,15 @@
 ;; System definition
 
 (def move-system
-  {:tick-fn (fn move-system-tick [entities]
-              (doseq [entity (filter relevant-to-movement-system? entities)]
-                (let [moved-entity (-> entity
-                                       update-velocity
-                                       apply-friction
-                                       update-position)]
+  {:system/tick-fn (fn move-system-tick [entities]
+                     (doseq [entity (filter relevant-to-movement-system? entities)]
+                       (let [moved-entity (-> entity
+                                              update-velocity
+                                              apply-friction
+                                              update-position)]
 
-                  (when (not= moved-entity entity)
-                    (attempt-to-move! entity
-                                      (-> moved-entity :component/shape :shape/center)
-                                      (-> moved-entity :component/motion :motion/velocity)
-                                      entities)))))})
+                         (when (not= moved-entity entity)
+                           (attempt-to-move! entity
+                                             (-> moved-entity :component/shape :shape/center)
+                                             (-> moved-entity :component/motion :motion/velocity)
+                                             entities)))))})

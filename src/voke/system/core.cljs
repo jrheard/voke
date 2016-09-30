@@ -25,7 +25,7 @@
   [system]
   (fn [state]
     (update-in state
-               [:entities]
+               [:game-state/entities]
                merge
                ; XXXX assert that the line below contains only entities that already exist in state :entities keys
                (into {}

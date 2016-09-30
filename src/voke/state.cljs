@@ -42,10 +42,10 @@
    event-processing-fn
    events]
   (assoc state
-         :entities
+         :game-state/entities
          (persistent!
            (reduce event-processing-fn
-                   (transient (state :entities))
+                   (transient (state :game-state/entities))
                    events))))
 
 (s/fdef process-events
