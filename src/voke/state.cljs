@@ -59,7 +59,7 @@
   (process-events state
                   (fn [entities event]
                     (let [entity (event :entity)]
-                      (publish-event {:type   :entity-added
+                      (publish-event {:event/type   :entity-added
                                       :entity entity})
                       (assoc! entities (entity :id) entity)))
                   add-events))
@@ -76,7 +76,7 @@
                     (let [entity-id (event :entity-id)]
                       (assoc! entities
                               entity-id
-                              ((event :fn) (get entities entity-id)))))
+                              ((event :game-state-event/update-fn) (get entities entity-id)))))
                   update-events))
 
 (s/fdef process-update-events
@@ -88,8 +88,8 @@
    remove-events]
   (process-events state
                   (fn [entities remove-event]
-                    (let [entity-id (remove-event :entity-id)]
-                      (publish-event {:type      :entity-removed
+                    (let [entity-id (remove-event :game-state-event/entity-id)]
+                      (publish-event {:event/type      :entity-removed
                                       :entity-id entity-id})
                       (dissoc! entities entity-id)))
                   remove-events))
@@ -136,9 +136,9 @@
 (defn add-entity!
   [entity
    origin]
-  (swap! buffer conj {:type   :add
-                      :origin origin
-                      :entity entity}))
+  (swap! buffer conj #:game-state-event {:type   :add
+                                         :origin origin
+                                         :entity entity}))
 
 (s/fdef add-entity!
   :args (s/cat :entity :entity/entity
@@ -154,10 +154,10 @@
    update-fn]
   ; this swap! call takes a bit longer than i'd like, shows up in profiles at around 3% of
   ; the time we spend. consider replacing the buffer with (gasp) a regular js array. not worth it yet though
-  (swap! buffer conj {:type      :update
-                      :origin    origin
-                      :entity-id entity-id
-                      :fn        update-fn}))
+  (swap! buffer conj #:game-state-event {:type      :update
+                                         :origin    origin
+                                         :entity-id entity-id
+                                         :update-fn update-fn}))
 
 (s/fdef update-entity!
   :args (s/cat :entity-id :entity/id
@@ -168,9 +168,9 @@
   "Queue an entity's removal from the game."
   [entity-id
    origin]
-  (swap! buffer conj {:type      :remove
-                      :origin    origin
-                      :entity-id entity-id}))
+  (swap! buffer conj #:game-state-event {:type      :remove
+                                         :origin    origin
+                                         :entity-id entity-id}))
 
 (s/fdef remove-entity!
   :args (s/cat :entity-id :entity/id

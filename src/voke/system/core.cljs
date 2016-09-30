@@ -1,18 +1,29 @@
 (ns voke.system.core
-  (:require [voke.events :refer [subscribe-to-event]]
+  (:require [cljs.spec :as s]
+            [voke.events :refer [subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
-            [voke.schemas :refer [GameState System]]
             [voke.system.ai.system :refer [ai-system]]
             [voke.system.attack :refer [attack-system]]
             [voke.system.collision.system :refer [collision-system]]
             [voke.system.movement :refer [move-system]]
-            [voke.system.rendering :refer [render-system]])
-  (:require-macros [schema.core :as sm]))
+            [voke.system.rendering :refer [render-system]]))
 
-(sm/defn system-to-tick-fn
+;; Specs
+
+(s/def :system/tick-fn fn?)
+(s/def :system/initialize fn?)
+(s/def :system/event-handler-fn fn?)
+(s/def :system/event-handler (s/keys :req [:event/type :system/event-handler-fn]))
+(s/def :system/event-handlers (s/coll-of :system/event-handlers))
+
+(s/def :system/system (s/keys :opt [:system/tick-fn :system/initialize :system/event-handlers]))
+
+;; Private
+
+(defn system-to-tick-fn
   "Takes a System map, returns a function of game-state -> game-state."
-  [system :- System]
-  (sm/fn [state :- GameState]
+  [system]
+  (fn [state]
     (update-in state
                [:entities]
                merge
@@ -20,6 +31,10 @@
                (into {}
                      (map (juxt :id identity)
                           ((system :tick-fn) (vals (state :entities))))))))
+
+(s/fdef system-to-tick-fn
+  :args (s/cat :system :system/system)
+  :ret fn?)
 
 ; smell: collision system is listed first so that its tick function can reset its internal state atoms
 ; before anything else can happen in each frame.
@@ -36,7 +51,7 @@
 
 ;; Public
 
-(sm/defn initialize-systems!
+(defn initialize-systems!
   [game-state player-entity-id]
 
   ; Run systems' initalize functions.
@@ -54,11 +69,15 @@
   ; Listen to keyboard input.
   (handle-keyboard-events player-entity-id))
 
-(sm/defn process-a-tick :- GameState
+(defn process-a-tick
   "A function from game-state -> game-state, which you can call to make a unit
   of time pass in the game-world."
-  [state :- GameState]
+  [state]
   (reduce (fn [state tick-function]
             (tick-function state))
           state
           tick-functions))
+
+(s/fdef process-a-tick
+  :args (s/cat :state :game-state/game-state)
+  :ret :game-state/game-state)
