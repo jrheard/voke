@@ -4430,3 +4430,38 @@ if i had to do this over again i would have used find/replace or sed waay more
 
 slack says cursive EAP has support for #:foo{:bar :baz} syntax, gonna try upgrading
 https://cursive-ide.com/eap.html
+
+neat
+
+playing around with gen, exercise, and test.check
+gen and exercise both accept an "options map", documented as:
+
+`
+Optionally an overrides map can be provided which
+should map spec names or paths (vectors of keywords) to no-arg
+generator-creating fns. These will be used instead of the generators at those
+names/paths. Note that parent generator (in the spec or overrides
+map) will supersede those of any subtrees. A generator for a regex
+op must always return a sequential collection (i.e. a generator for
+s/? should return either an empty sequence/vector or a
+sequence/vector with one item in it)
+`
+
+notes from me rubberducking into slack:
+
+i’ve got a somewhat complex map spec that i’m trying to s/exercise,
+and i’m getting the dreaded "Couldn't satisfy such-that predicate after 100 tries.” error.
+what are the primary things i should be looking for when trackingdown the root cause?
+i’m familiar with s/and and how you should eg do int? first, followed by even?, etc (edited)
+is naive `s/and` usage the primary trigger for this error, or
+are there other categories of spec misuse that often cause it? (edited)
+(if it’s helpful, the spec i’m trying to exercise is
+https://github.com/jrheard/voke/blob/spec/src/voke/specs.cljs#L74 ) (edited)
+i’ve only got one s/and in here, and it’s a `(s/and number?
+pos?)`, so i feel like there must be some other category of thing i’m doing totally incorrectly
+hm, seems to be specific to :component/input
+this guy’s the culprit: https://github.com/jrheard/voke/blob/spec/src/voke/specs.cljs#L22 (edited)
+the documentation on :kind says: "Note that if :kind is specified
+and :into is not, this pred must generate in order for every
+to generate.”; and adding `:into #{}` fixes the issue. guess
+i need to sit down and take some time to understand the semantics of `:kind` and `:into`.

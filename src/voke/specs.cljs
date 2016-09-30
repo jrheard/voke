@@ -1,14 +1,14 @@
 (ns voke.specs
   (:require [cljs.spec :as s]))
 
-;; Specs
-
 (s/def :entity/id int?)
 
 (s/def :geometry/x number?)
 (s/def :geometry/y number?)
 (s/def :geometry/vector2 (s/keys :req [:geometry/x :geometry/y]))
 (s/def :geometry/direction (s/nilable number?))
+
+;; Components
 
 (s/def :shape/type #{:rectangle})
 (s/def :shape/width number?)
@@ -19,7 +19,7 @@
                                 :opt [:shape/width :shape/height]))
 
 (s/def :input/intended-direction #{:up :left :down :right})
-(s/def :input/intended-move-direction (s/coll-of :input/intended-direction :kind set?))
+(s/def :input/intended-move-direction (s/coll-of :input/intended-direction :kind set? :into #{}))
 (s/def :input/intended-fire-direction (s/coll-of :input/intended-direction))
 
 (s/def :component/input (s/keys :req [:input/intended-move-direction :input/intended-fire-direction]))
@@ -59,7 +59,7 @@
                          :gold
                          :item
                          :explosion})
-(s/def :collision/collides-with (s/coll-of :collision/type :kind set?))
+(s/def :collision/collides-with (s/coll-of :collision/type :kind set? :into #{}))
 (s/def :collision/destroyed-on-contact boolean?)
 
 (s/def :component/collision (s/keys :req [:collision/type]
@@ -71,6 +71,8 @@
 (s/def :owned/owner-id :entity/id)
 (s/def :component/owned (s/keys :req [:owned/owner-id]))
 
+;; Entity
+
 (s/def :entity/entity (s/keys :req [:entity/id]
                               :opt [:component/shape
                                     :component/motion
@@ -79,4 +81,3 @@
                                     :component/owned
                                     :component/weapon
                                     :component/input]))
-

@@ -1,8 +1,13 @@
 (ns voke.test-utils
-  (:require [voke.state :as state]))
+  (:require [cljs.spec :as s]
+            [cojure.test.check.generators]
+            [voke.specs]
+            [voke.state :as state]))
 
 (def blank-game-state (state/make-game-state []))
+
 (def game-state-with-an-entity (assoc-in blank-game-state
                                          [:entities 0]
-                                         {:id 0 :renderable false}))
-
+                                         (assoc (first (s/exercise :entity/entity 1))
+                                                :entity/id
+                                                0)))
