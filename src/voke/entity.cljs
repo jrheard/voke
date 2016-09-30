@@ -23,23 +23,23 @@
 
 (defn make-input
   []
-  #:input {:intended-move-direction #{}
-           :intended-fire-direction []})
+  #:input{:intended-move-direction #{}
+          :intended-fire-direction []})
 
 (s/fdef make-input
   :ret :component/input)
 
 (defn make-weapon
   [fire-direction projectile-color]
-  #:weapon {:last-attack-timestamp 0
-            ; XXXX nuke fire-direction arg, just temporary thing for testing
-            :fire-direction        fire-direction
-            :shots-per-second      21
-            :shot-speed            5
-            :projectile-color      projectile-color
-            :projectile-shape      #:shape {:type   :rectangle
-                                            :width  10
-                                            :height 10}})
+  #:weapon{:last-attack-timestamp 0
+           ; XXXX nuke fire-direction arg, just temporary thing for testing
+           :fire-direction        fire-direction
+           :shots-per-second      21
+           :shot-speed            5
+           :projectile-color      projectile-color
+           :projectile-shape      #:shape {:type   :rectangle
+                                           :width  10
+                                           :height 10}})
 
 (s/fdef make-weapon
   :ret :component/weapon)
@@ -49,17 +49,17 @@
 (defn player
   [x y]
   (make-entity
-    #:component {:shape     {:shape/width  25
-                             :shape/height 25
-                             :shape/type   :rectangle
-                             :shape/center {:geometry/x x
-                                            :geometry/y y}}
-                 :motion    {:motion/velocity             {:geometry/x 0
-                                                           :geometry/y 0}
-                             :motion/affected-by-friction true
-                             :motion/direction            nil
-                             :motion/max-acceleration     2.0
-                             :motion/max-speed            11}
+    #:component {:shape     #:shape{:width  25
+                                    :height 25
+                                    :type   :rectangle
+                                    :center {:geometry/x x
+                                             :geometry/y y}}
+                 :motion    #:motion{:velocity             {:geometry/x 0
+                                                            :geometry/y 0}
+                                     :affected-by-friction true
+                                     :direction            nil
+                                     :max-acceleration     2.0
+                                     :max-speed            11}
                  :collision {:collision/type :good-guy}
                  :render    {:render/fill 0x333333}
                  :weapon    (make-weapon nil 0x666666)
@@ -72,17 +72,17 @@
 (defn monster
   [x y]
   (make-entity
-    #:component {:shape     {:shape/width  25
-                             :shape/height 25
-                             :shape/type   :rectangle
-                             :shape/center {:geometry/x x
-                                            :geometry/y y}}
-                 :motion    {:motion/velocity             {:geometry/x 0
-                                                           :geometry/y 0}
-                             :motion/affected-by-friction true
-                             :motion/direction            nil
-                             :motion/max-acceleration     1.5
-                             :motion/max-speed            4}
+    #:component {:shape     #:shape{:width  25
+                                    :height 25
+                                    :type   :rectangle
+                                    :center {:geometry/x x
+                                             :geometry/y y}}
+                 :motion    #:motion{:velocity             {:geometry/x 0
+                                                            :geometry/y 0}
+                                     :affected-by-friction true
+                                     :direction            nil
+                                     :max-acceleration     1.5
+                                     :max-speed            4}
                  :collision {:collision/type :bad-guy}
                  ;:weapon      nil
                  #_(make-weapon (- (/ Math/PI 2))
@@ -98,11 +98,11 @@
 (defn wall
   [x y width height]
   (make-entity
-    #:component {:shape     {:shape/width  width
-                             :shape/height height
-                             :shape/type   :rectangle
-                             :shape/center {:geometry/x x
-                                            :geometry/y y}}
+    #:component {:shape     #:shape{:width  width
+                                    :height height
+                                    :type   :rectangle
+                                    :center {:geometry/x x
+                                             :geometry/y y}}
                  :collision {:collision/type :obstacle}
                  :render    {:render/fill 0x333333}}))
 
@@ -112,19 +112,19 @@
 (defn projectile
   [owner-id position collides-with projectile-shape projectile-color x-velocity y-velocity]
   (make-entity
-    #:component {:shape     (assoc projectile-shape
-                                   :shape/center position)
-                 :owned     {:owner/id owner-id}
-                 :collision {:collision/type                 :projectile
-                             :collision/collides-with        collides-with
-                             :collision/destroyed-on-contact true}
-                 :render    {:render/fill projectile-color}
-                 :motion    {:motion/velocity             {:geometry/x x-velocity
-                                                           :geometry/y y-velocity}
-                             :motion/direction            nil
-                             :motion/affected-by-friction false
-                             :motion/max-speed            (max x-velocity y-velocity)
-                             :motion/max-acceleration     0}}))
+    #:component{:shape     (assoc projectile-shape
+                                  :shape/center position)
+                :owned     {:owner/id owner-id}
+                :collision #:collision{:type                 :projectile
+                                       :collides-with        collides-with
+                                       :destroyed-on-contact true}
+                :render    {:render/fill projectile-color}
+                :motion    #:motion{:velocity             #:geometry{:x x-velocity
+                                                                     :y y-velocity}
+                                    :direction            nil
+                                    :affected-by-friction false
+                                    :max-speed            (max x-velocity y-velocity)
+                                    :max-acceleration     0}}))
 
 (s/fdef projectile
   :ret :entity/entity)

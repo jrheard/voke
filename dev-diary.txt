@@ -4423,3 +4423,10 @@ i'm going to need to come up with some sort of grep command that finds bare non-
 TODO - go back after initial round of speccing and see if any fdefs could benefit from a :fn
 
 if i had to do this over again i would have used find/replace or sed waay more
+
+======
+
+9/30/16
+
+slack says cursive EAP has support for #:foo{:bar :baz} syntax, gonna try upgrading
+https://cursive-ide.com/eap.html
