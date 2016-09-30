@@ -1,18 +1,26 @@
 (ns voke.events
   "A super-simple synchronous pub/sub system."
-  (:require [voke.schemas :refer [EventType]])
-  (:require-macros [schema.core :as sm]))
+  (:require [cljs.spec :as s]))
 
-; A map of {EventType -> [event-handler-fn]}.
+;; Specs
+
+(s/def :event/type #{:movement :entity-added :entity-removed})
+(s/def :event/event (s/keys :req [:event/type]))
+
+; A map of {:event/type -> [event-handler-fn]}.
 (def ^:private registry (atom {}))
 
-(sm/defn publish-event [event]
+;; Public
+
+(defn publish-event [event]
   (doseq [handler (@registry (event :type))]
     (handler event)))
 
-(sm/defn subscribe-to-event
-  [event-type :- EventType
-   handler-fn]
+(s/fdef publish-event
+  :args (s/cat :event :event/event))
+
+(defn subscribe-to-event
+  [event-type handler-fn]
   (swap! registry
          update-in
          [event-type]
@@ -20,6 +28,9 @@
            (if (seq handlers)
              (conj handlers handler-fn)
              [handler-fn]))))
+(s/fdef subscribe-to-event
+  :args (s/cat :event-type :event/type
+               :handler-fn fn?))
 
 (defn unsub-all! []
   (reset! registry {}))
