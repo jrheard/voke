@@ -29,8 +29,8 @@
                merge
                ; XXXX assert that the line below contains only entities that already exist in state :entities keys
                (into {}
-                     (map (juxt :id identity)
-                          ((system :tick-fn) (vals (state :entities))))))))
+                     (map (juxt :event/id identity)
+                          ((system :system/tick-fn) (vals (state :game-state/entities))))))))
 
 (s/fdef system-to-tick-fn
   :args (s/cat :system :system/system)
@@ -47,7 +47,7 @@
 
 (def tick-functions
   (map system-to-tick-fn
-       (filter :tick-fn game-systems)))
+       (filter :system/tick-fn game-systems)))
 
 ;; Public
 
@@ -56,15 +56,15 @@
 
   ; Run systems' initalize functions.
   (doseq [initialize-fn (keep identity
-                              (map :initialize game-systems))]
+                              (map :system/initialize game-systems))]
     (initialize-fn game-state))
 
   ; Set up systems' event handlers.
   (doseq [event-handler-map (flatten
                               (keep identity
-                                    (map :event-handlers game-systems)))]
-    (subscribe-to-event (event-handler-map :event-type)
-                        (event-handler-map :fn)))
+                                    (map :system/event-handlers game-systems)))]
+    (subscribe-to-event (event-handler-map :event/type)
+                        (event-handler-map :system/event-handler-fn)))
 
   ; Listen to keyboard input.
   (handle-keyboard-events player-entity-id))
