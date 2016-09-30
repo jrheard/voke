@@ -1,12 +1,10 @@
 (ns voke.system.collision.system
   (:require [cljs.spec :as s]
             [voke.events :refer [publish-event]]
-            [voke.schemas :refer [Axis Entity EntityID System Vector2]]
             [voke.system.collision.resolution :refer [resolve-collision]]
             [voke.system.collision.state :refer [contacts-fired dead-entities]]
             [voke.system.collision.util :refer [-track-entity -stop-tracking-entity
-                                                apply-movement find-contacting-entities]])
-  (:require-macros [schema.core :as sm]))
+                                                apply-movement find-contacting-entities]]))
 
 ; TODO - obstacles shouldn't be able to collide with each other
 ; will simplify world generation / wall placement
