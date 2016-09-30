@@ -4419,3 +4419,7 @@ it's been mostly mechanical once i got going, although coming up with namespaces
 was a bit tricky
 
 i'm going to need to come up with some sort of grep command that finds bare non-namespaced keywords
+
+TODO - go back after initial round of speccing and see if any fdefs could benefit from a :fn
+
+if i had to do this over again i would have used find/replace or sed waay more
