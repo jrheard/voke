@@ -1,6 +1,5 @@
 (ns voke.system.movement
   (:require [cljs.spec :as s]
-            [voke.events :refer [publish-event]]
             [voke.system.collision.system :refer [attempt-to-move!]]))
 
 ; A dumb-as-rocks velocity/acceleration system.
