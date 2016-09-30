@@ -1,12 +1,8 @@
 (ns voke.system.collision.resolution
   (:require [cljs.spec :as s]
             [clojure.set :refer [intersection]]
-            [voke.schemas :refer [Axis Entity Vector2]]
             [voke.system.collision.util :refer [apply-movement find-contacting-entities remove-entity!]]
-            [voke.util :refer [winnow]])
-  (:require-macros [schema.core :as sm]))
-
-; spec this guy in the morning
+            [voke.util :refer [winnow]]))
 
 ; Austin told me not to write your own collision system. I should have listened.
 
@@ -96,7 +92,7 @@
 ; y = 4 or x = -2.021, etc.
 (s/def ::axis #{:geometry/x :geometry/y})
 (s/def ::axis-line-value number?)
-(s/def ::axis-aligned-line (s/keys [::axis ::axis-line-value]))
+(s/def ::axis-aligned-line (s/keys :req [::axis ::axis-line-value]))
 
 (defn entity-to-lines
   [entity]

@@ -31,7 +31,7 @@
   (js/Collision.resetState)
   (voke.events/unsub-all!)
   (voke.state/flush! @game-state)
-  (initialize-systems! @game-state (player :id))
+  (initialize-systems! @game-state (player :entity/id))
   (reset! last-frame-time (js/performance.now)))
 
 (defn ^:export main []

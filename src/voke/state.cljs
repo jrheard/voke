@@ -5,7 +5,8 @@
   These updates/removes will be queued, and will be processed by the core game loop in voke.core
   at the end of every frame."
   (:require [cljs.spec :as s]
-            [voke.events :refer [publish-event]]))
+            [voke.events :refer [publish-event]]
+            [voke.specs]))
 
 ;; Specs
 
