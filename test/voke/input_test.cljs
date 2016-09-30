@@ -48,8 +48,8 @@
     (go
       (let [stub-event-chan (atom nil)
             game-state (-> blank-game-state
-                           (assoc-in [:entities 0 :input]
-                                     {:intended-move-direction #{}}))]
+                           (assoc-in [:game-state/entities 0 :component/input]
+                                     {:input/intended-move-direction #{}}))]
         (with-redefs [input/listen-to-keyboard-inputs (fn [event-chan]
                                                         (reset! stub-event-chan event-chan))]
           (input/handle-keyboard-events 0)
@@ -62,10 +62,10 @@
           (>! @stub-event-chan {:type :noop})
 
           (let [game-state (state/flush! game-state)]
-            (is (= (get-in game-state [:entities 0 :input :intended-move-direction])
+            (is (= (get-in game-state [:game-state/entities 0 :component/input :input/intended-move-direction])
                    #{:down :right}))
 
-            (is (= (get-in game-state [:entities 0 :motion :direction])
+            (is (= (get-in game-state [:game-state/entities 0 :component/motion :motion/direction])
                    (input/intended-directions->angle #{:down :right})))
 
             ; let go of down
@@ -74,10 +74,10 @@
             (>! @stub-event-chan {:type :noop})
 
             (let [game-state (state/flush! game-state)]
-              (is (= (get-in game-state [:entities 0 :input :intended-move-direction])
+              (is (= (get-in game-state [:game-state/entities 0 :component/input :input/intended-move-direction])
                      #{:right}))
 
-              (is (= (get-in game-state [:entities 0 :motion :direction])
+              (is (= (get-in game-state [:game-state/entities 0 :component/motion :motion/direction])
                      (input/intended-directions->angle #{:right})))
 
               ; let go of right
@@ -86,10 +86,10 @@
               (>! @stub-event-chan {:type :noop})
 
               (let [game-state (state/flush! game-state)]
-                (is (= (get-in game-state [:entities 0 :input :intended-move-direction])
+                (is (= (get-in game-state [:game-state/entities 0 :component/input :input/intended-move-direction])
                        #{}))
 
-                (is (= (get-in game-state [:entities 0 :motion :direction])
+                (is (= (get-in game-state [:game-state/entities 0 :component/motion :motion/direction])
                        nil)))))))
       (done))))
 
@@ -98,8 +98,8 @@
     (go
       (let [stub-event-chan (atom nil)
             game-state (-> blank-game-state
-                           (assoc-in [:entities 0 :input]
-                                     {:intended-fire-direction []}))]
+                           (assoc-in [:game-state/entities 0 :component/input]
+                                     {:input/intended-fire-direction []}))]
         (with-redefs [input/listen-to-keyboard-inputs (fn [event-chan]
                                                         (reset! stub-event-chan event-chan))]
           (input/handle-keyboard-events 0)
@@ -112,10 +112,10 @@
           (>! @stub-event-chan {:type :noop})
 
           (let [game-state (state/flush! game-state)]
-            (is (= (get-in game-state [:entities 0 :input :intended-fire-direction])
+            (is (= (get-in game-state [:game-state/entities 0 :component/input :input/intended-fire-direction])
                    [:down :right]))
 
-            (is (= (get-in game-state [:entities 0 :weapon :fire-direction])
+            (is (= (get-in game-state [:game-state/entities 0 :component/weapon :weapon/fire-direction])
                    (input/intended-directions->angle [:right])))
 
             ; let go of right
@@ -124,10 +124,10 @@
             (>! @stub-event-chan {:type :noop})
 
             (let [game-state (state/flush! game-state)]
-              (is (= (get-in game-state [:entities 0 :input :intended-fire-direction])
+              (is (= (get-in game-state [:game-state/entities 0 :component/input :input/intended-fire-direction])
                      [:down]))
 
-              (is (= (get-in game-state [:entities 0 :weapon :fire-direction])
+              (is (= (get-in game-state [:game-state/entities 0 :component/weapon :weapon/fire-direction])
                      (input/intended-directions->angle [:down])))
 
               ; let go of down
@@ -136,10 +136,10 @@
               (>! @stub-event-chan {:type :noop})
 
               (let [game-state (state/flush! game-state)]
-                (is (= (get-in game-state [:entities 0 :input :intended-fire-direction])
+                (is (= (get-in game-state [:game-state/entities 0 :component/input :input/intended-fire-direction])
                        []))
 
-                (is (= (get-in game-state [:entities 0 :weapon :fire-direction])
+                (is (= (get-in game-state [:game-state/entities 0 :component/weapon :weapon/fire-direction])
                        nil)))))))
       (done))))
 

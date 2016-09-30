@@ -13,7 +13,6 @@
 (s/def :game-state/entities (s/coll-of :entity/entity))
 (s/def :game-state/game-state (s/keys :req [:game-state/entities]))
 
-;; TODO ::event/type?
 (s/def :game-state-event/type #{:add :remove :update})
 (s/def :game-state-event/origin keyword?)
 (s/def :game-state-event/entity :entity/entity)
@@ -60,10 +59,10 @@
    add-events]
   (process-events state
                   (fn [entities event]
-                    (let [entity (event :entity)]
-                      (publish-event {:event/type   :entity-added
-                                      :entity entity})
-                      (assoc! entities (entity :id) entity)))
+                    (let [entity (event :game-state-event/entity)]
+                      (publish-event {:event/type :entity-added
+                                      :entity     entity})
+                      (assoc! entities (entity :entity/id) entity)))
                   add-events))
 
 (s/fdef process-add-events
@@ -75,7 +74,7 @@
    update-events]
   (process-events state
                   (fn [entities event]
-                    (let [entity-id (event :entity-id)]
+                    (let [entity-id (event :game-state-event/entity-id)]
                       (assoc! entities
                               entity-id
                               ((event :game-state-event/update-fn) (get entities entity-id)))))
@@ -91,8 +90,8 @@
   (process-events state
                   (fn [entities remove-event]
                     (let [entity-id (remove-event :game-state-event/entity-id)]
-                      (publish-event {:event/type      :entity-removed
-                                      :entity-id entity-id})
+                      (publish-event {:event/type :entity-removed
+                                      :entity-id  entity-id})
                       (dissoc! entities entity-id)))
                   remove-events))
 
@@ -119,9 +118,9 @@
   Resets @buffer to []."
   [state]
   (let [buffer-contents @buffer
-        add-events (filter #(= (% :type) :add) buffer-contents)
-        update-events (filter #(= (% :type) :update) buffer-contents)
-        remove-events (filter #(= (% :type) :remove) buffer-contents)]
+        add-events (filter #(= (% :game-state-event/type) :add) buffer-contents)
+        update-events (filter #(= (% :game-state-event/type) :update) buffer-contents)
+        remove-events (filter #(= (% :game-state-event/type) :remove) buffer-contents)]
     (reset! buffer [])
 
     (-> state
@@ -139,8 +138,8 @@
   [entity
    origin]
   (swap! buffer conj #:game-state-event {:type   :add
-                                         :origin origin
-                                         :entity entity}))
+                                        :origin origin
+                                        :entity entity}))
 
 (s/fdef add-entity!
   :args (s/cat :entity :entity/entity

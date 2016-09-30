@@ -4465,3 +4465,6 @@ the documentation on :kind says: "Note that if :kind is specified
 and :into is not, this pred must generate in order for every
 to generate.”; and adding `:into #{}` fixes the issue. guess
 i need to sit down and take some time to understand the semantics of `:kind` and `:into`.
+
+interesting - in http://tales.sveri.de/posts/2016-05-28-clojure-spec.html , he has his
+(s/fdef) calls *above* his (defn)s. wonder if that works, and if so how

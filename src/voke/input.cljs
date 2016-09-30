@@ -65,7 +65,7 @@
           [#{:up :down} #{:left :right}]))
 
 (s/fdef remove-conflicting-directions
-  :args (s/cat :directions (s/coll-of :input/intended-direction))
+  :args (s/cat :directions (s/coll-of :input/intended-direction :kind set? :into #{}))
   :ret (s/coll-of :input/intended-direction)
   :fn #(subset? (-> % :args :directions)
                 (% :ret)))
@@ -149,7 +149,6 @@
                                      :fire-key-up [[:component/input :input/intended-fire-direction]
                                                    (fn [fire-directions]
                                                      (filterv #(not= direction %) fire-directions))])]
-
             (update-entity! player-id
                             :keyboard-input
                             (fn [entity]

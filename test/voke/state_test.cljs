@@ -9,13 +9,11 @@
 
 ;(stest/instrument)
 
-(comment
-  (first (s/exercise :entity/entity))
-  )
-
 (def example-entity
   (assoc
-    (first (s/exercise :entity/entity))
+    (-> (s/exercise :entity/entity)
+        first
+        first)
     :entity/id
     0))
 
@@ -24,14 +22,12 @@
     (state/add-entity! example-entity :combat-system)
 
     (let [updated-state (state/flush! blank-game-state)]
-      (is (= (get-in updated-state [:entities 0])
+      (is (= (get-in updated-state [:game-state/entities 0])
              example-entity)))))
 
 
 (deftest updating-entities
   (with-redefs [state/buffer (atom [])]
-
-    ; make game-state-with-an-entity just have a random entity with id 0
     (state/update-entity! 0 :combat-system (fn [entity] (assoc entity :component/render {:render/fill 3})))
 
     (let [updated-state (state/flush! game-state-with-an-entity)]
