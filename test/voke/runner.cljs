@@ -11,9 +11,8 @@
 
 ;(stest/instrument)
 
-(doo-tests 'voke.system.collision-test)
 
-#_(doo-tests 'voke.input-test
+(doo-tests 'voke.input-test
            'voke.events-test
            'voke.system.collision-test
            'voke.system.core-test
