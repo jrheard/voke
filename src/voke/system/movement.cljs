@@ -64,7 +64,7 @@
   (let [velocity (get-in entity [:component/motion :motion/velocity])
         x-velocity (velocity :geometry/x)
         y-velocity (velocity :geometry/y)
-        max-speed (get-in entity [:component/motion :max-speed])
+        max-speed (get-in entity [:component/motion :motion/max-speed])
         amplitude (Math/sqrt (+ (* x-velocity x-velocity)
                                 (* y-velocity y-velocity)))
         multiplier (if (> amplitude max-speed)
@@ -143,7 +143,6 @@
                                               update-velocity
                                               apply-friction
                                               update-position)]
-
                          (when (not= moved-entity entity)
                            (attempt-to-move! entity
                                              (-> moved-entity :component/shape :shape/center)
