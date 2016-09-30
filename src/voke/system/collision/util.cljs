@@ -77,10 +77,12 @@
   "Returns the given entity, with its most up-to-date center value spliced in.
   See `apply-movement` for an explanation of why the js-land collision system has more up-to-date center values."
   [entity]
-  (assoc-in entity
-            [:component/shape :shape/center]
-            (js->clj (js/Collision.getEntityCenter (entity :entity/id))
-                     :keywordize-keys true)))
+  (let [updated-center-obj (js/Collision.getEntityCenter (entity :entity/id))
+        updated-center #:geometry{:x (aget updated-center-obj "x")
+                                  :y (aget updated-center-obj "y")}]
+    (assoc-in entity
+              [:component/shape :shape/center]
+              updated-center)))
 
 (s/fdef get-updated-entity-center
   :args (s/cat :entity :entity/entity)

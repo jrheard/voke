@@ -13,7 +13,7 @@
 ;; Public
 
 (defn publish-event [event]
-  (doseq [handler (@registry (event :type))]
+  (doseq [handler (@registry (event :event/type))]
     (handler event)))
 
 (s/fdef publish-event

@@ -97,10 +97,10 @@
 (defn entity-to-lines
   [entity]
   (let [shape (entity :component/shape)]
-    [{::axis :x ::axis-line-value (left-edge-x shape)}
-     {::axis :x ::axis-line-value (right-edge-x shape)}
-     {::axis :y ::axis-line-value (top-edge-y shape)}
-     {::axis :y ::axis-line-value (bottom-edge-y shape)}]))
+    [{::axis :geometry/x ::axis-line-value (left-edge-x shape)}
+     {::axis :geometry/x ::axis-line-value (right-edge-x shape)}
+     {::axis :geometry/y ::axis-line-value (top-edge-y shape)}
+     {::axis :geometry/y ::axis-line-value (bottom-edge-y shape)}]))
 
 (s/fdef entity-to-lines
   :args (s/cat :entity :entity/entity)
