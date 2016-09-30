@@ -72,8 +72,8 @@
                      1)]
     (assoc-in entity
               [:component/motion :motion/velocity]
-              {:x (* x-velocity multiplier)
-               :y (* y-velocity multiplier)})))
+              {:geometry/x (* x-velocity multiplier)
+               :geometry/y (* y-velocity multiplier)})))
 
 (s/fdef cap-velocity
   :args (s/and (s/cat :entity :entity/entity)
@@ -114,8 +114,8 @@
         center (-> entity :component/shape :shape/center)]
     (assoc-in entity
               [:component/shape :shape/center]
-              {:geometry/x (+ (velocity :x) (center :x))
-               :geometry/y (+ (velocity :y) (center :y))})))
+              {:geometry/x (+ (velocity :geometry/x) (center :geometry/x))
+               :geometry/y (+ (velocity :geometry/y) (center :geometry/y))})))
 
 (s/fdef update-position
   :args (s/and (s/cat :entity :entity/entity)
