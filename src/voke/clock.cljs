@@ -1,11 +1,13 @@
 (ns voke.clock
   "A system for tracking the amount of sim time (as opposed to wall time) that's elapsed."
-  (:require [schema.core :as s])
-  (:require-macros [schema.core :as sm]))
+  (:require [cljs.spec :as s]))
 
 (defonce ^:private clock (atom 0))
 
 (defn now [] @clock)
 
-(sm/defn add-time! [dt :- s/Num]
+(defn add-time! [dt]
   (swap! clock + dt))
+
+(s/fdef add-time!
+  :args (s/cat :dt number?))
