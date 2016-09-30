@@ -1,19 +1,14 @@
 (ns voke.entity
-  (:require [cljs.spec :as s]
-            [voke.schemas :refer [Input Entity Weapon]])
-  (:require-macros [schema.core :as sm]))
+  (:require [cljs.spec :as s]))
+
+;; Specs
+
+(s/def :entity/id int?)
 
 (s/def :geometry/x (s/and number? pos?))
 (s/def :geometry/y (s/and number? pos?))
 (s/def :geometry/vector2 (s/keys :req [:geometry/x :geometry/y]))
 (s/def :geometry/direction (s/nilable number?))
-
-;;; Specs
-
-(s/def :entity/id int?)
-
-
-; Component specs
 
 (s/def :shape/type #{:rectangle})
 (s/def :shape/width number?)
@@ -24,9 +19,8 @@
                                 :opt [:shape/width :shape/height]))
 
 (s/def :input/intended-direction #{:up :left :down :right})
-(s/def :input/intended-direction-set (s/coll-of :input/intended-direction :kind set?))
-(s/def :input/intended-move-direction :input/intended-direction-set)
-(s/def :input/intended-fire-direction :input/intended-direction-set)
+(s/def :input/intended-move-direction (s/coll-of :input/intended-direction :kind set?))
+(s/def :input/intended-fire-direction (s/coll-of :input/intended-direction))
 
 (s/def :component/input (s/keys :req [:input/intended-move-direction :input/intended-fire-direction]))
 
@@ -45,12 +39,16 @@
 (s/def :weapon/last-attack-timestamp int?)
 (s/def :weapon/fire-direction :geometry/direction)
 (s/def :weapon/shots-per-second int?)
+(s/def :weapon/shot-speed (s/and number? pos?))
+(s/def :weapon/projectile-color number?)
 (s/def :weapon/projectile-shape (s/keys :req [:shape/type]
                                         :opt [:shape/width :shape/height]))
 
 (s/def :component/weapon (s/keys :req [:weapon/last-attack-timestamp
                                        :weapon/fire-direction
                                        :weapon/shots-per-second
+                                       :weapon/shot-speed
+                                       :weapon-projectile-color
                                        :weapon/projectile-shape]))
 
 (s/def :collision/type #{:good-guy
@@ -83,7 +81,7 @@
                                     :component/weapon
                                     :component/input]))
 
-
+;; Private functions
 
 (defonce next-entity-id (atom 0))
 
@@ -92,89 +90,114 @@
     (swap! next-entity-id inc)
     id-to-return))
 
-(sm/defn make-entity :- Entity
+(s/fdef get-next-entity-id
+  :ret :entity/id)
+
+(defn make-entity
   [entity-map]
   (assoc entity-map :id (get-next-entity-id)))
 
-(sm/defn make-input :- Input
+(s/fdef make-entity
+  :ret :entity/entity)
+
+(defn make-input
   []
   {:intended-move-direction #{}
    :intended-fire-direction []})
 
-(sm/defn make-weapon :- Weapon
+(s/fdef make-input
+  :ret :component/input)
+
+(defn make-weapon
   [fire-direction projectile-color]
-  {:last-attack-timestamp 0
-   ; XXXX nuke fire-direction arg, just temporary thing for testing
-   :fire-direction        fire-direction
-   :shots-per-second      21
-   :shot-speed            5
-   :projectile-color      projectile-color
-   :projectile-shape      {:type   :rectangle
-                           :width  10
-                           :height 10}})
+  #:weapon {:last-attack-timestamp 0
+            ; XXXX nuke fire-direction arg, just temporary thing for testing
+            :fire-direction        fire-direction
+            :shots-per-second      21
+            :shot-speed            5
+            :projectile-color      projectile-color
+            :projectile-shape      #:shape {:type   :rectangle
+                                            :width  10
+                                            :height 10}})
+
+(s/fdef make-weapon
+  :ret :component/weapon)
 
 ;; Public
 
-(sm/defn player :- Entity
+(defn player
   [x y]
   (make-entity
-    {:shape       {:width  25
-                   :height 25
-                   :type   :rectangle
-                   :center {:x x :y y}}
-     :motion      {:velocity             {:x 0 :y 0}
-                   :affected-by-friction true
-                   :direction            nil
-                   :max-acceleration     2.0
-                   :max-speed            11}
-     :collision   {:type :good-guy}
-     :render-info {:fill 0x333333}
-     :weapon      (make-weapon nil 0x666666)
-     :input       (make-input)}))
+    #:component {:shape     {:shape/width  25
+                             :shape/height 25
+                             :shape/type   :rectangle
+                             :shape/center {:x x :y y}}
+                 :motion    {:motion/velocity             {:x 0 :y 0}
+                             :motion/affected-by-friction true
+                             :motion/direction            nil
+                             :motion/max-acceleration     2.0
+                             :motion/max-speed            11}
+                 :collision {:collision/type :good-guy}
+                 :render    {:render/fill 0x333333}
+                 :weapon    (make-weapon nil 0x666666)
+                 :input     (make-input)}))
 
-(sm/defn monster :- Entity
+(s/fdef player
+  :ret :entity/entity)
+
+(defn monster
   [x y]
   (make-entity
-    {:shape       {:width  25
-                   :height 25
-                   :type   :rectangle
-                   :center {:x x :y y}}
-     :motion      {:velocity             {:x 0 :y 0}
-                   :affected-by-friction true
-                   :direction            nil
-                   :max-acceleration     1.5
-                   :max-speed            4}
-     :collision   {:type :bad-guy}
-     :weapon      nil #_(make-weapon (- (/ Math/PI 2))
-                                     0xFF0A00)
-     ; xxx not schema'd / standardized yet, these are just some example values
-     :ai          {:movement :basic
-                   :attack   :basic}
-     :render-info {:fill 0xB22822}}))
+    #:component {:shape     {:shape/width  25
+                             :shape/height 25
+                             :shape/type   :rectangle
+                             :shape/center {:x x :y y}}
+                 :motion    {:motion/velocity             {:x 0 :y 0}
+                             :motion/affected-by-friction true
+                             :motion/direction            nil
+                             :motion/max-acceleration     1.5
+                             :motion/max-speed            4}
+                 :collision {:collision/type :bad-guy}
+                 ;:weapon      nil
+                 #_(make-weapon (- (/ Math/PI 2))
+                                0xFF0A00)
+                 ; xxx not spec'd / standardized yet, these are just some example values
+                 :ai        {:movement :basic
+                             :attack   :basic}
+                 :render    {:render/fill 0xB22822}}))
 
-(sm/defn wall :- Entity
+(s/fdef monster
+  :ret :entity/entity)
+
+(defn wall
   [x y width height]
   (make-entity
-    {:shape       {:width  width
-                   :height height
-                   :type   :rectangle
-                   :center {:x x :y y}}
-     :collision   {:type :obstacle}
-     :render-info {:fill 0x333333}}))
+    #:component {:shape     {:shape/width  width
+                             :shape/height height
+                             :shape/type   :rectangle
+                             :shape/center {:x x :y y}}
+                 :collision {:collision/type :obstacle}
+                 :render    {:render/fill 0x333333}}))
 
-(sm/defn projectile :- Entity
+(s/fdef wall
+  :ret :entity/entity)
+
+(defn projectile
   [owner-id position collides-with projectile-shape projectile-color x-velocity y-velocity]
   (make-entity
-    {:shape       (assoc projectile-shape
-                         :center position)
-     :owner-id    owner-id
-     :collision   {:type                 :projectile
-                   :collides-with        collides-with
-                   :destroyed-on-contact true}
-     :render-info {:fill projectile-color}
-     :motion      {:velocity             {:x x-velocity
-                                          :y y-velocity}
-                   :direction            nil
-                   :affected-by-friction false
-                   :max-speed            (max x-velocity y-velocity)
-                   :max-acceleration     0}}))
+    #:component {:shape     (assoc projectile-shape
+                                   :shape/center position)
+                 :owned     {:owner/id owner-id}
+                 :collision {:collision/type                 :projectile
+                             :collision/collides-with        collides-with
+                             :collision/destroyed-on-contact true}
+                 :render    {:render/fill projectile-color}
+                 :motion    {:motion/velocity             {:x x-velocity
+                                                           :y y-velocity}
+                             :motion/direction            nil
+                             :motion/affected-by-friction false
+                             :motion/max-speed            (max x-velocity y-velocity)
+                             :motion/max-acceleration     0}}))
+
+(s/fdef projectile
+  :ret :entity/entity)
