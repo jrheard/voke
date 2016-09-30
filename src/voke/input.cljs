@@ -1,16 +1,14 @@
 (ns voke.input
   (:require [cljs.spec :as s]
-            [clojure.set :refer [intersection difference]]
+            [clojure.set :refer [intersection difference subset?]]
             [clojure.string :refer [starts-with?]]
             [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
             [plumbing.core :refer [safe-get-in]]
-            [voke.schemas :refer [Direction Entity IntendedDirection]]
             [voke.state :refer [update-entity!]]
             [voke.util :refer [in?]])
   (:import [goog.events KeyCodes])
-  (:require-macros [cljs.core.async.macros :refer [go-loop]]
-                   [schema.core :as sm]))
+  (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 
 (def move-key-mappings {KeyCodes.W     :up
                         KeyCodes.A     :left
@@ -54,10 +52,10 @@
                                :left  Math/PI
                                :right 0})
 
-(sm/defn remove-conflicting-directions :- [IntendedDirection]
+(defn remove-conflicting-directions
   "Takes a seq of directions like #{:up :down :left} and returns a seq of directions
   where the pairs of conflicting directions - up+down, left+right - are stripped out if they're present."
-  [directions :- [IntendedDirection]]
+  [directions]
   (reduce (fn [directions conflicting-pair]
             (if (= (intersection directions conflicting-pair)
                    conflicting-pair)
@@ -66,37 +64,63 @@
           directions
           [#{:up :down} #{:left :right}]))
 
-(sm/defn human-controlled-entity-movement-directions
-  [entity :- Entity]
+(s/fdef remove-conflicting-directions
+  :args (s/cat :directions (s/coll-of :input/intended-direction))
+  :ret (s/coll-of :input/intended-direction)
+  :fn #(subset? (-> % :args :directions)
+                (% :ret)))
+
+(defn human-controlled-entity-movement-directions
+  [entity]
   (-> entity
-      (safe-get-in [:input :intended-move-direction])
+      (safe-get-in [:component/input :input/intended-move-direction])
       remove-conflicting-directions))
 
-(sm/defn intended-directions->angle :- Direction
-  [intended-directions :- [IntendedDirection]]
+(s/fdef human-controlled-entity-movement-directions
+  :args (s/and (s/cat :entity :entity/entity)
+               #(contains? (% :entity) :component/input))
+  :ret (s/coll-of :input/intended-direction))
+
+(defn intended-directions->angle
+  [intended-directions]
   (let [intended-direction-values (map direction-value-mappings intended-directions)]
     (Math/atan2 (apply + (map Math/sin intended-direction-values))
                 (apply + (map Math/cos intended-direction-values)))))
 
-(sm/defn update-move-direction :- Entity
-  [entity :- Entity]
+(s/fdef intended-directions->angle
+  :args (s/cat :intended-directions (s/coll-of :input/intended-direction))
+  :ret :geometry/direction)
+
+(defn update-move-direction
+  [entity]
   (let [intended-directions (human-controlled-entity-movement-directions entity)]
     (if (seq intended-directions)
       (assoc-in entity
-                [:motion :direction]
+                [:component/motion :motion/direction]
                 (intended-directions->angle intended-directions))
+      ; xxxx TODO come back and make sure i understand the semantics of :motion :direction being nil
       (assoc-in entity
-                [:motion :direction]
+                [:component/motion :motion/direction]
                 nil))))
 
-(sm/defn update-fire-direction :- Entity
-  [entity :- Entity]
-  (let [intended-direction (last (get-in entity [:input :intended-fire-direction]))]
+(s/fdef update-move-direction
+  :args (s/and (s/cat :entity :entity/entity)
+               #(contains? (% :entity) :component/input))
+  :ret :entity/entity)
+
+(defn update-fire-direction
+  [entity]
+  (let [intended-direction (last (get-in entity [:component/input :input/intended-fire-direction]))]
     (if intended-direction
       (assoc-in entity
-                [:weapon :fire-direction]
+                [:component/weapon :weapon/fire-direction]
                 (intended-directions->angle [intended-direction]))
-      (assoc-in entity [:weapon :fire-direction] nil))))
+      (assoc-in entity [:component/weapon :weapon/fire-direction] nil))))
+
+(s/fdef update-fire-direction
+  :args (s/and (s/cat :entity :entity/entity)
+               #(contains? (% :entity) :component/input))
+  :ret :entity/entity)
 
 ;;; Public
 
@@ -115,14 +139,14 @@
 
           (let [direction (msg :direction)
                 update-entity-args (case (msg :type)
-                                     :move-key-down [[:input :intended-move-direction] conj direction]
-                                     :move-key-up [[:input :intended-move-direction] disj direction]
-                                     :fire-key-down [[:input :intended-fire-direction]
+                                     :move-key-down [[:component/input :input/intended-move-direction] conj direction]
+                                     :move-key-up [[:component/input :input/intended-move-direction] disj direction]
+                                     :fire-key-down [[:component/input :input/intended-fire-direction]
                                                      (fn [fire-directions]
                                                        (if (in? fire-directions direction)
                                                          fire-directions
                                                          (conj fire-directions direction)))]
-                                     :fire-key-up [[:input :intended-fire-direction]
+                                     :fire-key-up [[:component/input :input/intended-fire-direction]
                                                    (fn [fire-directions]
                                                      (filterv #(not= direction %) fire-directions))])]
 
