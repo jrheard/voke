@@ -63,7 +63,7 @@
   by us during this tick."
   [entity]
   ; The collision system should only be killing :destroyed-on-contact entities.
-  (assert (get-in entity [:collision :destroyed-on-contact]))
+  (assert (get-in entity [:component/collision :collision/destroyed-on-contact]))
 
   (when-not (contains? @dead-entities (entity :entity/id))
     (swap! dead-entities conj (entity :entity/id))
@@ -71,7 +71,7 @@
 
 (s/fdef remove-entity!
   :args (s/and (s/cat :entity :entity/entity)
-               #(-> % :entity :collision :destroyed-on-contact true?)))
+               #(-> % :entity :component/collision :collision/destroyed-on-contact true?)))
 
 (defn get-updated-entity-center
   "Returns the given entity, with its most up-to-date center value spliced in.
