@@ -31,12 +31,12 @@
     (state/update-entity! 0 :combat-system (fn [entity] (assoc entity :component/render {:render/fill 3})))
 
     (let [updated-state (state/flush! game-state-with-an-entity)]
-      (is (= (get-in updated-state [:entities 0])
-             {:id 0 :renderable true})))))
+      (is (= (get-in updated-state [:game-state/entities 0 :component/render :render/fill])
+             3)))))
 
 (deftest removing-entities
   (with-redefs [state/buffer (atom [])]
     (state/remove-entity! 0 :combat-system)
     (let [updated-state (state/flush! game-state-with-an-entity)]
       (is (= false
-             (contains? (updated-state :entities) 0))))))
+             (contains? (updated-state :game-state/entities) 0))))))

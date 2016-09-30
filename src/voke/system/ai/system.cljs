@@ -11,7 +11,7 @@
                        (for [entity entities-with-ai]
                          (let [entity-center (get-in entity [:component/shape :shape/center])]
                            (assoc-in entity
-                                     [:motion :direction]
+                                     [:component/motion :motion/direction]
                                      (Math/atan2 (- (player-center :geometry/y)
                                                     (entity-center :geometry/y))
                                                  (- (player-center :geometry/x)

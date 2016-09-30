@@ -88,7 +88,7 @@
                (<= (-pi-over -1 4) direction (-pi-over 1 4)) :right
                (<= (-pi-over 1 4) direction (-pi-over 3 4)) :down
                :else :left)
-        center (get-in entity [:shape :center])]
+        center (get-in entity [:component/shape :shape/center])]
     {:geometry/x (condp = side
                    :left (apply - (center :geometry/x) (-halves-along-dimension entity :geometry/x))
                    :right (apply + (center :geometry/x) (-halves-along-dimension entity :geometry/x))
