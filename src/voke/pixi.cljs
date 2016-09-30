@@ -1,7 +1,6 @@
 (ns voke.pixi
-  (:require [cljsjs.pixi]
-            [voke.schemas :refer [Entity Shape System]])
-  (:require-macros [schema.core :as sm]))
+  (:require [cljs.spec :as s]
+            [cljsjs.pixi]))
 
 (defn make-renderer
   [width height node]
@@ -39,29 +38,36 @@
       (aset "y" (- y (/ h 2))))
     graphics-data))
 
-(sm/defn entity->graphics-data!
-  [entity :- Entity]
-  (rectangle (-> entity :shape :center :x)
-             (-> entity :shape :center :y)
-             (-> entity :shape :width)
-             (-> entity :shape :height)
-             (-> entity :render-info :fill)))
+(defn entity->graphics-data!
+  [entity]
+  (rectangle (-> entity :component/shape :shape/center :geometry/x)
+             (-> entity :component/shape :shape/center :geometry/y)
+             (-> entity :component/shape :shape/width)
+             (-> entity :component/shape :shape/height)
+             (-> entity :component/render :render/fill)))
+
+(s/fdef entity->graphics-data!
+  :args (s/cat :entity :entity/entity))
 
 (defn handle-unknown-entities! [entities]
   ; TODO - only actually operate on the entity if it's visible
   (doseq [entity entities]
     (swap! graphics-data-by-entity-id
            assoc
-           (:id entity)
+           (:entity/id entity)
            (entity->graphics-data! entity))))
 
-(sm/defn update-entity-position!
+(defn update-entity-position!
   [entity-id new-center]
   (let [graphics-data (@graphics-data-by-entity-id entity-id)]
     (when graphics-data
       (let [shape (aget graphics-data "shape")]
-        (aset shape "x" (- (new-center :x) (/ (aget shape "width") 2)))
-        (aset shape "y" (- (new-center :y) (/ (aget shape "height") 2)))))))
+        (aset shape "x" (- (new-center :geometry/x) (/ (aget shape "width") 2)))
+        (aset shape "y" (- (new-center :geometry/y) (/ (aget shape "height") 2)))))))
+
+(s/fdef update-entity-position!
+  :args (s/cat :entity-id :entity/id
+               :new-center :geometry/vector2))
 
 (defn remove-entity!
   [entity-id]
@@ -75,7 +81,7 @@
 
 (defn render! [entities]
   (handle-unknown-entities! (filter
-                              #(not (contains? @graphics-data-by-entity-id (:id %)))
+                              #(not (contains? @graphics-data-by-entity-id (:entity/id %)))
                               entities))
   ; TODO update entity visibility
   ; TODO something something camera
