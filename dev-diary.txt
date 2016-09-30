@@ -4412,3 +4412,10 @@ or do i use namespaces that are concepts, like :collision/foo?
 asking in slack
 
 wow http://www.clojure-toolbox.com/ has a ton more stuff on it than the last time i looked
+
+ok i've been doing a ton of spec conversion
+
+it's been mostly mechanical once i got going, although coming up with namespaces for keywords
+was a bit tricky
+
+i'm going to need to come up with some sort of grep command that finds bare non-namespaced keywords

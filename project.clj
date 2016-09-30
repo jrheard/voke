@@ -8,7 +8,9 @@
                  [org.clojure/clojurescript "1.9.229"]
                  [org.clojure/core.async "0.2.391"
                   :exclusions [org.clojure/tools.reader]]
+                 ; todo delete
                  [prismatic/plumbing "0.5.3"]
+                 ; todo delete
                  [prismatic/schema "1.1.3"]
                  [cljsjs/pixi "3.0.10-0"]]
 
