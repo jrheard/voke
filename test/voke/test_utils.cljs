@@ -7,7 +7,7 @@
 (def blank-game-state (state/make-game-state []))
 
 (def game-state-with-an-entity (assoc-in blank-game-state
-                                         [:entities 0]
+                                         [:game-state/entities 0]
                                          (assoc (first (first (s/exercise :entity/entity 1)))
                                                 :entity/id
                                                 0)))

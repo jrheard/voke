@@ -29,7 +29,7 @@
                merge
                ; XXXX assert that the line below contains only entities that already exist in state :entities keys
                (into {}
-                     (map (juxt :event/id identity)
+                     (map (juxt :entity/id identity)
                           ((system :system/tick-fn) (vals (state :game-state/entities))))))))
 
 (s/fdef system-to-tick-fn
