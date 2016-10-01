@@ -60,7 +60,7 @@
 
 (s/fdef -collides-with
   :args (s/cat :entity :entity/entity)
-  :ret (s/coll-of :collision/type :kind set?))
+  :ret (s/coll-of :collision/type :kind set? :into #{}))
 
 ; TODO what does this function do? document it
 (defn -halves-along-dimension

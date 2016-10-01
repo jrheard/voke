@@ -4474,3 +4474,13 @@ i am so glad i wrote all these tests
 they were really really really really useful just now
 
 ok now let's set up instrumentation and generative testing
+
+hm, it's not obvious what the right way is of actually defining / checking the output of
+these generative tests
+
+let's read the documentation for test.check
+
+man i just cannot get (-> 'foo stest/enumerate-namespace stest/check) to work
+maybe it doesn't support cljs? i don't know
+
+anyway stest/summarize-results is useful

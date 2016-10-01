@@ -1,5 +1,6 @@
 (ns voke.input-test
-  (:require [cljs.core.async :refer [chan <! put! >!]]
+  (:require [cljs.spec.test :as stest]
+            [cljs.core.async :refer [chan <! put! >!]]
             [cljs.test :refer [async deftest is testing]]
             [goog.events :as events]
             [voke.input :as input]
@@ -7,6 +8,68 @@
             [voke.test-utils :refer [blank-game-state]])
   (:import [goog.events KeyCodes])
   (:require-macros [cljs.core.async.macros :refer [go]]))
+
+
+(deftest generative
+  (let [summary (stest/summarize-results
+                  (stest/check `input/update-fire-direction
+                               ;{:clojure.spec.test.check/opts {:num-tests 1}}
+                               )
+                  )]
+    (print (stest/check `input/update-fire-direction))
+
+    (is (= summary
+           {:total 1 :check-passed 1}))))
+
+
+#_(deftest generative
+    (let [summary (-> 'voke.input
+                      stest/enumerate-namespace
+                      stest/check
+                      stest/summarize-results)]
+      (is (= summary
+             {:total 1 :check-passed 1}))))
+
+(comment
+  (stest/summarize-results
+    (stest/check [
+                  ;`input/remove-conflicting-directions
+                  ;`input/human-controlled-entity-movement-directions
+                  ;`input/intended-directions->angle
+                  ;`input/update-move-direction
+                  `input/update-fire-direction
+                  ]
+                 {:clojure.spec.test.check/opts {:num-tests 1}}
+
+                 )
+    )
+
+  (stest/enumerate-namespace 'voke.input)
+
+  (macroexpand
+
+    '(stest/check
+       ((stest/enumerate-namespace voke.input))
+
+       )
+    )
+
+  (stest/enumerate-namespace 'voke.input)
+
+  (->> (stest/enumerate-namespace voke.input)
+       (take 1)
+       stest/check
+       )
+
+  (stest/enumerate-namespace 'voke.input)
+
+  (stest/check
+    (stest/enumerate-namespace 'voke.input)
+    )
+
+  )
+
+;(stest/check `input/human-controlled-entity-movement-directions)
 
 (deftest listen-to-keyboard-inputs
   (async done

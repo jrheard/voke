@@ -1,5 +1,6 @@
 (ns voke.input
   (:require [cljs.spec :as s]
+            [cljs.spec.test :as stest]
             [clojure.set :refer [intersection difference subset?]]
             [clojure.string :refer [starts-with?]]
             [cljs.core.async :refer [chan <! put!]]
@@ -67,8 +68,8 @@
 (s/fdef remove-conflicting-directions
   :args (s/cat :directions (s/coll-of :input/intended-direction :kind set? :into #{}))
   :ret (s/coll-of :input/intended-direction)
-  :fn #(subset? (-> % :args :directions)
-                (% :ret)))
+  :fn #(subset? (set (% :ret))
+                (-> % :args :directions)))
 
 (defn human-controlled-entity-movement-directions
   [entity]
@@ -119,7 +120,8 @@
 
 (s/fdef update-fire-direction
   :args (s/and (s/cat :entity :entity/entity)
-               #(contains? (% :entity) :component/input))
+               #(contains? (% :entity) :component/input)
+               #(contains? (% :entity) :component/weapon))
   :ret :entity/entity)
 
 ;;; Public
