@@ -4484,3 +4484,61 @@ man i just cannot get (-> 'foo stest/enumerate-namespace stest/check) to work
 maybe it doesn't support cljs? i don't know
 
 anyway stest/summarize-results is useful
+
+=======
+
+10/1/16
+
+heyyyyy
+http://leeorengel.com/from-schema-to-spec/
+looks relevant
+
+so it turns out test.check has this macro called defspec that i should look at
+and also test.chuck exists but i don't understand what it is / how it relates to test.check
+
+http://www.anthony-galea.com/blog/post/hello-parking-garage-meet-clojure.spec/
+mentions that test.chuck includes a string-from-regex generator, seems handy in certain situations
+
+http://blog.colinwilliams.name/blog/2015/01/26/alternative-clojure-dot-test-integration-with-test-dot-check/
+
+i think i can ignore test.chuck for now
+
+https://github.com/clojure/test.check/blob/master/src/main/clojure/clojure/test/check/clojure_test.cljc#L63
+mentions there's this concept of a "test var"
+
+https://github.com/clojure/clojurescript/blob/master/src/main/cljs/cljs/test.cljc#L206
+has the same concept
+
+i am having just a devil of a time testing update-fire-directions
+seeing output that indicates that quick-check isn't running on my guy at all?
+like, i just see the empty list as a return value from stest/check
+which seems bad
+
+let's see if we can figure out how to generate an example value from our fn's spec's :args
+
+======
+
+10/2/16
+
+ok so i've got a local copy of clojurescript that i'm pointing my project to via checkout dependencies
+i found one issue, which is that the cljs spec documentation says your option maps should look like
+{:clojure.spec.test.check/opts {:num-tests 100}} but actually they should be {:clojure.test.check/opts {:num-tests 100}}
+
+i don't think i've seen the issue i'm trying to track down - where (stest/check `foo/bar) sometimes returns [] -
+since starting work with this local clojurescript. maybe it was a bug that has been fixed on master?
+
+another frustrating issue: the doo runner (or *some* piece of code) hangs indefinitely after the test run completes
+when i've got an s/check test, so `lein doo phantom test auto` no longer works. irritating
+
+=====
+
+10/3/16
+
+ok i submitted a jira issue and patch re: the options map documentation issue, that feels nice
+
+i'm strongly considering just not using (stest/check) until that whole part of the system
+has had another few months to be fully baked - in particular, re: doo integration
+
+but i do want to have instrumentation
+
+so i'm gonna poke at that next

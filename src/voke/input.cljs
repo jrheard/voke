@@ -5,7 +5,6 @@
             [clojure.string :refer [starts-with?]]
             [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
-            [plumbing.core :refer [safe-get-in]]
             [voke.state :refer [update-entity!]]
             [voke.util :refer [in?]])
   (:import [goog.events KeyCodes])
@@ -74,7 +73,7 @@
 (defn human-controlled-entity-movement-directions
   [entity]
   (-> entity
-      (safe-get-in [:component/input :input/intended-move-direction])
+      (get-in [:component/input :input/intended-move-direction])
       remove-conflicting-directions))
 
 (s/fdef human-controlled-entity-movement-directions
@@ -106,8 +105,10 @@
 
 (s/fdef update-move-direction
   :args (s/and (s/cat :entity :entity/entity)
+               #(contains? (% :entity) :component/motion)
                #(contains? (% :entity) :component/input))
   :ret :entity/entity)
+
 
 (defn update-fire-direction
   [entity]

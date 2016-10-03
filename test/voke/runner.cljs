@@ -11,10 +11,13 @@
             [voke.state-test]
             [voke.util-test]))
 
-(stest/instrument `voke.input/remove-conflicting-directions)
+;(stest/instrument `voke.input/remove-conflicting-directions)
 
+(doo-tests 'voke.input-test)
 
-(doo-tests 'voke.clock-test
+(js/console.log "runner after doo-tests")
+
+#_(doo-tests 'voke.clock-test
            'voke.input-test
            'voke.events-test
            'voke.system.collision-test
