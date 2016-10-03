@@ -4538,7 +4538,33 @@ ok i submitted a jira issue and patch re: the options map documentation issue, t
 
 i'm strongly considering just not using (stest/check) until that whole part of the system
 has had another few months to be fully baked - in particular, re: doo integration
+although i'm toying with the idea of spending a few days digging into this and maybe fixing
+any underlying issues in cljs/doo, so we'll see
 
-but i do want to have instrumentation
+but anyway i do want to have instrumentation
 
 so i'm gonna poke at that next
+
+so what's the best way of getting this?
+let's take a look at leiningen preloads, i saw that dirac / devtools uses them, they sound useful here
+
+https://github.com/clojure/clojurescript/wiki/Compiler-Options#preloads
+
+couldn't get it to work, complained about no such namespace voke.preload
+wondered if it might be the case that preloads have to be .clj instead of .cljs, but that wasn't it
+it's on the classpath, src/voke/preload.cljs
+oh well
+
+couldn't find any example projects that use their own preloads via github code search,
+only found a million pages of devtools.repload, dirac, etc
+
+ok, turned on instrumentation
+immediately getting a failure in process-a-tick
+it's complaining that.. game-state/entities isn't a map, and that none of the entities it contains are maps
+how can that be?
+
+useful tip for navigating big spec failures: look for ":in "
+
+for one thing, looks like the spec for :game-state/entities is incorrect:
+(s/def :game-state/entities (s/coll-of :entity/entity))
+shouldn't be using :coll-of here, it's a map of int -> entity

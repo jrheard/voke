@@ -1,7 +1,5 @@
 (ns voke.input-test
-  (:require [cljs.spec :as s]
-            [cljs.spec.test :as stest]
-            [cljs.core.async :refer [chan <! put! >!]]
+  (:require [cljs.core.async :refer [chan <! put! >!]]
             [cljs.test :refer [async deftest is testing]]
             [goog.events :as events]
             [voke.input :as input]
@@ -9,98 +7,6 @@
             [voke.test-utils :refer [blank-game-state]])
   (:import [goog.events KeyCodes])
   (:require-macros [cljs.core.async.macros :refer [go]]))
-
-(enable-console-print!)
-
-
-(deftest generative
-
-  (print (s/get-spec `input/intended-directions->angle))
-  (print (:args (s/get-spec `input/intended-directions->angle)))
-  (print (:ret (s/get-spec `input/intended-directions->angle)))
-
-  ;(print (stest/check `input/intended-directions->angle))
-
-
-
-
-  (let [output (stest/check
-                 [`input/intended-directions->angle
-                  `input/update-move-direction
-                  `input/update-fire-direction
-                  ]
-                 {:clojure.test.check/opts {:num-tests 100}}
-                 )]
-
-    (print "SUP")
-
-    (print output)
-    (print (stest/summarize-results output))))
-
-
-(comment
-  ((s/registry) :voke.input/update-fire-direction)
-  (identity 3)
-
-  (-> (s/exercise
-
-        (s/and (s/cat :entity :entity/entity)
-               #(contains? (% :entity) :component/input)
-               #(contains? (% :entity) :component/weapon))
-
-        1)
-      first
-      first
-      )
-
-  (stest/check `input/update-fire-direction
-               {:clojure.spec.test.check/opts {:num-tests 10}}
-
-               )
-
-  (sort (map str (keys (s/registry))))
-
-  (s/get-spec (resolve `input/update-fire-direction))
-
-  (stest/summarize-results
-    (stest/check [
-                  ;`input/remove-conflicting-directions
-                  ;`input/human-controlled-entity-movement-directions
-                  ;`input/intended-directions->angle
-                  ;`input/update-move-direction
-                  `input/update-fire-direction
-                  ]
-                 {:clojure.spec.test.check/opts {:num-tests 1}}
-
-                 )
-    )
-
-  (stest/enumerate-namespace 'voke.input)
-
-  (macroexpand
-
-    '(stest/check
-       ((stest/enumerate-namespace voke.input))
-
-       )
-    )
-
-  (stest/enumerate-namespace 'voke.input)
-
-  (->> (stest/enumerate-namespace voke.input)
-       (take 1)
-       stest/check
-       )
-
-  (stest/enumerate-namespace 'voke.input)
-
-  (stest/check
-    (stest/enumerate-namespace 'voke.input)
-    )
-
-  )
-
-;(stest/check `input/human-controlled-entity-movement-directions)
 
 (deftest listen-to-keyboard-inputs
   (async done

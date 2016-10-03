@@ -1,5 +1,6 @@
 (ns voke.core
-  (:require [voke.entity :as e]
+  (:require [cljs.spec.test :as stest]
+            [voke.entity :as e]
             [voke.events]
             [voke.clock :refer [add-time!]]
             [voke.state :refer [make-game-state]]
@@ -36,6 +37,8 @@
 
 (defn ^:export main []
   (-initialize!)
+
+  (stest/instrument)
 
   (js/window.requestAnimationFrame
     (fn process-frame [ts]

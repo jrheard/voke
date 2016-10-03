@@ -10,9 +10,8 @@
 
 ;; Specs
 
-(s/def :game-state/entities (s/coll-of :entity/entity))
-(s/def :game-state/game-state (s/keys :req [:game-state/entities]))
-
+; TODO replace with ::event-type, etc
+; replace :event/type with :voke.event/type
 (s/def :game-state-event/type #{:add :remove :update})
 (s/def :game-state-event/origin keyword?)
 (s/def :game-state-event/entity :entity/entity)
