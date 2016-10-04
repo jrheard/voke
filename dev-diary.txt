@@ -4593,3 +4593,13 @@ ok, merging this spec branch into master
 looks pretty good so far
 there are a few TODOs i should go back and resolve
 mostly in the attack system, which could really use another pass
+
+=====
+
+10/4/16
+
+there's something in input-test that makes testing freeze when stest/instrument is called
+but it doesn't reproduce reliably
+v frustrating
+
+
