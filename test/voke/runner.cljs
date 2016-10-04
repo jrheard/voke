@@ -1,5 +1,6 @@
 (ns voke.runner
-  (:require [doo.runner :refer-macros [doo-tests]]
+  (:require [cljs.spec.test :as stest]
+            [doo.runner :refer-macros [doo-tests]]
             [voke.input]
             [voke.clock-test]
             [voke.input-test]
@@ -9,6 +10,8 @@
             [voke.system.movement-test]
             [voke.state-test]
             [voke.util-test]))
+
+(stest/instrument)
 
 (doo-tests 'voke.clock-test
            'voke.input-test

@@ -4593,3 +4593,16 @@ ok, merging this spec branch into master
 looks pretty good so far
 there are a few TODOs i should go back and resolve
 mostly in the attack system, which could really use another pass
+
+======
+
+10/4/16
+
+ok i turned on instrumentation on all vars before running tests, and it looks like it's input-test
+that's the specific culprit for all the messed-up behavior i've been seing re: stest
+
+when disabling input-test, all tests work fine; when leaving it enabled, testing hangs
+
+but it doesn't hang forever it eventually completes, it's just slow
+buh
+lol nvm it's not slow any more? it was just slow tat one time?
