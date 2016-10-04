@@ -85,7 +85,5 @@
 
 ;; Game state
 
-
-; this is incorrect - it's a map of int -> entity
 (s/def :game-state/entities (s/map-of :entity/id :entity/entity))
 (s/def :game-state/game-state (s/keys :req [:game-state/entities]))
