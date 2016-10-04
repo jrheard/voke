@@ -15,8 +15,6 @@
 (def friction-value 0.80)
 (def min-velocity 0.05)
 
-; TODO namespace keywords
-
 (defn should-update-velocity?
   "Entities' velocity should be updated if they're intending to move somewhere
   or if they're currently moving and affected by friction."
