@@ -106,7 +106,7 @@
 
 (defn make-projectile-for-entity
   [entity]
-  (projectile (entity :id)
+  (projectile (entity :entity/id)
               (-projectile-center entity)
               (-collides-with entity)
               (get-in entity [:component/weapon :weapon/projectile-shape])

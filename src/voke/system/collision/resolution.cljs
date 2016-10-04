@@ -147,7 +147,7 @@
 
 (s/fdef get-leading-corner
   :args (s/cat :entity :entity/entity
-               :new-velocity number?)
+               :new-velocity :geometry/vector2)
   :ret :geometry/vector2)
 
 (defn resolve-diagonal-collision
@@ -191,7 +191,7 @@
 (s/fdef resolve-diagonal-collision
   :args (s/cat :entity :entity/entity
                :new-velocity :geometry/vector2
-               :remaining-contacted-entities (s/coll-of :entity-entity)))
+               :remaining-contacted-entities (s/coll-of :entity/entity)))
 
 (defn move-to-nearest-clear-spot
   [entity new-center new-velocity remaining-contacted-entities all-entities]

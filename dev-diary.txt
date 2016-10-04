@@ -4568,3 +4568,23 @@ useful tip for navigating big spec failures: look for ":in "
 for one thing, looks like the spec for :game-state/entities is incorrect:
 (s/def :game-state/entities (s/coll-of :entity/entity))
 shouldn't be using :coll-of here, it's a map of int -> entity
+
+ah, map-of exists, nice
+v easy
+
+that seems to have fixed it
+
+ok, i had another issue where i had gotten mixed up about the right syntax for having multiple constraints
+on fdef args
+
+i was doing things like this:
+
+:args (s/cat :foo (s/and :bar/bar
+                         #(contains? (% :foo) :baz))
+
+but instead i should be doing
+
+:args (s/and (s/cat :foo :bar/bar)
+             #(contains? (% :foo) :baz))
+
+and that makes much more sense.

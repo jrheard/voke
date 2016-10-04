@@ -38,7 +38,9 @@
 (defn ^:export main []
   (-initialize!)
 
-  (stest/instrument)
+  (comment
+    (stest/instrument `process-a-tick)
+    (stest/instrument `voke.state/flush!))
 
   (js/window.requestAnimationFrame
     (fn process-frame [ts]

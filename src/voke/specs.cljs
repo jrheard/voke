@@ -3,6 +3,7 @@
 
 (s/def :entity/id int?)
 
+(s/def :geometry/axis #{:geometry/x :geometry/y})
 (s/def :geometry/x number?)
 (s/def :geometry/y number?)
 (s/def :geometry/vector2 (s/keys :req [:geometry/x :geometry/y]))
@@ -36,7 +37,7 @@
                                        :motion/max-speed
                                        :motion/max-acceleration]))
 
-(s/def :weapon/last-attack-timestamp int?)
+(s/def :weapon/last-attack-timestamp number?)
 (s/def :weapon/fire-direction :geometry/direction)
 (s/def :weapon/shots-per-second int?)
 (s/def :weapon/shot-speed (s/and number? pos?))
@@ -86,5 +87,5 @@
 
 
 ; this is incorrect - it's a map of int -> entity
-(s/def :game-state/entities (s/coll-of :entity/entity))
+(s/def :game-state/entities (s/map-of :entity/id :entity/entity))
 (s/def :game-state/game-state (s/keys :req [:game-state/entities]))

@@ -114,7 +114,7 @@
   (make-entity
     #:component{:shape     (assoc projectile-shape
                                   :shape/center position)
-                :owned     {:owner/id owner-id}
+                :owned     {:owned/owner-id owner-id}
                 :collision #:collision{:type                 :projectile
                                        :collides-with        collides-with
                                        :destroyed-on-contact true}

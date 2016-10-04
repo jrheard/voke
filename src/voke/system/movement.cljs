@@ -53,10 +53,10 @@
       (assoc-in entity [:component/motion :motion/velocity axis] 0))))
 
 (s/fdef -update-axis-velocity
-  :args (s/cat :entity (s/and :entity/entity
-                              #(contains? (% :entity) :component/motion))
-               :axis #{:geometry/x :geometry/y}
-               :trig-fn #{Math/cos Math/sin})
+  :args (s/and (s/cat :entity :entity/entity
+                      :axis :geometry/axis
+                      :trig-fn fn?)
+               #(contains? (% :entity) :component/motion))
   :ret :entity/entity)
 
 (defn cap-velocity
