@@ -4588,3 +4588,8 @@ but instead i should be doing
              #(contains? (% :foo) :baz))
 
 and that makes much more sense.
+
+ok, merging this spec branch into master
+looks pretty good so far
+there are a few TODOs i should go back and resolve
+mostly in the attack system, which could really use another pass

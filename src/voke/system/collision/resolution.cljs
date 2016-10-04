@@ -35,7 +35,7 @@
             contacted-entities)))
 
 (s/fdef find-closest-contacted-entity
-  :args (s/cat :axis #{:geometry/x :geometry/y}
+  :args (s/cat :axis :geometry/axis
                :new-velocity number?
                :contacted-entities (s/coll-of :entity/entity))
   :ret :entity/entity)
@@ -56,7 +56,7 @@
 
 (s/fdef find-closest-clear-spot
   :args (s/cat :entity :entity/entity
-               :axis #{:geometry/x :geometry/y}
+               :axis :geometry/axis
                :new-velocity number?
                :contacted-entities (s/coll-of :entity/entity)))
 
@@ -77,7 +77,7 @@
   :args (s/cat :entity :entity/entity
                :new-center number?
                :new-velocity number?
-               :axis #{:geometry/x :geometry/y}
+               :axis :geometry/axis
                :remaining-contacted-entities (s/coll-of :entity/entity)
                :all-entities (s/coll-of :entity/entity))
   :ret (s/cat :new-position number?
@@ -90,7 +90,7 @@
 
 ; We only support axis-aligned bounding boxes, so entities' component lines always look like
 ; y = 4 or x = -2.021, etc.
-(s/def ::axis #{:geometry/x :geometry/y})
+(s/def ::axis :geometry/axis)
 (s/def ::axis-line-value number?)
 (s/def ::axis-aligned-line (s/keys :req [::axis ::axis-line-value]))
 

@@ -1,6 +1,5 @@
 (ns voke.runner
-  (:require [cljs.spec.test :as stest]
-            [doo.runner :refer-macros [doo-tests]]
+  (:require [doo.runner :refer-macros [doo-tests]]
             [voke.input]
             [voke.clock-test]
             [voke.input-test]
@@ -11,13 +10,7 @@
             [voke.state-test]
             [voke.util-test]))
 
-;(stest/instrument `voke.input/remove-conflicting-directions)
-
-(doo-tests 'voke.input-test)
-
-(js/console.log "runner after doo-tests")
-
-#_(doo-tests 'voke.clock-test
+(doo-tests 'voke.clock-test
            'voke.input-test
            'voke.events-test
            'voke.system.collision-test

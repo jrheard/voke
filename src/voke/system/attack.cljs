@@ -33,7 +33,7 @@
 
 (s/fdef entity-velocity-contribution
   :args (s/cat :entity :entity/entity
-               :axis #{:geometry/x :geometry/y})
+               :axis :geometry/axis)
   :ret number?)
 
 (defn shot-speed
@@ -46,7 +46,7 @@
 
 (s/fdef shot-speed
   :args (s/cat :entity :entity/entity
-               :axis #{:geometry/x :geometry/y}))
+               :axis :geometry/axis))
 
 ; TODO why does this function exist? what is its purpose? docstring it
 (defn -collides-with
@@ -71,7 +71,7 @@
 
 (s/fdef -halves-along-dimension
   :args (s/cat :entity :entity/entity
-               :axis #{:geometry/x :geometry/y})
+               :axis :geometry/axis)
   ; what the fuck are :entity-half and :projectile-half
   :ret (s/cat :entity-half number?
               :projectile-half number?))

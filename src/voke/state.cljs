@@ -27,11 +27,11 @@
 
 (s/def :game-state-event/event (s/multi-spec event-type :game-state-event/type))
 
+;; Private
+
 (defn- event-with-type [event-type]
   (s/and :game-state-event/event
          #(= (% :game-state-event/type) event-type)))
-
-;; Private
 
 (def ^:private buffer (atom []))
 
