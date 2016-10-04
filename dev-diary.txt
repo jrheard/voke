@@ -4602,4 +4602,6 @@ there's something in input-test that makes testing freeze when stest/instrument 
 but it doesn't reproduce reliably
 v frustrating
 
+ok time to learn how to write macros
+http://www.braveclojure.com/writing-macros/ is good
 
