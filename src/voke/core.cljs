@@ -1,5 +1,6 @@
 (ns voke.core
-  (:require [voke.entity :as e]
+  (:require [cljs.spec.test :as stest]
+            [voke.entity :as e]
             [voke.events]
             [voke.clock :refer [add-time!]]
             [voke.state :refer [make-game-state]]
@@ -31,11 +32,15 @@
   (js/Collision.resetState)
   (voke.events/unsub-all!)
   (voke.state/flush! @game-state)
-  (initialize-systems! @game-state (player :id))
+  (initialize-systems! @game-state (player :entity/id))
   (reset! last-frame-time (js/performance.now)))
 
 (defn ^:export main []
   (-initialize!)
+
+  (comment
+    (stest/instrument `process-a-tick)
+    (stest/instrument `voke.state/flush!))
 
   (js/window.requestAnimationFrame
     (fn process-frame [ts]

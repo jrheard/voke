@@ -1,100 +1,139 @@
 (ns voke.system.attack
-  (:require [plumbing.core :refer [safe-get-in]]
-            [schema.core :as s]
+  (:require [cljs.spec :as s]
             [voke.clock :refer [now]]
             [voke.entity :refer [projectile]]
-            [voke.schemas :refer [Axis CollisionType Direction Entity System Vector2]]
             [voke.state :refer [add-entity!]]
-            [voke.util :refer [bound-between]])
-  (:require-macros [schema.core :as sm]))
+            [voke.util :refer [bound-between]]))
 
 (def maximum-entity-velocity-shot-speed-contribution 2)
 
 ;; everything in here is gross and that is ok for now
 
-(sm/defn can-attack? :- s/Bool
-  [entity :- Entity]
-  (let [weapon (entity :weapon)]
+(defn can-attack?
+  [entity]
+  (let [weapon (entity :component/weapon)]
     (and
-      (get-in entity [:weapon :fire-direction])
+      (get-in entity [:component/weapon :weapon/fire-direction])
       (>= (- (now)
-             (weapon :last-attack-timestamp))
+             (weapon :weapon/last-attack-timestamp))
           (/ 1000
-             (weapon :shots-per-second))))))
+             (weapon :weapon/shots-per-second))))))
 
-(sm/defn entity-velocity-contribution
-  [entity :- Entity
-   axis :- Axis]
-  (bound-between (safe-get-in entity [:motion :velocity axis])
-                 (- maximum-entity-velocity-shot-speed-contribution)
-                 maximum-entity-velocity-shot-speed-contribution))
+(s/fdef can-attack?
+  :args (s/cat :entity :entity/entity)
+  :ret boolean?)
 
-(sm/defn shot-speed
-  [entity :- Entity
-   axis :- Axis]
-  (let [weapon (entity :weapon)
-        trig-fn (if (= axis :x) Math/cos Math/sin)]
-    (+ (* (trig-fn (weapon :fire-direction))
-          (weapon :shot-speed))
+(defn entity-velocity-contribution
+  [entity axis]
+  (if (contains? entity :component/motion)
+    (bound-between (get-in entity [:component/motion :motion/velocity axis])
+                   (- maximum-entity-velocity-shot-speed-contribution)
+                   maximum-entity-velocity-shot-speed-contribution)
+    0))
+
+(s/fdef entity-velocity-contribution
+  :args (s/cat :entity :entity/entity
+               :axis :geometry/axis)
+  :ret number?)
+
+(defn shot-speed
+  [entity axis]
+  (let [weapon (entity :component/weapon)
+        trig-fn (if (= axis :geometry/x) Math/cos Math/sin)]
+    (+ (* (trig-fn (weapon :weapon/fire-direction))
+          (weapon :weapon/shot-speed))
        (entity-velocity-contribution entity axis))))
 
-(sm/defn -collides-with :- #{CollisionType}
-  [entity :- Entity]
+(s/fdef shot-speed
+  :args (s/cat :entity :entity/entity
+               :axis :geometry/axis))
+
+; TODO why does this function exist? what is its purpose? docstring it
+(defn -collides-with
+  [entity]
   (hash-set
     :obstacle
     :item
-    (if (= (get-in entity [:collision :type]) :good-guy)
+    (if (= (get-in entity [:component/collision :collision/type]) :good-guy)
       :bad-guy
       :good-guy)))
 
-(sm/defn -halves-along-dimension :- [(s/one s/Num "entity half") (s/one s/Num "projectile half")]
-  [entity :- Entity
-   axis :- Axis]
-  (let [side (if (= axis :x) :width :height)]
-    [(/ (get-in entity [:shape side]) 2)
-     (/ (get-in entity [:weapon :projectile-shape side]) 2)]))
+(s/fdef -collides-with
+  :args (s/cat :entity :entity/entity)
+  :ret (s/coll-of :collision/type :kind set? :into #{}))
+
+; TODO what does this function do? document it
+(defn -halves-along-dimension
+  [entity axis]
+  (let [side (if (= axis :geometry/x) :shape/width :shape/height)]
+    [(/ (get-in entity [:component/shape side]) 2)
+     (/ (get-in entity [:component/weapon :weapon/projectile-shape side]) 2)]))
+
+(s/fdef -halves-along-dimension
+  :args (s/cat :entity :entity/entity
+               :axis :geometry/axis)
+  ; what the fuck are :entity-half and :projectile-half
+  :ret (s/cat :entity-half number?
+              :projectile-half number?))
 
 (defn -pi-over
   [numerator denominator]
   (/ (* Math/PI numerator) denominator))
 
-(sm/defn -projectile-center :- Vector2
-  [entity :- Entity]
-  (let [direction (get-in entity [:weapon :fire-direction])
+(defn -projectile-center
+  [entity]
+  (let [direction (get-in entity [:component/weapon :weapon/fire-direction])
         side (cond
                (<= (-pi-over -3 4) direction (-pi-over -1 4)) :up
                (<= (-pi-over -1 4) direction (-pi-over 1 4)) :right
                (<= (-pi-over 1 4) direction (-pi-over 3 4)) :down
                :else :left)
-        center (get-in entity [:shape :center])]
-    {:x (condp = side
-          :left (apply - (center :x) (-halves-along-dimension entity :x))
-          :right (apply + (center :x) (-halves-along-dimension entity :x))
-          (center :x))
-     :y (condp = side
-          :up (apply - (center :y) (-halves-along-dimension entity :y))
-          :down (apply + (center :y) (-halves-along-dimension entity :y))
-          (center :y))}))
+        center (get-in entity [:component/shape :shape/center])]
+    {:geometry/x (condp = side
+                   :left (apply - (center :geometry/x) (-halves-along-dimension entity :geometry/x))
+                   :right (apply + (center :geometry/x) (-halves-along-dimension entity :geometry/x))
+                   (center :geometry/x))
+     :geometry/y (condp = side
+                   :up (apply - (center :geometry/y) (-halves-along-dimension entity :geometry/y))
+                   :down (apply + (center :geometry/y) (-halves-along-dimension entity :geometry/y))
+                   (center :geometry/y))}))
 
-(sm/defn make-projectile-for-entity
-  [entity :- Entity]
-  (projectile (entity :id)
+(s/fdef -projectile-center
+  :args (s/and (s/cat :entity :entity/entity)
+               #(contains? (% :entity) :component/weapon)
+               #(contains? (% :entity) :component/shape))
+  :ret :geometry/vector2)
+
+(defn make-projectile-for-entity
+  [entity]
+  (projectile (entity :entity/id)
               (-projectile-center entity)
               (-collides-with entity)
-              (safe-get-in entity [:weapon :projectile-shape])
-              (safe-get-in entity [:weapon :projectile-color])
-              (shot-speed entity :x)
-              (shot-speed entity :y)))
+              (get-in entity [:component/weapon :weapon/projectile-shape])
+              (get-in entity [:component/weapon :weapon/projectile-color])
+              (shot-speed entity :geometry/x)
+              (shot-speed entity :geometry/y)))
 
-(sm/defn process-firing-entities :- [Entity]
-  [entities :- [Entity]]
+(s/fdef make-projectile-for-entity
+  :args (s/and (s/cat :entity :entity/entity)
+               #(contains? (% :entity) :component/weapon)
+               #(contains? (% :entity) :component/shape)
+               #(contains? (% :entity) :component/collision))
+  :ret :entity/entity)
+
+(defn process-firing-entities
+  [entities]
   (flatten
     (for [entity (filter can-attack? entities)]
       (do
         (add-entity! (make-projectile-for-entity entity) :attack-system)
-        (assoc-in entity [:weapon :last-attack-timestamp] (now))))))
+        (assoc-in entity [:component/weapon :weapon/last-attack-timestamp] (now))))))
+
+(s/fdef process-firing-entities
+  :args (s/cat :entities (s/coll-of :entity/entity))
+  :ret (s/coll-of :entity/entity))
 
 ;; System definition
 
-(sm/def attack-system :- System
-  {:tick-fn process-firing-entities})
+(def attack-system
+  {:system/tick-fn process-firing-entities})

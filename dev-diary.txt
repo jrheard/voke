@@ -4381,3 +4381,215 @@ and attribute values should be registered under their attribute name keyword."
 i have no fucking idea what this means, asking in slack
 
 anyway overall pretty good document
+
+=========
+
+9/29/16
+
+https://www.youtube.com/watch?v=kb-m2fasdDY
+**** good shit
+on rpc in the context of having a ton of services talking to each other:
+"without types, it's a crazy mess! but it's not immediatley a crazy mess - you're
+borrowing against a _future_ crazy mess when someone will change something, and then
+maybe a couple of hops downstream they were depending on some subtle distinction between
+an empty string and null..."
+"we could have fixed all of this if we just had types"
+around 22:40, talks about standardizing dashboards ****** good shit
+tracing very important when you have a ton of services
+
+on logging in a standard format across all languages in a world where 1000 engineers
+have started within the last six months:
+"mandates are tricky - give them tools that are so obvious and easy to use that they wouldn't
+do it any other way"
+
+later, on mandates: they're bad
+instead: pure carrots, no sticks
+
+starting on the transition to spec
+some parts are straightforward, some are not
+do i use namespaced keywords that match my project's namespaces, like :voke.system.collision/foo?
+or do i use namespaces that are concepts, like :collision/foo?
+asking in slack
+
+wow http://www.clojure-toolbox.com/ has a ton more stuff on it than the last time i looked
+
+ok i've been doing a ton of spec conversion
+
+it's been mostly mechanical once i got going, although coming up with namespaces for keywords
+was a bit tricky
+
+i'm going to need to come up with some sort of grep command that finds bare non-namespaced keywords
+
+TODO - go back after initial round of speccing and see if any fdefs could benefit from a :fn
+
+if i had to do this over again i would have used find/replace or sed waay more
+
+======
+
+9/30/16
+
+slack says cursive EAP has support for #:foo{:bar :baz} syntax, gonna try upgrading
+https://cursive-ide.com/eap.html
+
+neat
+
+playing around with gen, exercise, and test.check
+gen and exercise both accept an "options map", documented as:
+
+`
+Optionally an overrides map can be provided which
+should map spec names or paths (vectors of keywords) to no-arg
+generator-creating fns. These will be used instead of the generators at those
+names/paths. Note that parent generator (in the spec or overrides
+map) will supersede those of any subtrees. A generator for a regex
+op must always return a sequential collection (i.e. a generator for
+s/? should return either an empty sequence/vector or a
+sequence/vector with one item in it)
+`
+
+notes from me rubberducking into slack:
+
+i’ve got a somewhat complex map spec that i’m trying to s/exercise,
+and i’m getting the dreaded "Couldn't satisfy such-that predicate after 100 tries.” error.
+what are the primary things i should be looking for when trackingdown the root cause?
+i’m familiar with s/and and how you should eg do int? first, followed by even?, etc (edited)
+is naive `s/and` usage the primary trigger for this error, or
+are there other categories of spec misuse that often cause it? (edited)
+(if it’s helpful, the spec i’m trying to exercise is
+https://github.com/jrheard/voke/blob/spec/src/voke/specs.cljs#L74 ) (edited)
+i’ve only got one s/and in here, and it’s a `(s/and number?
+pos?)`, so i feel like there must be some other category of thing i’m doing totally incorrectly
+hm, seems to be specific to :component/input
+this guy’s the culprit: https://github.com/jrheard/voke/blob/spec/src/voke/specs.cljs#L22 (edited)
+the documentation on :kind says: "Note that if :kind is specified
+and :into is not, this pred must generate in order for every
+to generate.”; and adding `:into #{}` fixes the issue. guess
+i need to sit down and take some time to understand the semantics of `:kind` and `:into`.
+
+interesting - in http://tales.sveri.de/posts/2016-05-28-clojure-spec.html , he has his
+(s/fdef) calls *above* his (defn)s. wonder if that works, and if so how
+
+ok anyway i fixed a lot of tests and i think the game is working again
+i am so glad i wrote all these tests
+they were really really really really useful just now
+
+ok now let's set up instrumentation and generative testing
+
+hm, it's not obvious what the right way is of actually defining / checking the output of
+these generative tests
+
+let's read the documentation for test.check
+
+man i just cannot get (-> 'foo stest/enumerate-namespace stest/check) to work
+maybe it doesn't support cljs? i don't know
+
+anyway stest/summarize-results is useful
+
+=======
+
+10/1/16
+
+heyyyyy
+http://leeorengel.com/from-schema-to-spec/
+looks relevant
+
+so it turns out test.check has this macro called defspec that i should look at
+and also test.chuck exists but i don't understand what it is / how it relates to test.check
+
+http://www.anthony-galea.com/blog/post/hello-parking-garage-meet-clojure.spec/
+mentions that test.chuck includes a string-from-regex generator, seems handy in certain situations
+
+http://blog.colinwilliams.name/blog/2015/01/26/alternative-clojure-dot-test-integration-with-test-dot-check/
+
+i think i can ignore test.chuck for now
+
+https://github.com/clojure/test.check/blob/master/src/main/clojure/clojure/test/check/clojure_test.cljc#L63
+mentions there's this concept of a "test var"
+
+https://github.com/clojure/clojurescript/blob/master/src/main/cljs/cljs/test.cljc#L206
+has the same concept
+
+i am having just a devil of a time testing update-fire-directions
+seeing output that indicates that quick-check isn't running on my guy at all?
+like, i just see the empty list as a return value from stest/check
+which seems bad
+
+let's see if we can figure out how to generate an example value from our fn's spec's :args
+
+======
+
+10/2/16
+
+ok so i've got a local copy of clojurescript that i'm pointing my project to via checkout dependencies
+i found one issue, which is that the cljs spec documentation says your option maps should look like
+{:clojure.spec.test.check/opts {:num-tests 100}} but actually they should be {:clojure.test.check/opts {:num-tests 100}}
+
+i don't think i've seen the issue i'm trying to track down - where (stest/check `foo/bar) sometimes returns [] -
+since starting work with this local clojurescript. maybe it was a bug that has been fixed on master?
+
+another frustrating issue: the doo runner (or *some* piece of code) hangs indefinitely after the test run completes
+when i've got an s/check test, so `lein doo phantom test auto` no longer works. irritating
+
+=====
+
+10/3/16
+
+ok i submitted a jira issue and patch re: the options map documentation issue, that feels nice
+
+i'm strongly considering just not using (stest/check) until that whole part of the system
+has had another few months to be fully baked - in particular, re: doo integration
+although i'm toying with the idea of spending a few days digging into this and maybe fixing
+any underlying issues in cljs/doo, so we'll see
+
+but anyway i do want to have instrumentation
+
+so i'm gonna poke at that next
+
+so what's the best way of getting this?
+let's take a look at leiningen preloads, i saw that dirac / devtools uses them, they sound useful here
+
+https://github.com/clojure/clojurescript/wiki/Compiler-Options#preloads
+
+couldn't get it to work, complained about no such namespace voke.preload
+wondered if it might be the case that preloads have to be .clj instead of .cljs, but that wasn't it
+it's on the classpath, src/voke/preload.cljs
+oh well
+
+couldn't find any example projects that use their own preloads via github code search,
+only found a million pages of devtools.repload, dirac, etc
+
+ok, turned on instrumentation
+immediately getting a failure in process-a-tick
+it's complaining that.. game-state/entities isn't a map, and that none of the entities it contains are maps
+how can that be?
+
+useful tip for navigating big spec failures: look for ":in "
+
+for one thing, looks like the spec for :game-state/entities is incorrect:
+(s/def :game-state/entities (s/coll-of :entity/entity))
+shouldn't be using :coll-of here, it's a map of int -> entity
+
+ah, map-of exists, nice
+v easy
+
+that seems to have fixed it
+
+ok, i had another issue where i had gotten mixed up about the right syntax for having multiple constraints
+on fdef args
+
+i was doing things like this:
+
+:args (s/cat :foo (s/and :bar/bar
+                         #(contains? (% :foo) :baz))
+
+but instead i should be doing
+
+:args (s/and (s/cat :foo :bar/bar)
+             #(contains? (% :foo) :baz))
+
+and that makes much more sense.
+
+ok, merging this spec branch into master
+looks pretty good so far
+there are a few TODOs i should go back and resolve
+mostly in the attack system, which could really use another pass
