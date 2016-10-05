@@ -1,8 +1,13 @@
 (ns voke.system.collision-test-macros
   (:require [clojure.spec :as s]))
 
+; I know you're only supposed to write macros that start with def- or let-,
+; and that having your macro introduce new symbols to your environment like this is gross,
+; but this is just a test utility helper that nobody else will ever look at so I don't feel bad.
+
 (defmacro with-collision-env
-  "docstring"
+  "Sets up / tears down the environment necessary for collision-related tests to run.
+  See voke.system.collision-test for example usage."
   [entities collision-events-sym apply-movement-calls-sym game-state-sym & body]
   `(let [~collision-events-sym (atom [])
          ~apply-movement-calls-sym (atom [])
