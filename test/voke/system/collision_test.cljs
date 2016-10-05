@@ -39,25 +39,25 @@
   (let [entity-1 (make-entity 1 100 100)
         entity-2 (make-entity 2 115 115)]
     (with-collision-env [entity-1 entity-2] collision-events apply-movement-calls game-state
-      ; Two 10x10 entities, moving diagonally into the same spot.
-      (system/attempt-to-move! entity-1
-                               #:geometry{:x 105 :y 105}
-                               #:geometry{:x 5 :y 5}
-                               (vals (game-state :game-state/entities)))
-      (system/attempt-to-move! entity-2
-                               #:geometry{:x 105 :y 105}
-                               #:geometry{:x 5 :y 5}
-                               (vals (game-state :game-state/entities)))
+                        ; Two 10x10 entities, moving diagonally into the same spot.
+                        (system/attempt-to-move! entity-1
+                                                 #:geometry{:x 105 :y 105}
+                                                 #:geometry{:x 5 :y 5}
+                                                 (vals (game-state :game-state/entities)))
+                        (system/attempt-to-move! entity-2
+                                                 #:geometry{:x 105 :y 105}
+                                                 #:geometry{:x 5 :y 5}
+                                                 (vals (game-state :game-state/entities)))
 
-      (testing "when two entities try to move into the same space, only one collision event should be fired"
-        (is (= @collision-events
-               [{:event/type :contact
-                 :entities   [entity-1 entity-2]}])))
+                        (testing "when two entities try to move into the same space, only one collision event should be fired"
+                          (is (= @collision-events
+                                 [{:event/type :contact
+                                   :entities   [entity-1 entity-2]}])))
 
-      (testing "diagonal collision resolution works correctly on corners"
-        (is (= @apply-movement-calls
-               [[entity-1 #:geometry{:x 104.9 :y 104.9} #:geometry{:x 0 :y 0}]
-                [entity-2 #:geometry{:x 99.9 :y 99.9} #:geometry{:x 0 :y 0}]]))))))
+                        (testing "diagonal collision resolution works correctly on corners"
+                          (is (= @apply-movement-calls
+                                 [[entity-1 #:geometry{:x 104.9 :y 104.9} #:geometry{:x 0 :y 0}]
+                                  [entity-2 #:geometry{:x 99.9 :y 99.9} #:geometry{:x 0 :y 0}]]))))))
 
 
 #_(deftest two-entities-moving-into-each-other-diagonally
