@@ -26,9 +26,9 @@
 
      (js/Collision.resetState)))
 
-#_(s/fdef with-collision-env
+(s/fdef with-collision-env
         :args (s/cat :entities vector?
                      :collision-events-sym simple-symbol?
                      :apply-movement-calls-sym simple-symbol?
                      :game-state-sym simple-symbol?
-                     :body any?))
+                     :body (s/* any?)))
