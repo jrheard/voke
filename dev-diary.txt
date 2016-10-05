@@ -4627,3 +4627,29 @@ doesn't answer my questions
 http://stackoverflow.com/questions/14781868/how-do-i-deal-with-required-clojurescript-code-from-clojurescript-macros
 seems relevant
 looks like i can refer to namespaced symbols directly in the syntax-quoted body of the macro, so i'll try that
+
+back in http://www.braveclojure.com/writing-macros/
+**** man this is good
+"One subtle pitfall of using macros is that you can end up having to write more and more
+of them to get anything done. This is a consequence of the fact that macro expansion happens before evaluation."
+too true, dude
+
+"But report, operating at macro expansion time, just can’t access those values. It’s like
+it has T. rex arms, with runtime values forever out of its reach."
+
+"Double evaluation and variable capture are two other subtle traps for the unwary, but you
+can avoid them through the judicious use of let expressions and gensyms."
+
+this article is super good overall, big fan
+
+ok time to try to understand https://github.com/lambdaisland/uniontypes/blob/master/src/lambdaisland/uniontypes/core.cljc
+example usage in the readme on https://github.com/lambdaisland/uniontypes
+looks neat but i don't think i'll be immediately reaching for it
+neat application of spec tho
+
+https://www.youtube.com/watch?v=GglfimrfYn4&list=PLZdCLR02grLq4e8-1P2JNHBKUOLFTX3kb&index=8
+neat, not directly relevant to any stuff i'm working on but neat
+
+ok anyway my current plan for the next few hours is to
+1) clean up voke.system.attack
+2) take one more look at stest/instrument and stest/check, particularly re: voke.input, to see why they've been behaving poorly
