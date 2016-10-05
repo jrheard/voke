@@ -19,8 +19,6 @@
 ; Single-axis-handling logic
 
 (defn find-closest-contacted-entity
-  ; TODO test this!!! it rarely gets executed because contacted-entities is almost always a list of 1 item
-  ; and so reduce just picks that one item without executing the reducing function
   [axis new-velocity contacted-entities]
   (let [[relevant-side-fn comparator] (case [axis (pos? new-velocity)]
                                         [:geometry/x false] [right-edge-x >]

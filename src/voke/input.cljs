@@ -1,6 +1,5 @@
 (ns voke.input
   (:require [cljs.spec :as s]
-            [cljs.spec.test :as stest]
             [clojure.set :refer [intersection difference subset?]]
             [clojure.string :refer [starts-with?]]
             [cljs.core.async :refer [chan <! put!]]
@@ -98,7 +97,6 @@
       (assoc-in entity
                 [:component/motion :motion/direction]
                 (intended-directions->angle intended-directions))
-      ; xxxx TODO come back and make sure i understand the semantics of :motion :direction being nil
       (assoc-in entity
                 [:component/motion :motion/direction]
                 nil))))

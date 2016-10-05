@@ -4593,3 +4593,37 @@ ok, merging this spec branch into master
 looks pretty good so far
 there are a few TODOs i should go back and resolve
 mostly in the attack system, which could really use another pass
+
+=====
+
+10/4/16
+
+there's something in input-test that makes testing freeze when stest/instrument is called
+but it doesn't reproduce reliably
+v frustrating
+
+ok time to learn how to write macros
+http://www.braveclojure.com/writing-macros/ is good
+
+======
+
+10/5/16
+
+ran into some issues around cljc files
+i need to sit down and read about cljc files' semantics/rules from scratch
+
+http://blog.cognitect.com/blog/2016/10/5/interactive-development-with-clojurespec
+** good article
+
+good examples of exercise, exercise-fn
+
+notice how when they have several functions that share the same arg spec, they extract it out
+into its own named/defed thing; should look into doing that in eg the collision system
+
+https://github.com/clojure/clojurescript/wiki/Using-cljc
+on cljc
+doesn't answer my questions
+
+http://stackoverflow.com/questions/14781868/how-do-i-deal-with-required-clojurescript-code-from-clojurescript-macros
+seems relevant
+looks like i can refer to namespaced symbols directly in the syntax-quoted body of the macro, so i'll try that

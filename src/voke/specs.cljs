@@ -25,6 +25,7 @@
 
 (s/def :component/input (s/keys :req [:input/intended-move-direction :input/intended-fire-direction]))
 
+; When :motion/direction is nil, the entity isn't trying to move anywhere, so just let it sit or coast.
 (s/def :motion/direction :geometry/direction)
 (s/def :motion/velocity :geometry/vector2)
 (s/def :motion/affected-by-friction boolean?)
