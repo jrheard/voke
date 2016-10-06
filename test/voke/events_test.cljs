@@ -1,6 +1,11 @@
 (ns voke.events-test
-  (:require [cljs.test :refer [deftest is testing]]
-            [voke.events :as events]))
+  (:require [cljs.spec.test]
+            [cljs.test :refer [deftest is testing]]
+            [voke.events :as events]
+            [voke.test-utils-macros :refer-macros [check]]))
+
+(deftest generative
+  (check `events/publish-event))
 
 (deftest event-system
   (let [foo-counter (atom 0)

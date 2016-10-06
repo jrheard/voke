@@ -1,5 +1,8 @@
 (ns voke.clock-test
-  (:require [cljs.spec.test :as stest]
-            [voke.clock :as clock]))
+  (:require [cljs.test :refer [deftest is]]
+            [cljs.spec.test]
+            [voke.clock :as clock]
+            [voke.test-utils-macros :refer-macros [check]]))
 
-(stest/check `clock/add-time!)
+(deftest generative
+  (check `clock/add-time!))

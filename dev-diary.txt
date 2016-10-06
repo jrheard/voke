@@ -4653,3 +4653,32 @@ neat, not directly relevant to any stuff i'm working on but neat
 ok anyway my current plan for the next few hours is to
 1) clean up voke.system.attack
 2) take one more look at stest/instrument and stest/check, particularly re: voke.input, to see why they've been behaving poorly
+
+did 1; tried again to do
+
+(stest/instrument (stest/enumerate-namespace 'voke.events)), but i get an error message complaining
+that stest doesn't exist. poked dnolen, he says it's a bug, opened CLJS-1811. fun!
+
+i'll continue to poke around and instrument/check a few namespaces, and try to see why voke.input is being
+so recalcitrant, but will put off putting together a fully polished cljs.spec.test setup until cljs-1811 is fixed
+
+hm, even adding a single
+(stest/check `events/publish-event)
+to events-test causes tests to hang, but only _sometimes_
+guess i need to add some printfs, eh
+
+i think i may have found another bug in cljs spec test
+it looks like calling (stest/check `foo/bar) has the side effect of instrumenting foo/bar
+i don't think that's intentional
+it looks like (stest/unstrument 'foo/bar) is supposed to only return 'foo/bar if it was unstrumented
+gonna compare against the clj implementation
+
+yeah, in clj, if you unstrument a noninstrumented var you get [] back
+
+opened cljs-1812
+
+aha - i was having trouble tracking down the implementation of set!
+i think it's here:
+https://github.com/clojure/clojurescript/blob/master/src/main/clojure/cljs/compiler.cljc#L1022
+
+ok i had fun poking around with stest again but i think i'm going to put it down yet again
