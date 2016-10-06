@@ -1,5 +1,8 @@
 (ns voke.clock-test
-  (:require [cljs.spec.test :as stest]
+  (:require [cljs.test :refer [deftest is]]
+            [cljs.spec.test :as stest]
             [voke.clock :as clock]))
 
-(stest/check `clock/add-time!)
+; TODO actually add an assert
+(deftest generative
+  (stest/check `clock/add-time!))

@@ -10,7 +10,9 @@
             [voke.state-test]
             [voke.util-test]))
 
-(doo-tests 'voke.clock-test
+(doo-tests 'voke.events-test)
+
+#_(doo-tests 'voke.clock-test
            'voke.input-test
            'voke.events-test
            'voke.system.collision-test

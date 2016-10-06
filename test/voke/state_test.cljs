@@ -1,13 +1,10 @@
 (ns voke.state-test
   (:require [cljs.test :refer [deftest is testing]]
             [cljs.spec :as s]
-            [cljs.spec.test :as stest]
             [clojure.test.check.generators]
             [voke.specs]
             [voke.state :as state]
             [voke.test-utils :refer [blank-game-state game-state-with-an-entity]]))
-
-;(stest/instrument)
 
 (def example-entity
   (assoc
