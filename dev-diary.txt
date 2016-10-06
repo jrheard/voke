@@ -4680,3 +4680,5 @@ opened cljs-1812
 aha - i was having trouble tracking down the implementation of set!
 i think it's here:
 https://github.com/clojure/clojurescript/blob/master/src/main/clojure/cljs/compiler.cljc#L1022
+
+ok i had fun poking around with stest again but i think i'm going to put it down yet again
