@@ -1,6 +1,5 @@
 (ns voke.events-test
-  (:require [cljs.pprint :refer [pprint]]
-            [cljs.spec.test]
+  (:require [cljs.spec.test]
             [cljs.test :refer [deftest is testing]]
             [voke.events :as events]
             [voke.test-utils-macros :refer-macros [check]]))
