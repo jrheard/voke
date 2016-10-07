@@ -4682,3 +4682,24 @@ i think it's here:
 https://github.com/clojure/clojurescript/blob/master/src/main/clojure/cljs/compiler.cljc#L1022
 
 ok i had fun poking around with stest again but i think i'm going to put it down yet again
+
+=====
+
+10/6/16
+
+example gen override usage via slack:
+
+(defn foo [x] (println "FOO" x) (inc x))
+(s/fdef foo :args (s/cat :x ::x))
+(s/def ::x clojure.future/int?)
+(stest/check `foo
+             {:gen          {::x #(gen/return 10)}
+              ::stestc/opts {:num-tests 1}})
+
+where gen is [clojure.spec.gen :as gen]
+
+https://www.youtube.com/watch?v=JaKLSH4csqE&list=PLPgnbBCmP6ZMfHPJ4yMwuoLEZvEe5LVe8&index=7
+
+"names are orders of magnitude more common than any other form of indirection"
+
+
