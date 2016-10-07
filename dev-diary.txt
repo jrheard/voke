@@ -4702,4 +4702,29 @@ https://www.youtube.com/watch?v=JaKLSH4csqE&list=PLPgnbBCmP6ZMfHPJ4yMwuoLEZvEe5L
 
 "names are orders of magnitude more common than any other form of indirection"
 
+=====
 
+10/7/16
+
+ok, came up with some stuff on the bike ride in re: health, damage
+
+so we have a health system and a health component, and it looks like this:
+
+:component/health {:health/health 100
+                   :health/max-health 100}
+
+super simple. the system listens to :contact events, which cover situations like this:
+1) projectile touches something it can damage
+2) non-projectile entity touches something it can damage
+which i guess are basically the exact same thing. TODO: where is "the amount of damage i do on contact" encoded? come back to this
+3) player walks over a food / health / etc powerup
+4) monster fires healing projectile at another monster
+
+the player will likely also be able to heal himself using spacebar items like in BoI; for that,
+the inventory system will listen for :use-consumable-item events (fired by the input system)
+if the player has a consumable item in their inventory, the item runs a function from game-state -> game-state
+this can eg heal the player, stun all enemies, turn the game upside down, etc etc i don't know
+if the player has no consumable item, nothing happens
+
+and there's a death system that either runs every tick or listens to :damage events and removes any dead entities
+(at the start or end of the frame)
