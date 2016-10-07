@@ -55,6 +55,8 @@
                                     :type   :rectangle
                                     :center {:geometry/x x
                                              :geometry/y y}}
+                 :health    #:health{:health     100
+                                     :max-health 100}
                  :motion    #:motion{:velocity             {:geometry/x 0
                                                             :geometry/y 0}
                                      :affected-by-friction true
@@ -78,6 +80,8 @@
                                     :type   :rectangle
                                     :center {:geometry/x x
                                              :geometry/y y}}
+                 :health    #:health{:health     100
+                                     :max-health 100}
                  :motion    #:motion{:velocity             {:geometry/x 0
                                                             :geometry/y 0}
                                      :affected-by-friction true

@@ -7,6 +7,8 @@
             [voke.system.ai.system :refer [ai-system]]
             [voke.system.attack :refer [attack-system]]
             [voke.system.collision.system :refer [collision-system]]
+            [voke.system.damage :as damage]
+            [voke.system.health :as health]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]]))
 
@@ -40,6 +42,8 @@
 (def game-systems [collision-system
                    move-system
                    attack-system
+                   damage/system                            ; TODO standardize names
+                   health/system
                    ai-system
                    render-system])
 

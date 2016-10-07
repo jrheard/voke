@@ -1,4 +1,5 @@
 (ns voke.system.damage
+  "Responsible for listening to :contact events and firing :damage events."
   (:require [cljs.spec :as s]
             [voke.specs]
             [voke.events :refer [publish-event]]))
@@ -18,7 +19,7 @@
 
 (defn handle-contact
   [event]
-  (let [[a b] (event :contacted-entities)]
+  (let [[a b] (event :entities)]
     (one-way-damage-check a b)
     (one-way-damage-check b a)))
 

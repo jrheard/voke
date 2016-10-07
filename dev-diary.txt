@@ -4763,3 +4763,22 @@ ok so the health system listens to :damage and :heal events, and updates entitie
 and is just really really small and that's ok
 
 seems fine to me
+
+https://8thlight.com/blog/eric-smith/2016/10/05/a-testable-clojurescript-setup.html
+**** good
+explains how to set up a cljs project + environment from scratch
+"It's idiomatic to create a function and call that as the last line of your main ClojureScript namespace"
+good because that is what i do
+https://github.com/bhauman/lein-figwheel/wiki/HTML-watcher-including-browser-reloading
+has info on how to get figwheel to reload when you make html changes
+i am... not going to do that
+
+he uses this doo-all-tests function, i haven't seen that before
+
+http://adventofcode.com/ looks cool, will have to take a look at that
+
+ok setting these things aside for now, back to health/damage
+
+i'm torn between whether to have the health system handle death, or whether to have a separate
+death system
+i think i'll probably do the latter? just seems like the health system will be really small, but whatever
