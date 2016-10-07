@@ -8,6 +8,7 @@
             [voke.system.attack :refer [attack-system]]
             [voke.system.collision.system :refer [collision-system]]
             [voke.system.damage :as damage]
+            [voke.system.death :as death]
             [voke.system.health :as health]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]]))
@@ -40,6 +41,7 @@
 ; before anything else can happen in each frame.
 ; should systems have a :before-tick function that serves this purpose?
 (def game-systems [collision-system
+                   death/system
                    move-system
                    attack-system
                    damage/system                            ; TODO standardize names
