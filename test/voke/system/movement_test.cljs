@@ -26,7 +26,7 @@
 (deftest move-system-tick
   (testing "the movement system should call attempt-to-move! once per each relevant moving entity"
     (let [pi-over-4 (/ Math/PI 4)
-          tick-fn (system-to-tick-fn movement/move-system)
+          tick-fn (system-to-tick-fn movement/system)
           initial-state (-> blank-game-state
                             (assoc-in [:game-state/entities 0]
                                       {:entity/id        0

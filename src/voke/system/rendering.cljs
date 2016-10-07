@@ -26,7 +26,7 @@
 
 ;; System definition
 
-(def render-system
+(def system
   {:system/event-handlers [{:event/type              :movement
                             :system/event-handler-fn handle-movement-event}
                            {:event/type              :entity-removed

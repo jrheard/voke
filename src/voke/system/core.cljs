@@ -4,14 +4,14 @@
             [voke.events :refer [subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
             [voke.specs]
-            [voke.system.ai.system :refer [ai-system]]
-            [voke.system.attack :refer [attack-system]]
-            [voke.system.collision.system :refer [collision-system]]
+            [voke.system.ai.system :as ai]
+            [voke.system.attack :as attack]
+            [voke.system.collision.system :as collision]
             [voke.system.damage :as damage]
             [voke.system.death :as death]
             [voke.system.health :as health]
-            [voke.system.movement :refer [move-system]]
-            [voke.system.rendering :refer [render-system]]))
+            [voke.system.movement :as movement]
+            [voke.system.rendering :as rendering]))
 
 ;; Private
 
@@ -40,14 +40,14 @@
 ; smell: collision system is listed first so that its tick function can reset its internal state atoms
 ; before anything else can happen in each frame.
 ; should systems have a :before-tick function that serves this purpose?
-(def game-systems [collision-system
+(def game-systems [collision/system
                    death/system
-                   move-system
-                   attack-system
-                   damage/system                            ; TODO standardize names
+                   movement/system
+                   attack/system
+                   damage/system
                    health/system
-                   ai-system
-                   render-system])
+                   ai/system
+                   rendering/system])
 
 (def tick-functions
   (map system-to-tick-fn

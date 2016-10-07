@@ -137,5 +137,5 @@
 
 ;; System definition
 
-(def attack-system
+(def system
   {:system/tick-fn process-firing-entities})
