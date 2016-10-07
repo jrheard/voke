@@ -19,6 +19,13 @@
 (s/def :component/shape (s/keys :req [:shape/type :shape/center]
                                 :opt [:shape/width :shape/height]))
 
+(s/def :health/health int?)
+(s/def :health/max-health int?)
+(s/def :component/health (s/keys :req [:health/health :health/max-health]))
+
+(s/def :damage/amount int?)
+(s/def :component/damage (s/keys :req [:damage/amount]))
+
 (s/def :input/intended-direction #{:up :left :down :right})
 (s/def :input/intended-move-direction (s/coll-of :input/intended-direction :kind set? :into #{}))
 (s/def :input/intended-fire-direction (s/coll-of :input/intended-direction))
@@ -43,6 +50,7 @@
 (s/def :weapon/shots-per-second int?)
 (s/def :weapon/shot-speed (s/and number? pos?))
 (s/def :weapon/projectile-color number?)
+(s/def :weapon/damage :damage/amount)
 (s/def :weapon/projectile-shape (s/keys :req [:shape/type]
                                         :opt [:shape/width :shape/height]))
 
@@ -50,6 +58,7 @@
                                        :weapon/fire-direction
                                        :weapon/shots-per-second
                                        :weapon/shot-speed
+                                       :weapon/damage
                                        :weapon/projectile-color
                                        :weapon/projectile-shape]))
 
@@ -82,7 +91,9 @@
                                     :component/render
                                     :component/owned
                                     :component/weapon
-                                    :component/input]))
+                                    :component/input
+                                    :component/health
+                                    :component/damage]))
 
 ;; Game state
 

@@ -4,7 +4,7 @@
 
 ;; Specs
 
-(s/def :event/type #{:movement :entity-added :entity-removed :contact})
+(s/def :event/type #{:movement :entity-added :entity-removed :contact :damage})
 (s/def :event/event (s/keys :req [:event/type]))
 
 ; A map of {:event/type -> [event-handler-fn]}.

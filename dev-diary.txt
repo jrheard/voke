@@ -4743,3 +4743,23 @@ that's a status effect, so there's a component that looks like this
                                                    :status-effect/expiration 123853283}]}
 
 and that'll also be used for eg poison, stun, etc etc
+
+ok, so where does "the amount of damage i do" go?
+how about just a plain old :component/damage component?
+if it exists, it signifies that entities who a) collide with it and b) can take damage (have a health component
+and are not invincible, etc) should be damaged
+
+so what does this mean for systems, though?
+do we have a health system *and* a damage system?
+or just a damage system?
+
+one approach:
+
+the damage system listens for :contact events, performs no actions/modifications on entities, and
+emits :damage events. this seems like an unnecessary layer of indirection, but i could see it being useful
+for eg lifesteal; projectiles that spawn monsters when they successfuly hit; etc. i like this actually
+
+ok so the health system listens to :damage and :heal events, and updates entities' health accordingly,
+and is just really really small and that's ok
+
+seems fine to me
