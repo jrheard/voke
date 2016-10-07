@@ -4728,3 +4728,18 @@ if the player has no consumable item, nothing happens
 
 and there's a death system that either runs every tick or listens to :damage events and removes any dead entities
 (at the start or end of the frame)
+
+https://idea.popcount.org/2016-09-20-strange-loop---ip-spoofing/
+good article
+
+oh right, re: the above topics, i forgot about status effects
+
+so when the player's hit by a bullet, or a bad guy touches him, he takes some damage and
+turns temporarily invincible
+
+that's a status effect, so there's a component that looks like this
+
+:component/status-effect {:status-effect/effects [{:status-effect/type :invincible
+                                                   :status-effect/expiration 123853283}]}
+
+and that'll also be used for eg poison, stun, etc etc

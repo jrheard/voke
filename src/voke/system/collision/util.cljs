@@ -9,6 +9,7 @@
        :y (vector2 :geometry/y)})
 
 (defn -track-entity
+  "Registers an entity with the JS-side collision system."
   [entity]
   (-> entity
       (select-keys [:entity/id :component/collision :component/shape])
@@ -19,10 +20,12 @@
   :args (s/cat :entity :entity/entity))
 
 (defn -update-entity-center
+  "Notifies the JS-side collision system that an an entity has moved."
   [entity-id new-center]
   (js/Collision.updateEntity entity-id (vector2->js new-center)))
 
 (defn -stop-tracking-entity
+  "Unregsiters an entity with the JS-side collision system."
   [entity-id]
   (js/Collision.removeEntity entity-id))
 

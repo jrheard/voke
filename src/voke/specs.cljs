@@ -88,3 +88,13 @@
 
 (s/def :game-state/entities (s/map-of :entity/id :entity/entity))
 (s/def :game-state/game-state (s/keys :req [:game-state/entities]))
+
+;; Systems
+
+(s/def :system/tick-fn fn?)
+(s/def :system/initialize fn?)
+(s/def :system/event-handler-fn fn?)
+(s/def :system/event-handler (s/keys :req [:event/type :system/event-handler-fn]))
+(s/def :system/event-handlers (s/coll-of :system/event-handlers))
+
+(s/def :system/system (s/keys :opt [:system/tick-fn :system/initialize :system/event-handlers]))

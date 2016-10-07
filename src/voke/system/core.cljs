@@ -1,22 +1,14 @@
 (ns voke.system.core
   (:require [cljs.spec :as s]
+            [clojure.set :refer [difference]]
             [voke.events :refer [subscribe-to-event]]
             [voke.input :refer [handle-keyboard-events]]
+            [voke.specs]
             [voke.system.ai.system :refer [ai-system]]
             [voke.system.attack :refer [attack-system]]
             [voke.system.collision.system :refer [collision-system]]
             [voke.system.movement :refer [move-system]]
             [voke.system.rendering :refer [render-system]]))
-
-;; Specs
-
-(s/def :system/tick-fn fn?)
-(s/def :system/initialize fn?)
-(s/def :system/event-handler-fn fn?)
-(s/def :system/event-handler (s/keys :req [:event/type :system/event-handler-fn]))
-(s/def :system/event-handlers (s/coll-of :system/event-handlers))
-
-(s/def :system/system (s/keys :opt [:system/tick-fn :system/initialize :system/event-handlers]))
 
 ;; Private
 
@@ -24,13 +16,19 @@
   "Takes a System map, returns a function of game-state -> game-state."
   [system]
   (fn [state]
-    (update-in state
-               [:game-state/entities]
-               merge
-               ; XXXX assert that the line below contains only entities that already exist in state :entities keys
-               (into {}
-                     (map (juxt :entity/id identity)
-                          ((system :system/tick-fn) (vals (state :game-state/entities))))))))
+    (let [updated-entities (into {}
+                                 (map (juxt :entity/id identity)
+                                      ((system :system/tick-fn) (vals (state :game-state/entities)))))]
+      (assert (= (difference
+                   (apply hash-set (map :entity/id updated-entities))
+                   (apply hash-set (map :entity/id (state :game-state/entities))))
+                 #{})
+              "Tick functions shouldn't return new entities; use voke.state/add-entity! instead")
+
+      (update-in state
+                 [:game-state/entities]
+                 merge
+                 updated-entities))))
 
 (s/fdef system-to-tick-fn
   :args (s/cat :system :system/system)

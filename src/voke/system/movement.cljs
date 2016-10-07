@@ -58,6 +58,7 @@
   :ret :entity/entity)
 
 (defn cap-velocity
+  "Ensures that entities can't travel faster than their :motion/max-speed."
   [entity]
   (let [velocity (get-in entity [:component/motion :motion/velocity])
         x-velocity (velocity :geometry/x)

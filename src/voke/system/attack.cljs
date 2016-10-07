@@ -62,8 +62,9 @@
   :args (s/cat :entity :entity/entity)
   :ret :collision/collides-with)
 
-; TODO what does this function do? document it
 (defn -halves-along-dimension
+  "Returns ((entity's size on this axis) + (its projectiles' size on this axis) / 2).
+  Useful for figuring out where to place new projectiles."
   [entity axis]
   (let [side (if (= axis :geometry/x) :shape/width :shape/height)]
     (/ (+ (get-in entity [:component/shape side])

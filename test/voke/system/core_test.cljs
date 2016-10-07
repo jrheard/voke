@@ -10,3 +10,10 @@
 
     (is (= (tick-fn game-state-with-an-entity)
            (assoc-in game-state-with-an-entity [:game-state/entities 0 :foo] :bar)))))
+
+(deftest system-tick-functions-cant-return-new-entities
+  (let [system {:system/tick-fn (fn [entities]
+                                  (conj entities {:entity/id 123}))}
+        tick-fn (core/system-to-tick-fn system)]
+
+    (is (thrown? js/Error (tick-fn blank-game-state)))))
