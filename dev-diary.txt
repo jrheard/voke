@@ -4782,3 +4782,44 @@ ok setting these things aside for now, back to health/damage
 i'm torn between whether to have the health system handle death, or whether to have a separate
 death system
 i think i'll probably do the latter? just seems like the health system will be really small, but whatever
+
+=======
+
+10/10/16
+
+spec notes from slack:
+
+<me>
+noob question, i’m sure, re: conformer - i reached for conformer when i was operating on
+data that looked like “123”, but i wanted (s/conform ::my-spec) to parse the integer such
+that it ended up being 123. what should i use instead of s/conformer in situations like that,
+for coercion of this sort
+i felt like i read about something that would solve this problem idiomatically in the rationale
+or guide, but couldn’t find it when i went back to look for it
+
+<seancorfield>
+yes I have a lot of cases where I have strings as input but I want them conformed to integers
+(for API input specs). But @alexmiller has told me a couple of times that is "not idiomatic"
+and to avoid conformers like that :(
+
+<me>
+hm, i don’t understand - the strings have to be turned into integers at _some_ point, right?
+is it more idiomatic to have a secondary, non-spec transformation layer that happens after s/conform?
+i’m sure @alexmiller has good reasons for saying that, but i don’t understand what spec users are actually supposed to do here
+
+<alexmiller>
+The downside is that once you enshrine a conversion into your spec, you have made a conformance
+decision for all future consumers that has removed information. If you understand this ramification
+and are willing to live with the consequences, then that's up to you.
+There are many ways to apply conversions - you should be aware of when you are conflating conformance and conversion though
+
+<me>
+i think i follow those statements, but a “in situations like that, try doing this instead” example would be supremely helpful :slightly_smiling_face:
+
+<alexmiller>
+There's not one answer
+You can apply post transformations
+You can apply a second spec
+You can apply a different spec in one case vs@another
+Etc
+And in some cases conformers might be the right answer
