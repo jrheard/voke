@@ -4823,3 +4823,11 @@ You can apply a second spec
 You can apply a different spec in one case vs@another
 Etc
 And in some cases conformers might be the right answer
+
+====
+
+10/11/16
+
+been reading through the cogmind devblog all afternoon
+super neat stuff
+http://www.gridsagegames.com/blog/2016/09/ability-effect-systems-scripted-content/ seems relevant
