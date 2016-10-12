@@ -4831,3 +4831,24 @@ And in some cases conformers might be the right answer
 been reading through the cogmind devblog all afternoon
 super neat stuff
 http://www.gridsagegames.com/blog/2016/09/ability-effect-systems-scripted-content/ seems relevant
+
+http://www.gridsagegames.com/blog/2014/07/dungeon-metrics/ talks about randomly generated dungeons
+also pathfinding
+
+"Another tip for more efficiently addressing issues during
+development: Always have the generator output the random
+seed used to generate each map (I have mine added to an
+ongoing list). That way you can always feed the seed back
+into the generator to repeatedly generate the same map
+and find out what went wrong or how the algorithm could be improved."
+
+oh fuck he has a whole series of posts on this topic
+http://www.gridsagegames.com/blog/2014/06/procedural-map-generation/
+***** TODO COME BACK TO THIS LATER
+
+https://github.com/binaryage/dirac/blob/master/docs/about-repls.md
+boy this is complicated
+https://lambdaisland.com/guides/clojure-repls
+
+
+

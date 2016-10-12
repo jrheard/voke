@@ -30,11 +30,11 @@
   :ret :component/input)
 
 (defn make-weapon
-  [fire-direction projectile-color damage-amount]
+  [fire-direction projectile-color damage-amount shots-per-second]
   #:weapon{:last-attack-timestamp 0
            ; XXXX nuke fire-direction arg, just temporary thing for testing
            :fire-direction        fire-direction
-           :shots-per-second      21
+           :shots-per-second      shots-per-second
            :shot-speed            5
            :damage                damage-amount
            :projectile-color      projectile-color
@@ -65,7 +65,7 @@
                                      :max-speed            11}
                  :collision {:collision/type :good-guy}
                  :render    {:render/fill 0x333333}
-                 :weapon    (make-weapon nil 0x666666 10)
+                 :weapon    (make-weapon nil 0x666666 10 20)
                  :input     (make-input)}))
 
 (s/fdef player
@@ -89,9 +89,7 @@
                                      :max-acceleration     1.5
                                      :max-speed            4}
                  :collision {:collision/type :bad-guy}
-                 ;:weapon      nil
-                 #_(make-weapon (- (/ Math/PI 2))
-                                0xFF0A00)
+                 :weapon    (make-weapon nil 0xFF0A00 0 5)
                  ; xxx ai component not spec'd / standardized yet, these are just some example values
                  :ai        {:movement :basic
                              :attack   :basic}
