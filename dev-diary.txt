@@ -4875,4 +4875,4 @@ i'm going to spin up a roadmap.md to just be a central master list for feature i
 i don't yet completely understand the relationship between dev-diary.txt, roadmap.md, and
 the github issues tracker, but this still seems like a sane idea
 
-
+let's read this series http://www.gridsagegames.com/blog/2014/06/procedural-map-generation/

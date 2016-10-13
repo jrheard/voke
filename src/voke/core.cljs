@@ -3,7 +3,7 @@
             [voke.entity :as e]
             [voke.events]
             [voke.clock :refer [add-time!]]
-            [voke.state :refer [make-game-state]]
+            [voke.state :refer [make-game-state add-entity!]]
             [voke.system.core :refer [initialize-systems! process-a-tick]]
             [voke.system.rendering :refer [render-tick]]))
 
@@ -58,3 +58,8 @@
 
       (reset! animation-frame-request-id
               (js/window.requestAnimationFrame process-frame)))))
+
+(comment
+
+  (add-entity! (e/monster 800 600) :repl)
+  )
