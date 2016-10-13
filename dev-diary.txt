@@ -4859,3 +4859,20 @@ apropos
 pst
 dir
 
+http://vvvvalvalval.github.io/posts/2016-07-24-datomic-web-app-a-practical-guide.html
+recommends luminus
+maybe come back to this when i actually use datomic
+
+http://nommu.org/memory-faq.txt
+
+http://lwn.net/Articles/250967/
+
+=====
+
+10/13/16
+
+i'm going to spin up a roadmap.md to just be a central master list for feature ideas, etc
+i don't yet completely understand the relationship between dev-diary.txt, roadmap.md, and
+the github issues tracker, but this still seems like a sane idea
+
+
