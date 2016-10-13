@@ -135,7 +135,7 @@
 
 ;; System definition
 
-(def move-system
+(def system
   {:system/tick-fn (fn move-system-tick [entities]
                      (doseq [entity (filter relevant-to-movement-system? entities)]
                        (let [moved-entity (-> entity

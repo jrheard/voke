@@ -4743,3 +4743,136 @@ that's a status effect, so there's a component that looks like this
                                                    :status-effect/expiration 123853283}]}
 
 and that'll also be used for eg poison, stun, etc etc
+
+ok, so where does "the amount of damage i do" go?
+how about just a plain old :component/damage component?
+if it exists, it signifies that entities who a) collide with it and b) can take damage (have a health component
+and are not invincible, etc) should be damaged
+
+so what does this mean for systems, though?
+do we have a health system *and* a damage system?
+or just a damage system?
+
+one approach:
+
+the damage system listens for :contact events, performs no actions/modifications on entities, and
+emits :damage events. this seems like an unnecessary layer of indirection, but i could see it being useful
+for eg lifesteal; projectiles that spawn monsters when they successfuly hit; etc. i like this actually
+
+ok so the health system listens to :damage and :heal events, and updates entities' health accordingly,
+and is just really really small and that's ok
+
+seems fine to me
+
+https://8thlight.com/blog/eric-smith/2016/10/05/a-testable-clojurescript-setup.html
+**** good
+explains how to set up a cljs project + environment from scratch
+"It's idiomatic to create a function and call that as the last line of your main ClojureScript namespace"
+good because that is what i do
+https://github.com/bhauman/lein-figwheel/wiki/HTML-watcher-including-browser-reloading
+has info on how to get figwheel to reload when you make html changes
+i am... not going to do that
+
+he uses this doo-all-tests function, i haven't seen that before
+
+http://adventofcode.com/ looks cool, will have to take a look at that
+
+ok setting these things aside for now, back to health/damage
+
+i'm torn between whether to have the health system handle death, or whether to have a separate
+death system
+i think i'll probably do the latter? just seems like the health system will be really small, but whatever
+
+=======
+
+10/10/16
+
+spec notes from slack:
+
+<me>
+noob question, i’m sure, re: conformer - i reached for conformer when i was operating on
+data that looked like “123”, but i wanted (s/conform ::my-spec) to parse the integer such
+that it ended up being 123. what should i use instead of s/conformer in situations like that,
+for coercion of this sort
+i felt like i read about something that would solve this problem idiomatically in the rationale
+or guide, but couldn’t find it when i went back to look for it
+
+<seancorfield>
+yes I have a lot of cases where I have strings as input but I want them conformed to integers
+(for API input specs). But @alexmiller has told me a couple of times that is "not idiomatic"
+and to avoid conformers like that :(
+
+<me>
+hm, i don’t understand - the strings have to be turned into integers at _some_ point, right?
+is it more idiomatic to have a secondary, non-spec transformation layer that happens after s/conform?
+i’m sure @alexmiller has good reasons for saying that, but i don’t understand what spec users are actually supposed to do here
+
+<alexmiller>
+The downside is that once you enshrine a conversion into your spec, you have made a conformance
+decision for all future consumers that has removed information. If you understand this ramification
+and are willing to live with the consequences, then that's up to you.
+There are many ways to apply conversions - you should be aware of when you are conflating conformance and conversion though
+
+<me>
+i think i follow those statements, but a “in situations like that, try doing this instead” example would be supremely helpful :slightly_smiling_face:
+
+<alexmiller>
+There's not one answer
+You can apply post transformations
+You can apply a second spec
+You can apply a different spec in one case vs@another
+Etc
+And in some cases conformers might be the right answer
+
+====
+
+10/11/16
+
+been reading through the cogmind devblog all afternoon
+super neat stuff
+http://www.gridsagegames.com/blog/2016/09/ability-effect-systems-scripted-content/ seems relevant
+
+http://www.gridsagegames.com/blog/2014/07/dungeon-metrics/ talks about randomly generated dungeons
+also pathfinding
+
+"Another tip for more efficiently addressing issues during
+development: Always have the generator output the random
+seed used to generate each map (I have mine added to an
+ongoing list). That way you can always feed the seed back
+into the generator to repeatedly generate the same map
+and find out what went wrong or how the algorithm could be improved."
+
+oh fuck he has a whole series of posts on this topic
+http://www.gridsagegames.com/blog/2014/06/procedural-map-generation/
+***** TODO COME BACK TO THIS LATER
+
+https://github.com/binaryage/dirac/blob/master/docs/about-repls.md
+boy this is complicated
+https://lambdaisland.com/guides/clojure-repls
+
+=====
+
+10/12/16
+
+already learning some new stuff from https://lambdaisland.com/guides/clojure-repls/clojure-repls
+apropos
+pst
+dir
+
+http://vvvvalvalval.github.io/posts/2016-07-24-datomic-web-app-a-practical-guide.html
+recommends luminus
+maybe come back to this when i actually use datomic
+
+http://nommu.org/memory-faq.txt
+
+http://lwn.net/Articles/250967/
+
+=====
+
+10/13/16
+
+i'm going to spin up a roadmap.md to just be a central master list for feature ideas, etc
+i don't yet completely understand the relationship between dev-diary.txt, roadmap.md, and
+the github issues tracker, but this still seems like a sane idea
+
+

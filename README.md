@@ -16,11 +16,8 @@ http://jrheard.com/voke usually has a reasonably-recent, reasonably-stable versi
 I have no idea what I'm doing.
 
 I figured it'd be fun to build a game from scratch, because I don't know how to do that, and
-because I want to figure out how to write a nontrivial ClojureScript program. The general idea
-is to have gameplay similar to Binding of Isaac, with sprawling randomly generated levels vaguely (vaguely! vaguely vaguely vaguely) in the
-style of Diablo, and a super-simple leveling-up system like Risk of Rain. (Not the difficulty-increases-over-time system,
-just the super-basic your-guy-gets-a-little-more-powerful-when-he-kills-a-bunch-of-monsters
-system.)
+because I want to figure out how to write a nontrivial ClojureScript program. See roadmap.md
+for more information about the game I have in mind.
 
 I don't intend for anyone else to ever play this game, I just figured it'd be fun to figure out
 how to write a computer program program like this one.

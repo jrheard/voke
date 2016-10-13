@@ -36,7 +36,7 @@
 
 ;; System definition
 
-(def collision-system
+(def system
   {:system/initialize     (fn [game-state]
                             (doseq [entity (vals (game-state :game-state/entities))]
                               (-track-entity entity)))

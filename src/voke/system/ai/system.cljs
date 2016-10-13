@@ -1,6 +1,6 @@
 (ns voke.system.ai.system)
 
-(def ai-system
+(def system
   {:system/tick-fn (fn [entities]
                      (let [player (->> entities
                                        (filter #(contains? % :component/input))

@@ -30,12 +30,13 @@
   :ret :component/input)
 
 (defn make-weapon
-  [fire-direction projectile-color]
+  [fire-direction projectile-color damage-amount]
   #:weapon{:last-attack-timestamp 0
            ; XXXX nuke fire-direction arg, just temporary thing for testing
            :fire-direction        fire-direction
            :shots-per-second      21
            :shot-speed            5
+           :damage                damage-amount
            :projectile-color      projectile-color
            :projectile-shape      #:shape {:type   :rectangle
                                            :width  10
@@ -54,6 +55,8 @@
                                     :type   :rectangle
                                     :center {:geometry/x x
                                              :geometry/y y}}
+                 :health    #:health{:health     100
+                                     :max-health 100}
                  :motion    #:motion{:velocity             {:geometry/x 0
                                                             :geometry/y 0}
                                      :affected-by-friction true
@@ -62,7 +65,7 @@
                                      :max-speed            11}
                  :collision {:collision/type :good-guy}
                  :render    {:render/fill 0x333333}
-                 :weapon    (make-weapon nil 0x666666)
+                 :weapon    (make-weapon nil 0x666666 10)
                  :input     (make-input)}))
 
 (s/fdef player
@@ -77,6 +80,8 @@
                                     :type   :rectangle
                                     :center {:geometry/x x
                                              :geometry/y y}}
+                 :health    #:health{:health     100
+                                     :max-health 100}
                  :motion    #:motion{:velocity             {:geometry/x 0
                                                             :geometry/y 0}
                                      :affected-by-friction true
@@ -87,7 +92,7 @@
                  ;:weapon      nil
                  #_(make-weapon (- (/ Math/PI 2))
                                 0xFF0A00)
-                 ; xxx not spec'd / standardized yet, these are just some example values
+                 ; xxx ai component not spec'd / standardized yet, these are just some example values
                  :ai        {:movement :basic
                              :attack   :basic}
                  :render    {:render/fill 0xB22822}}))
@@ -110,10 +115,11 @@
   :ret :entity/entity)
 
 (defn projectile
-  [owner-id position collides-with projectile-shape projectile-color x-velocity y-velocity]
+  [owner-id position collides-with projectile-shape projectile-color damage x-velocity y-velocity]
   (make-entity
     #:component{:shape     (assoc projectile-shape
                                   :shape/center position)
+                :damage    {:damage/amount damage}
                 :owned     {:owned/owner-id owner-id}
                 :collision #:collision{:type                 :projectile
                                        :collides-with        collides-with

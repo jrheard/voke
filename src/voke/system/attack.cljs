@@ -111,6 +111,7 @@
               (-projectile-collides-with entity)
               (get-in entity [:component/weapon :weapon/projectile-shape])
               (get-in entity [:component/weapon :weapon/projectile-color])
+              (get-in entity [:component/weapon :weapon/damage])
               (shot-speed-on-axis entity :geometry/x)
               (shot-speed-on-axis entity :geometry/y)))
 
@@ -136,5 +137,5 @@
 
 ;; System definition
 
-(def attack-system
+(def system
   {:system/tick-fn process-firing-entities})
