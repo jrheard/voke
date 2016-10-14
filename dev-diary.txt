@@ -4876,3 +4876,72 @@ i don't yet completely understand the relationship between dev-diary.txt, roadma
 the github issues tracker, but this still seems like a sane idea
 
 let's read this series http://www.gridsagegames.com/blog/2014/06/procedural-map-generation/
+
+he describes a few common techniques for generating randomized maps
+bsp trees (rooms and corridors) - seems very relevant
+drunkard's walk
+cellular automata
+
+"Beyond choosing a method of generation (or mixing multiple methods), any number of parameters
+must be established and tweaked to produce layouts that work for the gameplay. Many small
+rooms or fewer large rooms? Lots of long corridors, or no corridors at all, just rooms separated
+by doors? An expansive winding cave system that draws the player to explore and lose themselves
+in it, or a mostly linear cavern contoured as it is for the atmosphere?"
+
+i currently want:
+fewer large rooms
+medium-length, fat corridors inbetween them
+(i don't want the player to be able to just funnel everything into a chokepoint and hold the fire button
+and kill everything without having to think - monsters should be able to spill through chokepoints and
+overwhelm you)
+
+******
+come to think of it, teleglitch's levels did a good job of this - fat corridors
+separated by wide automatically opening+closing doors
+
+"Cogmind is mostly ranged combat, so wider corridors and large rooms are much more common to give combatants room to find a shot."
+
+*****
+"the primary factor I pay attention to when tweaking map parameters is the number and density
+of loops. By loops I mean places where multiple pathways reach the same destination. A map
+with few or no loops in its layout will require lots of backtracking, and backtracking is _not_ fun!"
+
+"Long paths that lead to dead ends had better at least contain treasure or access to a new area."
+
+he uses a combination of tunneling and cellular automata
+
+http://www.gridsagegames.com/blog/2014/06/mapgen-tunneling-algorithm/
+
+i don't want to use tunnelers, i want more of a cavelike feel than a room-and-corridor feel
+
+i wonder.. this is funny+dumb
+i think that because my current collision system can only handle axis-aligned bounding boxes,
+these roguelike dungeon generation articles are going to be surprisingly relevant for me
+because really it's going to be like the _level_ is laid out on a very coarse grid, but the player
+and monsters can move about with a much much higher granularity
+
+so basically it's gonna be like if you're playing a zoomed-in version of the cogmind mines, for instance
+neat! dumb but maybe actually also kinda cool
+
+apparently it's difficult to make 2-width corridors happen, just 1-width and 3-width? weird
+
+"During the generation process tunnelers are responsible for laying the paths that take the
+player from an entrance to an exit, of which there are usually several with a guaranteed
+amount of space between them. How tunnelers move and what they decide to do pretty much determines
+what most of the map will look like."
+
+**** note - important phase in generation is to pick an entrance and an exit, and create one
+or more paths from the entrance to the exit. makes sense
+
+he talks about cellular automata in http://www.gridsagegames.com/blog/2014/06/mapgen-cellular-automata/
+says he likes http://www.evilscience.co.uk/a-c-algorithm-to-build-roguelike-cave-systems-part-1/
+and that it's nonstandard
+
+"I don’t have a lot of experience fiddling with cellular automata, but the few times I tried
+it was somewhat difficult to tweak for good results. This method produces good results _with ease_."
+
+======
+
+10/14/16
+
+ok, gonna pause for a second and work through https://github.com/Rovanion/webgl-clojurescript-tutorial
