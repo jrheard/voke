@@ -5233,3 +5233,50 @@ http://pcg.wikidot.com/pcg-algorithm:drunkard-walk
 heyyy what - procedural content generation wiki?!
 
 anyway this seems like a good algorithm to start with, since it's so easy
+update: it was really easy
+
+http://forums.roguetemple.com/index.php?topic=4128.0 makes more sense now
+
+http://pcg.wikidot.com/pcg-algorithm:dungeon-generation
+
+"There are two basic approaches to dungeon generation: place the rooms first, then attempt
+to connect them via corridors; or place the corridors using a maze generation algorithm,
+then unify sections of the maze to form rooms.
+ The first approach is easier to understand and by far more common, but it does not guarantee
+ connectivity between all parts of the dungeon for every dungeon generated, so may require
+ an existing dungeon layout be discarded and started again."
+
+"Depending on the complexity of dungeon layout attempted, the tunnelling code required to
+connect the rooms can get extremely complex and be prone to connection failures, and consequently
+disconnected segments of the dungeon. The usual approach is to use a spanning tree algorithm
+to validate that all rooms are connected correctly, by adding rooms at end endpoint of the
+corridor to the spanning tree."
+
+this is the second time i've seen spanning trees come up - this will likely be the data structure
+we use to figure out whether there's a clear path from the entrance to the exit
+
+http://www.roguebasin.com/index.php?title=Articles is a gold mine of general game concepts
+
+lol fuck i have 80 open tabs now
+
+"There are many algorithms that will generate a dungeon. What they do is to fill a dungeon
+with rooms passages, stairs, traps, doors, items, and monsters, often in that order. Which
+comes first can be an interesting decision."
+
+i think i want to do:
+
+stairs first
+then caves
+then passages
+then everything else
+
+http://www.roguebasin.com/index.php?title=Roguelike_Dev_FAQ#How_do_you_make_sure_all_your_rooms_and_passages_are_reachable.3F
+explains how floodfill is useful to figure out which rooms are reachable
+
+http://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation
+this is a really good explanation
+
+http://roguelikedeveloper.blogspot.com/2007/11/unangband-dungeon-generation-part-one.html lol jesus nine parts
+ok it looks like this will be worth reading, gonna come back to part 2
+
+

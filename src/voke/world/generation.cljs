@@ -3,8 +3,7 @@
             [voke.util :refer [bound-between]]))
 
 (s/def ::cell #{:empty :full})
-(s/def ::grid (s/coll-of (s/coll-of ::cell :count 20)
-                         :count 20))
+(s/def ::grid (s/coll-of (s/coll-of ::cell)))
 
 (defn full-grid [w h]
   (vec (repeat h
