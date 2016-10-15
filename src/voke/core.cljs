@@ -62,4 +62,8 @@
 (comment
 
   (add-entity! (e/monster 800 600) :repl)
+
+  (doseq [i (range 5)]
+    (add-entity! (e/monster 800 (+ 200 (* i 100)))))
   )
+

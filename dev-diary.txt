@@ -5078,3 +5078,94 @@ lines to check for visibility of nearby hostiles."
 http://www.goldenkronehotel.com/wordpress/2015/10/10/tightening-up-the-graphics-on-dungeon-floor-3/
 
 TODO understand http://humbit.com/pathfinding/test.html
+
+ok, back to http://www.gridsagegames.com/blog/2014/06/mapgen-cellular-automata/
+
+he talks about "guided" cellular automata - makes the cave fit into a longer, thinner box
+in order to avoid the player having to do a lot of backtracking
+
+http://www.gridsagegames.com/blog/2014/07/dungeon-metrics/
+he's talking about taking a generated map and analyzing it based on a bunch of different heuristics
+if the map seems like it's bad, throw it away and generate another one
+eg
+* playable space, with a lower and upper bound
+* number of rooms of different sizes
+* minimum distance between entrance and exit
+
+"Once you’ve decided to keep a generated map, there’s still plenty to be done. It’s time
+to analyze the content and layout to record what useful info we can."
+
+"The simplest component we’ll want to remember is where all the rooms/caves are located.
+Caves are a different story since they were grown randomly. To find them
+we just scan the map with a standard floodfill."
+
+TODO what's a floodfill
+
+"General statistics collected from the final map may also affect what you decide to do with
+it as a whole, data like the percent composition by cell type, maximum and average seclusion
+of areas, the largest individual hall/cave, etc. These could of course be used as additional
+requirements to filter out unwanted maps."
+
+"So what do we do with all this collected data besides decide whether to throw away a map?
+The obvious application is object placement."
+
+"My favorite analytical tool for cave systems is the relative connectedness of each cave."
+
+"Because the number of direct cave connections alone is less meaningful in many scenarios,
+I define “connectedness” as the number of immediately connected caves plus the number of
+caves those are connected to as well."
+
+"Less connected caves in different parts of the map are likely positions for entrances/exits,
+and others are good candidates for placing loot, secrets, or perhaps nastier surprises for nosy explorers.
+
+At the other end of the spectrum, well-connected caves are where most enemy activity will
+probably be concentrated."
+
+************************
+dude this makes so much sense
+
+rimworld: https://www.youtube.com/watch?v=RMBQn_sg7DA this video fucking rules
+***********
+reachability, pathfinding, closest-item finding
+regions remind me of geoquads vs latlongs
+just a coarser granularity
+y'know, rimworld's levels look a _lot_ like the ones i want to generate
+AABBs and all
+this might be super super relevant stuff
+
+i like how he says it's mostly about your data structures, algorithms become clear based on those
+i'm going to steal this region concept
+
+he talks a lot about recalculating regions, rooms, etc when the geography changes, but i don't
+plan on having the maps change in mid-game - nothing will be creating or destroying geography
+so that makes things simpler
+we can precalculate a bunch of metadata and know that the geography-based portions of it will not change
+
+around 24:00 he talks about regions with shared spans, and about hashing the spans
+i didn't understand why the system he describes works, but it looks like there are some implicit
+rules about where spans live, and that's how neighboring regions can share spans
+qualifying areas for spans: bottom row, left column, top+1 row, right+1 column
+and so that's how they overlap. see?
+
+i _don't_ understand how the system works if a fully enclosed room is wholly inside one region though
+
+overall the region system seems like a very good idea, nice
+
+=======
+
+10/15/16
+
+ok cool
+it seemed like i must have some other stuff to work on first before tackling world generation,
+but i don't think there's anything super high on the list
+
+i obviously need to get around to making different kinds of enemies at some point, but might as well
+have a big world to test them out in, right?
+
+i really like the way rimworld's levels look, they're 400x400 grids that still manage to have an open
+cavelike feel. i can't find any info on how they're generated, but they look like the ones generated
+by cellular automata in http://www.gridsagegames.com/blog/2014/06/procedural-map-generation/
+so that's the approach i'm going to look into first
+
+heh, i see viebel in slack talking about klipse again - maybe if this goes well i can show
+it off as a blog post? we'll see

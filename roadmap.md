@@ -15,6 +15,8 @@ Mechanics I'm definitely adding
 
 * Spacebar items like Binding of Isaac
 * Passive items like Binding of Isaac
+* Minimap
+  * this implies fog of war / visibility
 
 Mechanics I'm undecided on
 --------------------------
