@@ -1,6 +1,8 @@
 This document is a master list of all of the stuff I plan to put in the game. Most of this
 stuff isn't in the game yet.
 
+TODO: process http://www.roguebasin.com/index.php?title=Monster_attacks for ideas
+
 Main features
 =============
 

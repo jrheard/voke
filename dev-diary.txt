@@ -4945,3 +4945,136 @@ it was somewhat difficult to tweak for good results. This method produces good r
 10/14/16
 
 ok, gonna pause for a second and work through https://github.com/Rovanion/webgl-clojurescript-tutorial
+
+that was all right but i didn't really understand any of it
+https://github.com/thi-ng/geom/tree/develop has an impressive list of features i don't understand
+"React.js component helpers for WebGL" hm
+see also https://github.com/kovasb/gamma if i ever want to do webgl stuff
+
+https://www.reddit.com/r/roguelikedev/comments/57dnqk/faq_friday_49_awareness_systems/
+wow i'm going to read all of these
+
+https://www.reddit.com/r/roguelikedev/comments/2tcvaj/faq_friday_1_languages_and_libraries/
+
+https://bitbucket.org/libtcod/libtcod/wiki/Features seems worth reading at some point
+"fov toolkit" and "pathfinding toolkit" seem relevant
+
+https://www.reddit.com/r/roguelikedev/comments/2yuuom/faq_friday_8_core_mechanic/ is good
+i haven't thought about voke's core mechanic, i think that's fine
+
+voke's really just a learning experience
+
+if i want to make a super cool roguelike after this, _then_ i can do a lot of research and thinking
+and design before i start to actually work on it
+
+http://www.gridsagegames.com/blog/2014/03/balance/
+lol jesus christ ok nvm maybe i'm not interested in actual gamedev, this looks so boring
+
+http://jere.in/time-travel-is-hard
+he talks about having trouble saving the whole game state whenever things change
+clj solves that :)
+
+`One thing that doesn't get mentioned enough is that 'omnidirectional light emitters' can
+easily be simulated by a circular FOV algorithm, and 'beam light emitters' can easily be
+simulated by a conical FOV algorithm. So the lesson for newbie developers is that if you
+implement a flexible FOV algorithm you get lighting for 'cheap', if not 'free'. You still
+have to think about ambient light levels and how that plays into Character's FOV in a world
+where there's lighting, but it gets you out of the gate.`
+
+in https://www.reddit.com/r/roguelikedev/comments/30fvqp/faq_friday_9_debugging/
+they complain that unit tests aren't useful in roguelikes
+because "Many of the bugs in roguelikes are due to combinations
+of inputs that you didn't think of. Unit tests can't help
+here, because in order to write the test, you'd have had to have thought of that combination."
+generative tests to the rescue?
+
+https://www.reddit.com/r/roguelikedev/comments/358mt5/faq_friday_12_field_of_vision/
+
+"Cogmind uses a brute force Bresenham raycast model that shoots rays from the FOV origin
+to every cell along the edges of a bounding box that represents the farthest possible area
+visible, and each ray quits after either reaching the maximum sight range or as soon as it
+hits an opaque wall. Yes, there is lots of overlap, but it also ensures a more liberal result
+that catches everything that should be seen. It’s worth the extra cost, rather than having
+the occasional odd piece missing around a strangely shaped map feature. (And becomes absolutely
+necessary if you want to properly implement semi-transparent cells.)"
+
+adding fov sounds like a fun idea, not sure if i'll actually do it though
+
+https://www.reddit.com/r/roguelikedev/comments/3b4wx2/faq_friday_15_ai/
+"The one roguelike I didn't do this in, Gruesome, just has random AI movement, some with
+slightly different weightings dependant on the unit's colour. I've seen interesting discussion
+from players on how the AI is super-smart and tries to keep in safe areas. It's all false,
+but humans are great pattern spotters :) This taught me that there's no point spending time
+on complex AI - humans don't notice it well and will imagine that stupid AI is complex anyway :P "
+
+*********
+this first post is really good
+particularly re: maintaining a certain distance range, and pack tactics / hit and run pack
+
+"A Smart Object can consist of multiple Interactions, and an Interaction holds an Action
+Chain, which basically guides an actor through a chain of actions required for the interaction
+(rather than the actor "knowing" how to interact with everything, the Smart Object tells
+the actor how it should be interacted with)."
+
+this whole comment - https://www.reddit.com/r/roguelikedev/comments/3b4wx2/faq_friday_15_ai/ - is very good
+
+the demons guy's post is interesting
+"How do monsters decide whether to use their turn doing something else, like moving, rather than using an ability?"
+"For the most part, the AI hates moving and regards it as little better than doing nothing.
+It will only consider moving if none of the ability->target evaluations come up as Average
+(100.0) or better, and the chance of it doing a move instead of the best it found is roughly
+proportional to how how far below Average that best evaluation was."
+
+"In NetHack 3.4.3, monsters tend to avoid the previous four squares they've stepped on. This
+causes them to have a tendency to go down corridors rather than random-walk back and foth.
+In NetHack 4, monsters have a goal square at almost all times (they can go without one for
+a turn, in which case they'll pick a new one at the end of the turn). Lots of things set
+a monster's goal square, such as seeing the player, hearing noise, seeing an item they want
+to pick up, and the like. If a monster reaches its goal, or cannot make progress towards
+the goal, it picks a new one on the next turn."
+
+*****
+"Currently I have some sort of ability-based AI, where different behaviours are not coded
+in each AI, but on the abilities. I just add a list of abilities to each creature, then when
+that creature tries to attack, it runs through all its abilities getting the situational
+value for each of them, and choses the best one for the situation."
+
+https://www.reddit.com/r/roguelikedev/comments/3b4wx2/faq_friday_15_ai/csjjo2b
+***** this is much more relevant to my situation
+
+http://www.roguebasin.com/index.php?title=Monster_attacks
+
+https://www.reddit.com/r/roguelikedev/comments/3ldi50/faq_friday_21_morgue_files/
+interesting
+BoI has this, cogmind has this
+
+http://www.gridsagegames.com/blog/2014/10/player-always-right-existential-approach-game-ai/
+on simpler-is-better AI
+"Any game that can should try to get away with the simplest AI possible and work up from
+there as necessary, just beyond whatever point at which the AI is apparently behaving stupidly."
+
+https://www.reddit.com/r/roguelikedev/comments/3slu9c/faq_friday_25_pathfinding/
+he likes A*
+"It uses Manhattan distance to the goal as the heuristic, and search data is sorted in a binary heap."
+"Pathfinding is easily the single most CPU intensive process in Cogmind (and many other games).
+Right now 47% of the CPU cycles are spent calculating paths!"
+gonna have to watch out for that
+i think i'll just avoid it by having pathfinding only be run every eg 10th tick
+(will have to avoid thundering herd)
+
+robinson's clojure a* implementation is:
+https://github.com/aaron-santos/clj-tiny-astar/blob/master/src/clj_tiny_astar/path.cljx
+"It returns a list of (x, y)s from the start to end positions if a path exists."
+
+https://www.reddit.com/r/roguelikedev/comments/448jw6/faq_friday_31_pain_points/
+
+https://www.reddit.com/r/roguelikedev/comments/50qbig/faq_friday_46_optimization/
+
+"FOV is not really an issue, because it would be crazy to try calculating the huge number
+of FOVs practically in real time, and at the sight ranges which are common in Cogmind (16+).
+Instead I opted to only calculate the player's FOV, while all other actors just use direct
+lines to check for visibility of nearby hostiles."
+
+http://www.goldenkronehotel.com/wordpress/2015/10/10/tightening-up-the-graphics-on-dungeon-floor-3/
+
+TODO understand http://humbit.com/pathfinding/test.html
