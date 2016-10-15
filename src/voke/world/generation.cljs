@@ -42,22 +42,29 @@
         width (count (first grid))]
 
     (loop [grid grid
-           [x y] [(rand-int width) (rand-int height)]]
+           x (rand-int width)
+           y (rand-int height)]
 
       (if (= (count-empty-spaces grid)
              num-empty-cells)
         grid
 
-        (recur (assoc-in grid [y x] :empty)
-               (case (rand-nth [:north :east :south :west])
-                 :north [x
-                         (bound-between (dec y) 0 height)]
-                 :east [(bound-between (inc x) 0 width)
-                        y]
-                 :south [x
-                         (bound-between (inc y) 0 height)]
-                 :west [(bound-between (dec x) 0 width)
-                        y]))))))
+        (let [base-directions [:north :south :east :west]
+              horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
+              vertical-direction-to-center (if (< y (/ height 2)) :south :north)
+              direction (rand-nth (conj base-directions
+                                        horizontal-direction-to-center
+                                        vertical-direction-to-center))]
+
+          (recur (assoc-in grid [y x] :empty)
+                 (case direction
+                   :east (bound-between (inc x) 0 width)
+                   :west (bound-between (dec x) 0 width)
+                   x)
+                 (case direction
+                   :north (bound-between (dec y) 0 height)
+                   :south (bound-between (inc y) 0 height)
+                   y)))))))
 
 (comment
   (-> ::grid
@@ -68,7 +75,7 @@
       )
 
   (-> (full-grid 50 20)
-      (drunkards-walk 250)
+      (drunkards-walk 200)
       grid->str
       print
       )
