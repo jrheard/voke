@@ -7,7 +7,7 @@ Main features
 =============
 
 * Binding of Isaac style top-down twin-stick bullet-hell-lite roguelite gameplay
-* Randomly generated levels _vaguely_ in the vein of diablo (i.e. large maps as opposed to individual BoI style rooms)
+* Randomly generated levels _vaguely_ in the vein of diablo (i.e. large maps as opposed to individual BoI style rooms), maybe a cross between Diablo and Rimworld
 * Very basic xp/leveling system, a la Risk of Rain - no talent tree, manual stat allocation, etc, just cumulative stat increases
 
 Mechanics I'm definitely adding

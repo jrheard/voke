@@ -5169,3 +5169,67 @@ so that's the approach i'm going to look into first
 
 heh, i see viebel in slack talking about klipse again - maybe if this goes well i can show
 it off as a blog post? we'll see
+
+so yeah look into cellular automata and then spend a lot of time processing and implementing
+http://www.gridsagegames.com/blog/2014/07/dungeon-metrics/
+
+which come to think of it i'm still processing
+
+so he's talking about room connectivity, and how that's a useful metric
+the bit about seclusion is interesting, makes sense in tunneled levels
+
+http://www.gridsagegames.com/blog/2014/07/dungeon-prefabs/ is interesting, i prob won't use it though
+
+http://www.gridsagegames.com/blog/2016/03/generating-populating-caves/
+
+"“encounters,” wherein caves (analogous to rooms in room-and-corridor
+maps) each have their own content pulled from a pool of
+available encounters that themselves generally fall into one of four categories: fluff, rewards,
+risk vs. reward, and danger."
+
+sounds relevant
+
+"the cave generator itself, which isn’t even a part of the game engine (i.e. it can be run without Cogmind at all)"
+
+this is what i was planning for my generator too, cool
+i think it's just going to output a 2d vector of edn
+which can be used by the game engine to create a level, or visualized using dev tools of some sort
+
+http://www.gridsagegames.com/blog/2015/05/map-composition/
+
+ok spinning up https://github.com/jrheard/voke/issues/34 to track this issue and centralize related links
+
+http://dungeonmaker.sourceforge.net/DM2_Manual/index.html
+this claims to be the most advanced dungeon generator on the planet, but appears to be from 2005
+
+"I always like to watch the movie of creating a labyrinth/dungeon hybrid, because there are
+a lot of surprises, and some very tricky environments get created. But would these environments
+be fun to play in? I really don't know. No doubt it depends much on the game dynamics, and
+unconventional dungeons such as these would have to be playtested before any decision is
+made on including them in a game. The fact that the DungeonMaker is capable of making develishly
+difficult dungeons should not induce us to base a game on them. It may well be that simpler
+dungeons are more fun."
+
+i like that
+
+" The lower down you go, the better treasure you can get. Every dungeon has a number of magical
+artefacts and one major treasure. When you steal one of these, the AI will mount a serious
+attempt to corner and catch you, while they might otherwise have been content to just see
+you leave. If you steal the major treasure, the alarm will even go out to neighboring dungeons,
+and they will already be in an alert hunting stance when you enter them. "
+
+https://www.reddit.com/r/gamedev/comments/1dlwc4/procedural_dungeon_generation_algorithm_explained/
+
+this isn't going to be super relevant, he's got room-and-corridor levels, but probably still interesting
+
+"At this point we have 150 random cells in a small area, most are overlapping. Next we use
+simple separation steering behaviour to separate out all of the rectangles so that none are
+overlapping. This technique ensures that the cells are not overlapping, yet in general remain
+as tightly packed together as possible."
+
+this post is pretty good actually
+
+http://pcg.wikidot.com/pcg-algorithm:drunkard-walk
+heyyy what - procedural content generation wiki?!
+
+anyway this seems like a good algorithm to start with, since it's so easy
