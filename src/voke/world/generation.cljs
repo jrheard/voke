@@ -6,7 +6,7 @@
 (s/def ::cell #{:empty :full})
 (s/def ::grid (s/coll-of (s/coll-of ::cell)))
 (s/def ::active-cells (s/coll-of ::cell))
-(s/def ::generated-world (s/keys :req [::grid ::active-cells]))
+(s/def ::world (s/keys :req [::grid ::active-cells]))
 
 (defn full-grid [w h]
   (vec (repeat h
@@ -78,7 +78,7 @@
 (s/fdef drunkards-walk
   :args (s/cat :grid ::grid
                :num-empty-cells nat-int?)
-  :ret ::generated-world)
+  :ret ::world)
 
 (stest/instrument [`drunkards-walk
                    `full-grid
