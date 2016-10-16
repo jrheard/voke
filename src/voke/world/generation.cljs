@@ -5,8 +5,8 @@
 
 (s/def ::cell #{:empty :full})
 (s/def ::grid (s/coll-of (s/coll-of ::cell)))
-(s/def ::active-cells (s/coll-of ::cell))
-(s/def ::world (s/keys :req [::grid ::active-cells]))
+(s/def ::historical-active-cells (s/coll-of ::cell))
+(s/def ::world (s/keys :req [::grid ::historical-active-cells]))
 
 (defn full-grid [w h]
   (vec (repeat h
@@ -51,7 +51,7 @@
       (if (= (count-empty-spaces grid)
              num-empty-cells)
         {::grid         grid
-         ::active-cells historical-active-cells}
+         ::historical-active-cells historical-active-cells}
 
         (let [horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
               vertical-direction-to-center (if (< y (/ height 2)) :south :north)

@@ -3,32 +3,41 @@
             [reagent.core :as r]
             [voke.world.generation :as generate]))
 
-; TODO spec out generation state, figure out how it evoles over time
-; construct some sort of system that takes a ::generation/world and draws its progress over time
+(s/def ::active-cell ::generate/cell)
+(s/def ::dungeon (s/keys :req [::generate/grid ::active-cell]))
 
-(defonce generation-state (-> (generate/full-grid 20 20)
-                              (generate/drunkards-walk 100)
-                              r/atom))
+; TODO construct some sort of system that takes a ::generation/world and draws its progress over time
 
-(defn row [a-row row-num]
+(let [world (-> (generate/full-grid 30 30)
+                (generate/drunkards-walk 150))]
+  (def dungeon (r/atom {::generate/grid (world ::generate/grid)
+                        ::active-cell   [2 2]})))
+
+(defn row [a-row y active-cell]
   [:div.row
-   (for [[i cell] (map-indexed vector a-row)]
-     ^{:key ["cell" row-num i]} [:div.cell {:class (name cell)}])])
+   (for [[x cell] (map-indexed vector a-row)]
+     (let [classes (str
+                     "cell "
+                     (name cell)
+                     " "
+                     (when (= active-cell [x y])
+                       "active"))]
+       ^{:key ["cell" x y]} [:div {:class classes}]))])
 
 ; TODO rewrite when grid is 1d
-(defn grid [generation-state]
+(defn grid [dungeon]
   [:div.world
-   (for [[i a-row] (map-indexed vector (::generate/grid @generation-state))]
-     ^{:key ["row" i]} [row a-row i])])
+   (doall (for [[y a-row] (map-indexed vector (@dungeon ::generate/grid))]
+            ^{:key ["row" y]} [row a-row y (@dungeon ::active-cell)]))])
 
 
 (defn ^:export main []
-  (r/render-component [grid generation-state]
+  (r/render-component [grid dungeon]
                       (js/document.getElementById "content")))
 
 
 (comment
-  (reset! generation-state
+  (reset! dungeon
           (-> (generate/full-grid 30 30)
               (generate/drunkards-walk 200)
               )

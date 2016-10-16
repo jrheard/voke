@@ -6,7 +6,8 @@ display: block;
 
 .world {
 margin: 0 auto;
-width: 800px;
+width: 450px;
+border: solid 1px #333;
 }
 
 .row {
@@ -14,12 +15,20 @@ width: 800px;
 }
 
 .cell {
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     float: left;
 }
 
 .cell.full {
-    background-color: black;
+    background-color: #333;
+}
+
+.cell.empty {
+    background-color: #CCC;
+}
+
+.cell.active {
+    background-color: #7BCC70;
 }
 

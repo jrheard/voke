@@ -5386,3 +5386,8 @@ should solve that problem
 he talks about how you can use web workers to get more processing power
 
 ok uh anyway i think webgl is overkill for the visualization i have in mind, i'll just use reagent
+
+basic visualization up and running
+next up:
+convert grid to 1d vector (compare drunkard speed before / after)
+animate world generation over time
