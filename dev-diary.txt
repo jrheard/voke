@@ -5355,3 +5355,34 @@ and so the visualizer will just draw a grid of squares where filled ones are dar
 empty ones are lighter, and the currently visited cell is green; and there'll be
 a button you can press to generate a new dungeon, and (TODO think more about this)
 a rewind progress bar feature
+
+https://news.ycombinator.com/item?id=9753897 has gamma videos
+
+wow http://demo.thi.ng/ws-ldn-8/gol/ is pretty sick, i should look through this
+
+https://medium.com/@thi.ng/workshop-report-hi-perf-clojurescript-with-webgl-asm-js-and-emscripten-a545cca083bc#.47xf4fyka
+********* GOOD SHIT, RELEVANT TO PERF
+is by the guy who made the other webgl library
+
+this looks really relevant to me because it's describing operating on a ton of grid
+items / doing neighbor lookups / etc in cljs, which i'm going to be doing all the time
+
+he implements a macro version of get-in that's 5x faster
+
+"The more obvious improvement to speed up the simulation was using a flat 1D vector to encode
+the grid and calculate cell indices for the 2D coordinates, much like in a pixel buffer.
+This not just gives us better cache locality, but instead of get-in we could now just use
+nth, gain a ~6x speed up and somewhat simpler code."
+*************************************
+yeah i'll probably end up doing this
+
+he uses typed arrays, i haven't looked into that at all
+
+"avoid keywords or collections as functions (use get instead)"
+i should look into that - i prefer using collections as functions rather than using get
+because i don't like that (get foo bar) doesn't throw an error if foo is nil, but spec
+should solve that problem
+
+he talks about how you can use web workers to get more processing power
+
+ok uh anyway i think webgl is overkill for the visualization i have in mind, i'll just use reagent

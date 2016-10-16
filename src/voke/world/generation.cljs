@@ -1,9 +1,12 @@
 (ns voke.world.generation
   (:require [cljs.spec :as s]
-            [voke.util :refer [bound-between]]))
+            [cljs.spec.test :as stest]
+            [voke.util :refer [bound-between rand-nth-weighted]]))
 
 (s/def ::cell #{:empty :full})
 (s/def ::grid (s/coll-of (s/coll-of ::cell)))
+(s/def ::active-cells (s/coll-of ::cell))
+(s/def ::generated-world (s/keys :req [::grid ::active-cells]))
 
 (defn full-grid [w h]
   (vec (repeat h
@@ -41,29 +44,45 @@
         width (count (first grid))]
 
     (loop [grid grid
+           historical-active-cells []
            x (rand-int width)
            y (rand-int height)]
 
       (if (= (count-empty-spaces grid)
              num-empty-cells)
-        grid
+        {::grid         grid
+         ::active-cells historical-active-cells}
 
-        (let [base-directions [:north :south :east :west]
-              horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
+        (let [horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
               vertical-direction-to-center (if (< y (/ height 2)) :south :north)
-              direction (rand-nth (conj base-directions
-                                        horizontal-direction-to-center
-                                        vertical-direction-to-center))]
+              direction (rand-nth-weighted
+                          (into {}
+                                (map (fn [direction]
+                                       (if (#{horizontal-direction-to-center vertical-direction-to-center}
+                                             direction)
+                                         [direction 1.2]
+                                         [direction 1.0]))
+                                     [:north :south :east :west])))]
 
           (recur (assoc-in grid [y x] :empty)
+                 (conj historical-active-cells [x y])
                  (case direction
-                   :east (bound-between (inc x) 0 width)
-                   :west (bound-between (dec x) 0 width)
+                   :east (bound-between (inc x) 0 (dec width))
+                   :west (bound-between (dec x) 0 (dec width))
                    x)
                  (case direction
-                   :north (bound-between (dec y) 0 height)
-                   :south (bound-between (inc y) 0 height)
+                   :north (bound-between (dec y) 0 (dec height))
+                   :south (bound-between (inc y) 0 (dec height))
                    y)))))))
+
+(s/fdef drunkards-walk
+  :args (s/cat :grid ::grid
+               :num-empty-cells nat-int?)
+  :ret ::generated-world)
+
+(stest/instrument [`drunkards-walk
+                   `full-grid
+                   `count-empty-spaces])
 
 (comment
   (-> ::grid
@@ -74,7 +93,11 @@
       )
 
   (-> (full-grid 50 20)
-      (drunkards-walk 200)
+      (drunkards-walk 150)
+      ;::active-cells
+      ;count
+
+      ::grid
       grid->str
       print
       )
