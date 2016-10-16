@@ -5325,3 +5325,33 @@ this series is pretty boring tbh
 gridsagegames' articles are way better
 ok yeah i give up on this series
 
+http://www.gamasutra.com/blogs/AAdonaac/20150903/252889/Procedural_Dungeon_Generation_Algorithm.php
+******* SUPER GREAT stuff for room-and-corridor (not relevant here but still cool)
+
+ok i've read every non-cellular-automata tab
+so it's time to read those now
+my brain is tired though, gonna take a break
+
+========
+
+10/16/16
+
+i actually think i'm going to start first by spinning up a little tool to help visualize
+dungeon generation algorithms
+
+i'm planning on using either reagent [i should probably just do this] or some webgl react-y
+tool (i think gamma exists but is very new, maybe something else exists too, if none of these
+options are compelling then just use reagent) to draw the dungeon generation process on
+a web page.
+
+i plan to modify eg drunkards-walk to return {::grid grid, ::active-cells <list of cells
+that were actively being visited, in chronological order>}
+
+i haven't looked into cellular automata yet, but from the shape of the generated dungeons
+it looks like they might have several cells be visited at the same time, so maybe active-cells
+will end up being a list of lists, we'll see. anyway it should be pretty straightforward
+
+and so the visualizer will just draw a grid of squares where filled ones are dark,
+empty ones are lighter, and the currently visited cell is green; and there'll be
+a button you can press to generate a new dungeon, and (TODO think more about this)
+a rewind progress bar feature
