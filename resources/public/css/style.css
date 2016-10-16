@@ -4,3 +4,22 @@ margin: 0 auto;
 display: block;
 }
 
+.world {
+margin: 0 auto;
+width: 800px;
+}
+
+.row {
+    overflow: hidden;
+}
+
+.cell {
+    width: 10px;
+    height: 10px;
+    float: left;
+}
+
+.cell.full {
+    background-color: black;
+}
+
