@@ -5279,4 +5279,49 @@ this is a really good explanation
 http://roguelikedeveloper.blogspot.com/2007/11/unangband-dungeon-generation-part-one.html lol jesus nine parts
 ok it looks like this will be worth reading, gonna come back to part 2
 
+"Cellular Automata Dungeons" is listed on the roguebasin of "things which are hard to code", auspicious
+
+http://www.roguebasin.com/index.php?title=Creating_Measurably_%22Fun%22_Maps
+"First connect the dungeon beginning to the dungeon ending. The beginning is generally the
+cave entrance or the stairs up or wherever the player begins that dungeon level at. The end
+cell is up to you to define. Connect these two cells using DSP and stash the returned path.
+Now you have two sets of nodes. Nodes on the path (path nodes) and nodes not on the path
+(pointless nodes). The key idea is to "solve" the pointless nodes such that the player either
+wants to or has to visit most of those pointless nodes (thereby adding them to the path nodes)."
+
+this is relevant to the gridsagegames concept of "seclusion", which he mainly talks about
+in tunneled maps
+
+"There are many ways to "solve" pointless nodes. Before we discuss them, you must group the
+pointless nodes into pointless areas. A pointless area is a collection of all pointless nodes
+that can reach each other without crossing any path nodes"
+
+http://www.roguebasin.com/index.php?title=Data_structures_for_the_map
+
+http://www.roguebasin.com/index.php?title=Delving_a_connected_cavern
+i can't see any of the generated dungeons :( so i am going to ignore this article
+
+http://www.roguebasin.com/index.php?title=Dungeon-Building_Algorithm
+
+http://www.roguebasin.com/index.php?title=Random_Walk_Cave_Generation
+mentions that dynamically resizing the map helps make drunkard's walk generation less bad
+
+http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps
+****** this seems potentially relevant (eventually)
+"Most of the things a monster will do involve moving toward something or moving away from it."
+
+http://www.roguebasin.com/index.php?title=Programming_Roguelike_Magic
+"But once I started adding more spells, a lot of code needed to be unnecessarily duplicated.
+For example, a magic missile spell and a icebolt spell do not really differ very much, and
+neither do a fireball and a firebolt."
+
+http://www.avanderw.co.za/voronoi-dungeon-generator/
+i don't really like the maps this generates, too room-and-corridor for my taste
+
+ok, returning to http://roguelikedeveloper.blogspot.com/2007/11/unangband-dungeon-generation-part-one.html
+(i still haven't read the posts on cellular automata that i've had up for days and am planning to use!)
+
+this series is pretty boring tbh
+gridsagegames' articles are way better
+ok yeah i give up on this series
 

@@ -23,6 +23,8 @@ Mechanics I'm undecided on
 
 * Mana, spells
   * Monsters will definitely have these, but not sure whether player will
+  * Read http://www.roguebasin.com/index.php?title=Programming_Roguelike_Magic when we get to this
+  * God, also read http://roguelikedeveloper.blogspot.com/2008/05/unangband-magic-system-part-one.html , which has sixteen+ parts
 
 Monster types
 -------------
