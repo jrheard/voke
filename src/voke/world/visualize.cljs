@@ -1,7 +1,9 @@
 (ns voke.world.visualize
   (:require [cljs.spec :as s]
+            [cljs.core.async :refer [chan <! put!]]
             [reagent.core :as r]
-            [voke.world.generation :as generate]))
+            [voke.world.generation :as generate])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (s/def ::active-cell ::generate/cell)
 (s/def ::dungeon (s/keys :req [::generate/grid ::active-cell]))
@@ -10,10 +12,14 @@
 
 ; TODO construct some sort of system that takes a ::generation/world and draws its progress over time
 
-(let [world (-> (generate/full-grid 30 30)
-                (generate/drunkards-walk 150))]
-  (def dungeon (r/atom {::generate/grid (world ::generate/grid)
-                        ::active-cell   [2 2]})))
+(defn make-dungeon []
+
+  (let [world (-> (generate/full-grid 30 30)
+                  (generate/drunkards-walk 150))]
+    {::generate/grid (world ::generate/grid)
+     ::active-cell   [2 2]}))
+
+(defonce dungeon (r/atom (make-dungeon)))
 
 (defn row [a-row y]
   [:div.row
@@ -27,12 +33,19 @@
            ^{:key ["row" y]} [row a-row y])
 
          (let [[x y] (@dungeon ::active-cell)]
-           [:div.cell.active {:style {:left (* cell-size x)
-                                      :top  (* cell-size y)}}]))])
+           ^{:key "active-cell"} [:div.cell.active {:style {:left (* cell-size x)
+                                                            :top  (* cell-size y)}}]))])
 
+(defn ui [dungeon]
+  [:div.content
+   ^{:key "dungeon"} [grid dungeon]
+   ^{:key "button"} [:button {:on-click (fn [e]
+                                          (.preventDefault e)
+                                          (reset! dungeon (make-dungeon)))}
+                     "generate"]])
 
 (defn ^:export main []
-  (r/render-component [grid dungeon]
+  (r/render-component [ui dungeon]
                       (js/document.getElementById "content")))
 
 
