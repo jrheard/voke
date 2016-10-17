@@ -5497,3 +5497,7 @@ let's add controls to the visualization UI for width, height, and target empty c
 lol gonna need to make the css a bit more intelligent
 hm i wonder how long generating a 100x100 grid takes
 TODO come back and benchmark
+
+ok i'm playing around with sliders
+having trouble getting the slider's displayed value to change when its backing atom changes
+seems like the <input> tag isn't being rerendered for some reason

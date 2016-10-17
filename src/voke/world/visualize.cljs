@@ -9,26 +9,25 @@
 ;; Constants
 
 (def cell-size 15)
-(def ms-per-tick (atom 5))
-(def grid-width (atom 80))
-(def grid-height (atom 60))
-(def num-empty-cells (atom 100))
+(defonce ms-per-tick (r/atom 16))
+(defonce grid-width (r/atom 30))
+(defonce grid-height (r/atom 30))
+(defonce num-empty-cells (r/atom 100))
 
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
                                       ::active-cell   nil
                                       ::id            0}))
 
-(defn reset-visualization-state [old-state]
-  {::generate/grid (generate/full-grid @grid-width @grid-height)
-   ::active-cell   nil
-   ::id            (inc (old-state ::id))})
+(defn reset-visualization-state! []
+  (swap! visualization-state (fn [old-state]
+                               {::generate/grid (generate/full-grid @grid-width @grid-height)
+                                ::active-cell   nil
+                                ::id            (inc (old-state ::id))})))
 
 ;; Async code
 
 (defn animate-dungeon-history [historical-active-cells]
-  (let [visualization-id (-> visualization-state
-                             (swap! reset-visualization-state)
-                             ::id)]
+  (let [visualization-id ((reset-visualization-state!) ::id)]
 
     (go-loop [history historical-active-cells]
       (when (and (seq history)
@@ -66,20 +65,29 @@
            ^{:key "active-cell"} [:div.cell.active {:style {:left (* cell-size x)
                                                             :top  (* cell-size y)}}]))])
 
-(defn slider [an-atom min max]
-  [:input {:type      "range" :value @an-atom :min min :max max
-           :style     {:width "100%"}
-           :on-change (fn [e]
-                        (reset! an-atom (js/parseInt (.-target.value e))))}])
+(defn slider [an-atom min max callback]
+  (let [_ @an-atom]
+    [:input {:type      "range" :value @an-atom :min min :max max
+             :style     {:width "100%"}
+             :on-change (fn [e]
+                          (reset! an-atom (js/parseInt (.-target.value e)))
+                          (callback))}]))
 
 (defn ui [visualization-state]
   [:div.content
-   [slider grid-width 20 80]
+   [:p (str "Grid width: " @grid-width)]
+   [slider grid-width 25 35 reset-visualization-state!]
+   [:p (str "Grid height: " @grid-height)]
+   [slider grid-height 25 35 reset-visualization-state!]
+   [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
+   [:p "(doesn't take effect until the next time you press \"generate\")"]
+   [slider num-empty-cells 10 300]
+   [:p (str "Animation speed: " @ms-per-tick " ms per frame")]
+   [slider ms-per-tick 5 250]
    ^{:key "button"} [:button
                      {:on-click (fn [e]
                                   (.preventDefault e)
-                                  (js/console.log @grid-width)
-                                  (let [new-dungeon (-> (generate/full-grid @grid-width @grid-height)
+                                  (let [new-dungeon (-> (@visualization-state ::generate/grid)
                                                         (generate/drunkards-walk @num-empty-cells))]
                                     (animate-dungeon-history (new-dungeon ::generate/historical-active-cells))))}
                      "generate"]
@@ -95,8 +103,8 @@
 (comment
   (reset! dungeon
           (-> (generate/full-grid 30 30)
-              (generate/drunkards-walk 200)
-              )
-          )
+              (generate/drunkards-walk 200))))
 
-  )
+
+
+

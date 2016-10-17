@@ -102,5 +102,5 @@
       (dotimes [_ 100]
         (p :drunkard
            (drunkards-walk grid 150)
-           nil))))
-  )
+           nil)))))
+
