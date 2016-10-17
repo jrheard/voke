@@ -1,4 +1,5 @@
-(ns voke.util)
+(ns voke.util
+  (:require [cljs.core.async :refer [chan close!]]))
 
 (defn in?
   "per https://stackoverflow.com/questions/3249334/test-whether-a-list-contains-a-specific-value-in-clojure"
@@ -40,3 +41,8 @@
         choice
         (recur (- i weight) remaining)))))
 
+; from https://gist.github.com/swannodette/5882703
+(defn timeout [ms]
+  (let [c (chan)]
+    (js/setTimeout (fn [] (close! c)) ms)
+    c))

@@ -5389,5 +5389,5 @@ ok uh anyway i think webgl is overkill for the visualization i have in mind, i'l
 
 basic visualization up and running
 next up:
-convert grid to 1d vector (compare drunkard speed before / after)
 animate world generation over time
+convert grid to 1d vector (compare drunkard speed before / after)
