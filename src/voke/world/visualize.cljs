@@ -8,7 +8,10 @@
 
 ;; Constants
 
+
 (def cell-size 15)
+; TODO - allow UI to modify these next three values (sliders for all three?)
+; also allow UI to modify number of cells dug out
 (def ms-per-tick 50)
 (def grid-width 30)
 (def grid-height 30)
@@ -24,7 +27,7 @@
 
 ;; Async code
 
-(defn animate-dungeon-history [historical-active-cells w h]
+(defn animate-dungeon-history [historical-active-cells]
   (let [visualization-id (-> visualization-state
                              (swap! reset-visualization-state)
                              ::id)]
@@ -68,13 +71,12 @@
 (defn ui [visualization-state]
   [:div.content
    ^{:key "dungeon"} [grid visualization-state]
-   ^{:key "button"} [:button {:on-click (fn [e]
-                                          (.preventDefault e)
-                                          (let [new-dungeon (-> (generate/full-grid 30 30)
-                                                                (generate/drunkards-walk 100))]
-                                            (animate-dungeon-history (new-dungeon ::generate/historical-active-cells)
-                                                                     30
-                                                                     30)))}
+   ^{:key "button"} [:button
+                     {:on-click (fn [e]
+                                  (.preventDefault e)
+                                  (let [new-dungeon (-> (generate/full-grid 30 30)
+                                                        (generate/drunkards-walk 100))]
+                                    (animate-dungeon-history (new-dungeon ::generate/historical-active-cells))))}
                      "generate"]])
 
 ;; Main

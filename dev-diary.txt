@@ -5391,3 +5391,40 @@ basic visualization up and running
 next up:
 animate world generation over time
 convert grid to 1d vector (compare drunkard speed before / after)
+
+======
+
+10/17/16
+
+ok, animation works, nice
+next up: performance pass
+plan:
+
+1. figure out how to accurately time eg 100 executions of drunkard's walk before optimization
+2. profile it
+implement each of the following items, timing execution before/after to measure speedup
+(pending what we find in profiling step)
+3. don't call count-empty-cells fn on every pass, just pass a num-empty-cells variable along
+    as part of the loop/recur's state
+4. convert data structure to 1d grid
+5. instead of using a cljs vector of :full :empty keywords, convert to a js array of 0 or 1
+   (it can still return a cljs vector of keywords though, just convert to that at the end)
+6. look into typed arrays
+
+but first i'm gonna clear my chrome tabs
+
+https://github.com/facundoolano/advenjure
+
+https://facundoolano.wordpress.com/2016/10/16/from-clojure-to-clojurescript/
+
+"I found that some built-ins I used to implement them, like read-string and eval, are not
+directly available in ClojureScript, but a bit of googling revealed how to bring them back."
+
+neat info about eval, read-string, saving game state to localstorage
+
+huh, i didn't know that javascript regexes don't support named capture groups
+apparently http://xregexp.com/ is a solution
+
+refers to http://www.spacjer.com/blog/2014/09/12/clojurescript-javascript-interop/
+(have i read this before?)
+

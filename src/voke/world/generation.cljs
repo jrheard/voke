@@ -4,13 +4,15 @@
             [voke.util :refer [bound-between rand-nth-weighted]]))
 
 (s/def ::cell #{:empty :full})
-(s/def ::grid (s/coll-of (s/coll-of ::cell)))
+(s/def ::width nat-int?)
+(s/def ::height nat-int?)
+(s/def ::grid (s/coll-of ::cell))
+
 (s/def ::historical-active-cells (s/coll-of ::cell))
-(s/def ::world (s/keys :req [::grid ::historical-active-cells]))
+(s/def ::grid-with-history (s/keys :req [::grid ::historical-active-cells]))
 
 (defn full-grid [w h]
-  (vec (repeat h
-               (vec (repeat w :full)))))
+  (vec (repeat (* w h) :full)))
 
 (s/fdef full-grid
   :args (s/cat :w nat-int? :h nat-int?)
@@ -78,7 +80,7 @@
 (s/fdef drunkards-walk
   :args (s/cat :grid ::grid
                :num-empty-cells nat-int?)
-  :ret ::world)
+  :ret ::grid-with-history)
 
 (stest/instrument [`drunkards-walk
                    `full-grid
