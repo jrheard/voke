@@ -6,39 +6,49 @@
             [voke.world.generation :as generate])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 
-(s/def ::active-cell ::generate/cell)
-(s/def ::dungeon (s/keys :req [::generate/grid ::active-cell]))
+;; Constants
 
 (def cell-size 15)
 (def ms-per-tick 50)
+(def grid-width 30)
+(def grid-height 30)
 
-; TODO construct some sort of system that takes a ::generation/world and draws its progress over time
+(defonce visualization-state (r/atom {::generate/grid (generate/full-grid grid-width grid-height)
+                                      ::active-cell   nil
+                                      ::id            0}))
 
-(defn make-dungeon []
-  {::generate/grid (generate/full-grid 30 30)
-   ::active-cell   nil})
+(defn reset-visualization-state [old-state]
+  {::generate/grid (generate/full-grid grid-width grid-height)
+   ::active-cell   nil
+   ::id            (inc (old-state ::id))})
 
-(defonce dungeon (r/atom (make-dungeon)))
+;; Async code
 
 (defn animate-dungeon-history [historical-active-cells w h]
-  (reset! dungeon {::generate/grid (generate/full-grid w h)
-                   ::active-cell   nil})
+  (let [visualization-id (-> visualization-state
+                             (swap! reset-visualization-state)
+                             ::id)]
 
-  (go-loop [history historical-active-cells]
-    (when (seq history)
-      (<! (timeout ms-per-tick))
+    (go-loop [history historical-active-cells]
+      (when (and (seq history)
+                 (= (@visualization-state ::id) visualization-id))
+        (<! (timeout ms-per-tick))
 
-      (let [[x y] (first history)]
-        (swap! dungeon (fn [a-dungeon]
-                         (-> a-dungeon
-                             (assoc-in [::generate/grid y x] :empty)
-                             (assoc ::active-cell [x y])))))
-      (recur (rest history)))))
+        (let [[x y] (first history)]
+          (swap! visualization-state (fn [state]
+                                       (if (= (state ::id) visualization-id)
+                                         (-> state
+                                             (assoc-in [::generate/grid y x] :empty)
+                                             (assoc ::active-cell [x y]))
+                                         state))))
+        (recur (rest history))))))
 
 (s/fdef animate-dungeon-history
   :args (s/cat :historical-active-cells ::generate/historical-active-cells
                :w nat-int?
                :h nat-int?))
+
+;; Reagent components
 
 (defn row [a-row y]
   [:div.row
@@ -46,18 +56,18 @@
      ^{:key ["cell" x y]} [:div.cell {:class (name cell)}])])
 
 ; TODO rewrite when grid is 1d
-(defn grid [dungeon]
+(defn grid [visualization-state]
   [:div.world
-   (conj (for [[y a-row] (map-indexed vector (@dungeon ::generate/grid))]
+   (conj (for [[y a-row] (map-indexed vector (@visualization-state ::generate/grid))]
            ^{:key ["row" y]} [row a-row y])
 
-         (when-let [[x y] (@dungeon ::active-cell)]
+         (when-let [[x y] (@visualization-state ::active-cell)]
            ^{:key "active-cell"} [:div.cell.active {:style {:left (* cell-size x)
                                                             :top  (* cell-size y)}}]))])
 
-(defn ui [dungeon]
+(defn ui [visualization-state]
   [:div.content
-   ^{:key "dungeon"} [grid dungeon]
+   ^{:key "dungeon"} [grid visualization-state]
    ^{:key "button"} [:button {:on-click (fn [e]
                                           (.preventDefault e)
                                           (let [new-dungeon (-> (generate/full-grid 30 30)
@@ -67,8 +77,10 @@
                                                                      30)))}
                      "generate"]])
 
+;; Main
+
 (defn ^:export main []
-  (r/render-component [ui dungeon]
+  (r/render-component [ui visualization-state]
                       (js/document.getElementById "content")))
 
 
