@@ -32,7 +32,8 @@
                {:id           "min"
                 :source-paths ["src"]
                 :compiler     {:output-to     "resources/public/js/compiled/voke.js"
-                               :main          voke.core
+                               ; :main          voke.core
+                               :main          voke.world.visualize
                                :optimizations :advanced
                                :output-dir    "resources/public/js/compiled/out-min"
                                :asset-path    "js/compiled/out-min"

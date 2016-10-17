@@ -5501,3 +5501,10 @@ TODO come back and benchmark
 ok i'm playing around with sliders
 having trouble getting the slider's displayed value to change when its backing atom changes
 seems like the <input> tag isn't being rerendered for some reason
+
+lol i forgot to use r/atom
+
+ok anyway now things are looking pretty and interactive
+grid generation takes too long for my taste though
+so let's do a cleanup pass and then convert to a 1d grid
+TODO be sure to benchmark grid generation before+after, and drunkard's before and after
