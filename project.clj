@@ -53,5 +53,6 @@
 
   :profiles {:dev {:dependencies [[binaryage/devtools "0.8.2"]
                                   [figwheel-sidecar "0.5.7"]
+                                  [com.taoensso/tufte "1.0.2"]
                                   [org.clojure/test.check "0.9.0"]]
                    :plugins      [[lein-doo "0.1.7" :exclusions [[org.clojure/clojurescript]]]]}})

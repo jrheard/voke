@@ -5427,4 +5427,69 @@ apparently http://xregexp.com/ is a solution
 
 refers to http://www.spacjer.com/blog/2014/09/12/clojurescript-javascript-interop/
 (have i read this before?)
+******* good shit, great primer on basic js cljs interop
 
+https://github.com/ptaoussanis/tengen
+
+ok cool let's look into benchmarking a clojurescript function
+
+https://github.com/ptaoussanis/tufte potentially relevant
+wow this looks _great_
+i am going to use this
+note: be wary of https://github.com/ptaoussanis/tufte#how-does-tufte-compare-to-hugoduncancriterium though
+
+ok, timing 100 executions of drunkards-walk with 30x30 grid and 150 empty cells
+(this first run is taking so long that i'm doing other stuff on my computer while i wait for it,
+which is likely going to throw off the benchmark a bit)
+results:
+{:id :drunkard, :n-calls 100, :min "1.22s", :max "6.5s",
+:mad "677.51ms", :mean "2.36s", :time% 100, :time "236.06s"}
+
+ok, now let's profile it in chrome devtools
+hm, the output's really noisy if i try to do this:
+
+(let [grid (full-grid 30 30)]
+    (js/console.profile "drunkard")
+    (dotimes [_ 10]
+      (drunkards-walk grid 150))
+    (js/console.profileEnd))
+
+lots of schema and figwheel stuff.
+gonna turn off instrumentation and try to run this outside of figwheel
+oh lol turning off spec instrumentation already immediately makes this _way_ faster, oops
+let's benchmark it again before doing anything else
+
+{:id :drunkard, :n-calls 100, :min "158ms", :max "550ms",
+:mad "62.19ms", :mean "275.92ms", :time% 100, :time "27.59s"}
+
+ok, 10x faster. so yeah spec instrumentation adds a ton of overhead, gotta remember to turn it off
+let's keep going though
+trying profiling again
+
+running this directly in js console:
+console.profile("drunkard");
+for(var i = 0; i < 25; i++) {
+    voke.world.generation.drunkards_walk(voke.world.generation.a_grid, 150);
+}
+console.profileEnd();
+
+haha yeah it looks like 89% of our time is spent in count-empty-spaces
+so let's kill that
+now we get:
+
+{:id :drunkard, :n-calls 100, :min "7ms", :max "42ms", :mad
+"4.14ms", :mean "15.32ms", :time% 100, :time "1.53s"}
+
+so so far that's a 154x speedup, nice
+profiling again
+
+looks like we spend a surprising amount of time in rand-nth-weighted
+not going to bother optimizing that just yet, unless it turns out that cellular automata need it too
+wow and the bulk of the rest of our time is spent in the(into) call that just assembles the
+list of directions and weights
+so uh ok i'm going to stop here
+assoc-in and get-in take 4.94% and 3.8% of our time, respectively
+and conjing the cell onto historical active cells takes 3.68%
+
+soooo yeah, that was a pretty easy optimization pass
+let's add controls to the visualization UI for width, height, and target empty cells now

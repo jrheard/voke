@@ -1,34 +1,24 @@
 (ns voke.world.generation
   (:require [cljs.spec :as s]
             [cljs.spec.test :as stest]
+            [taoensso.tufte :as tufte :refer-macros [p profiled profile]]
             [voke.util :refer [bound-between rand-nth-weighted]]))
 
 (s/def ::cell #{:empty :full})
 (s/def ::width nat-int?)
 (s/def ::height nat-int?)
-(s/def ::grid (s/coll-of ::cell))
+(s/def ::grid (s/coll-of (s/coll-of ::cell)))
 
-(s/def ::historical-active-cells (s/coll-of ::cell))
+(s/def ::historical-active-cells (s/coll-of (s/coll-of ::cell)))
 (s/def ::grid-with-history (s/keys :req [::grid ::historical-active-cells]))
 
 (defn full-grid [w h]
-  (vec (repeat (* w h) :full)))
+  (vec (repeat h
+               (vec (repeat w :full)))))
 
 (s/fdef full-grid
   :args (s/cat :w nat-int? :h nat-int?)
   :ret ::grid)
-
-(defn grid->str [grid]
-  (apply str
-         (map (fn [line]
-                (str (apply str
-                            (map (fn [cell]
-                                   (if (= cell :full)
-                                     "X"
-                                     " "))
-                                 line))
-                     "\n"))
-              grid)))
 
 (defn count-empty-spaces [grid]
   (apply +
@@ -41,21 +31,24 @@
   :args (s/cat :grid ::grid)
   :ret nat-int?)
 
-(defn drunkards-walk [grid num-empty-cells]
+(def ^:export a-grid (full-grid 30 30))
+
+(defn ^:export drunkards-walk [grid num-empty-cells]
   (let [height (count grid)
         width (count (first grid))]
 
     (loop [grid grid
            historical-active-cells []
            x (rand-int width)
-           y (rand-int height)]
+           y (rand-int height)
+           empty-cells 0]
 
-      (if (= (count-empty-spaces grid)
-             num-empty-cells)
-        {::grid         grid
+      (if (= empty-cells num-empty-cells)
+        {::grid                    grid
          ::historical-active-cells historical-active-cells}
 
-        (let [horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
+        (let [cell-was-full? (= (get-in grid [y x]) :full)
+              horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
               vertical-direction-to-center (if (< y (/ height 2)) :south :north)
               direction (rand-nth-weighted
                           (into {}
@@ -75,33 +68,39 @@
                  (case direction
                    :north (bound-between (dec y) 0 (dec height))
                    :south (bound-between (inc y) 0 (dec height))
-                   y)))))))
+                   y)
+                 (if cell-was-full?
+                   (inc empty-cells)
+                   empty-cells)))))))
 
 (s/fdef drunkards-walk
   :args (s/cat :grid ::grid
                :num-empty-cells nat-int?)
   :ret ::grid-with-history)
 
-(stest/instrument [`drunkards-walk
-                   `full-grid
-                   `count-empty-spaces])
+#_(stest/instrument [`drunkards-walk
+                     `full-grid
+                     `count-empty-spaces])
 
 (comment
-  (-> ::grid
-      (s/exercise 1)
-      ffirst
-      grid->str
-      print
-      )
+  (tufte/add-basic-println-handler! {})
 
-  (-> (full-grid 50 20)
-      (drunkards-walk 150)
-      ;::active-cells
-      ;count
+  (stest/unstrument [`drunkards-walk
+                     `full-grid
+                     `count-empty-spaces])
 
-      ::grid
-      grid->str
-      print
-      )
+  (let [grid (full-grid 30 30)]
+    (js/console.profile "drunkard")
+    (dotimes [_ 10]
+      (drunkards-walk grid 150))
+    (js/console.profileEnd))
 
+  ; master benchmarking command
+  (profile
+    {}
+    (let [grid (full-grid 30 30)]
+      (dotimes [_ 100]
+        (p :drunkard
+           (drunkards-walk grid 150)
+           nil))))
   )
