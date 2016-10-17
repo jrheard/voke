@@ -84,14 +84,16 @@
    [slider num-empty-cells 10 300]
    [:p (str "Animation speed: " @ms-per-tick " ms per frame")]
    [slider ms-per-tick 5 250]
-   ^{:key "button"} [:button
-                     {:on-click (fn [e]
-                                  (.preventDefault e)
-                                  (let [new-dungeon (-> (@visualization-state ::generate/grid)
-                                                        (generate/drunkards-walk @num-empty-cells))]
-                                    (animate-dungeon-history (new-dungeon ::generate/historical-active-cells))))}
-                     "generate"]
-   ^{:key "dungeon"} [grid visualization-state]])
+   [:div.button-wrapper
+    [:a.generate-button
+     {:href     "#"
+      :on-click (fn [e]
+                  (.preventDefault e)
+                  (let [new-dungeon (-> (@visualization-state ::generate/grid)
+                                        (generate/drunkards-walk @num-empty-cells))]
+                    (animate-dungeon-history (new-dungeon ::generate/historical-active-cells))))}
+     "generate"]]
+   [grid visualization-state]])
 
 ;; Main
 
