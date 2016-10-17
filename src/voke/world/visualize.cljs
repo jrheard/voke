@@ -8,20 +8,18 @@
 
 ;; Constants
 
-
 (def cell-size 15)
-; TODO - allow UI to modify these next three values (sliders for all three?)
-; also allow UI to modify number of cells dug out
-(def ms-per-tick 50)
-(def grid-width 30)
-(def grid-height 30)
+(def ms-per-tick (atom 5))
+(def grid-width (atom 80))
+(def grid-height (atom 60))
+(def num-empty-cells (atom 100))
 
-(defonce visualization-state (r/atom {::generate/grid (generate/full-grid grid-width grid-height)
+(defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
                                       ::active-cell   nil
                                       ::id            0}))
 
 (defn reset-visualization-state [old-state]
-  {::generate/grid (generate/full-grid grid-width grid-height)
+  {::generate/grid (generate/full-grid @grid-width @grid-height)
    ::active-cell   nil
    ::id            (inc (old-state ::id))})
 
@@ -35,7 +33,7 @@
     (go-loop [history historical-active-cells]
       (when (and (seq history)
                  (= (@visualization-state ::id) visualization-id))
-        (<! (timeout ms-per-tick))
+        (<! (timeout @ms-per-tick))
 
         (let [[x y] (first history)]
           (swap! visualization-state (fn [state]
@@ -68,16 +66,24 @@
            ^{:key "active-cell"} [:div.cell.active {:style {:left (* cell-size x)
                                                             :top  (* cell-size y)}}]))])
 
+(defn slider [an-atom min max]
+  [:input {:type      "range" :value @an-atom :min min :max max
+           :style     {:width "100%"}
+           :on-change (fn [e]
+                        (reset! an-atom (js/parseInt (.-target.value e))))}])
+
 (defn ui [visualization-state]
   [:div.content
-   ^{:key "dungeon"} [grid visualization-state]
+   [slider grid-width 20 80]
    ^{:key "button"} [:button
                      {:on-click (fn [e]
                                   (.preventDefault e)
-                                  (let [new-dungeon (-> (generate/full-grid 30 30)
-                                                        (generate/drunkards-walk 100))]
+                                  (js/console.log @grid-width)
+                                  (let [new-dungeon (-> (generate/full-grid @grid-width @grid-height)
+                                                        (generate/drunkards-walk @num-empty-cells))]
                                     (animate-dungeon-history (new-dungeon ::generate/historical-active-cells))))}
-                     "generate"]])
+                     "generate"]
+   ^{:key "dungeon"} [grid visualization-state]])
 
 ;; Main
 

@@ -55,7 +55,7 @@
                                 (map (fn [direction]
                                        (if (#{horizontal-direction-to-center vertical-direction-to-center}
                                              direction)
-                                         [direction 1.2]
+                                         [direction 1.4]
                                          [direction 1.0]))
                                      [:north :south :east :west])))]
 

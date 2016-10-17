@@ -5493,3 +5493,7 @@ and conjing the cell onto historical active cells takes 3.68%
 
 soooo yeah, that was a pretty easy optimization pass
 let's add controls to the visualization UI for width, height, and target empty cells now
+
+lol gonna need to make the css a bit more intelligent
+hm i wonder how long generating a 100x100 grid takes
+TODO come back and benchmark

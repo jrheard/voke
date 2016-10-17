@@ -1,3 +1,12 @@
+body {
+    text-align: center;
+}
+
+#content {
+    text-align: left;
+    display: inline-block;
+}
+
 canvas {
 border: solid 1px #666;
 margin: 0 auto;
@@ -6,7 +15,6 @@ display: block;
 
 .world {
 margin: 0 auto;
-width: 450px;
 border: solid 1px #333;
 position: relative;
 }
