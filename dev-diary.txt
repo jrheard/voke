@@ -5747,3 +5747,36 @@ identical? is ===
 after removing cljs eq:
 {:id :automata, :n-calls 100, :min "5ms", :max "19ms", :mad
 "1.85ms", :mean "8.01ms", :time% 99, :time "801ms"}
+
+ah, found another = call, now we get:
+
+{:id :automata, :n-calls 100, :min "4ms", :max "12ms", :mad
+"997μs", :mean "6.05ms", :time% 100, :time "605ms"}
+
+ok, now array->grid takes 66% of our time
+
+poked at it with help from david and alex in slack.
+before:
+
+(into []
+    (for [row an-array]
+      (into []
+            (for [full? row]
+              (if full? :full :empty)))))
+
+after:
+
+(into []
+        (map (fn [row]
+               (into []
+                     (map (fn [cell]
+                            (if (true? cell) :full :empty)))
+                     row)))
+        an-array)
+
+so now we get:
+{:id :automata, :n-calls 100, :min "1ms", :max "18ms", :mad
+"1.94ms", :mean "3.58ms", :time% 96, :time "358ms"}
+
+and array->grid is about 30% of our time.
+i think this is about as fast as we'd ever want this to be for now, stopping here. nice!

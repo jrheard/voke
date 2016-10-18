@@ -76,10 +76,17 @@
 
 (defn array->grid [an-array]
   (into []
-        (for [row an-array]
-          (into []
-                (for [full? row]
-                  (if full? :full :empty))))))
+        (map (fn [row]
+               (into []
+                     (map (fn [cell]
+                            (if (true? cell) :full :empty)))
+                     row)))
+        an-array))
+
+(comment
+
+  (map (fn [x] (if (true? x) :full :empty)))
+  )
 
 (defn -make-js-row [width full-probability]
   (let [arr (make-array width)]
@@ -136,7 +143,7 @@
                                                         (aget y)
                                                         (aget x))
                                       neighbors (-get-neighbors grid x y w h)
-                                      num-full-neighbors (.-length (.filter neighbors #(= % true)))]
+                                      num-full-neighbors (.-length (.filter neighbors #(identical? % true)))]
 
                                   (cond
                                     (and cell-is-full?
