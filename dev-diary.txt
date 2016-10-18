@@ -5708,3 +5708,42 @@ so favor loop/recur when you need perf
 http://blog.klipse.tech//klipse/2016/10/16/klipse-is-fast.html
 
 http://blog.klipse.tech/clojurescript/2016/04/09/clojurescript-protocols-secret.html
+
+ok, removed the call to rand-weighted and just used (rand) because that's all we needed, and now:
+{:id :manual, :n-calls 1000, :min "0ns", :max "10ms", :mad
+"436.97μs", :mean "306μs", :time% 96, :time "306ms"}
+
+so that's pretty fuckin decent!
+
+let's try profiling in the browser again
+
+oh also before i forget
+TODO update the visualization of automata such that:
+when a cell is visited and is turned into a wall, make it look green
+when it's turned into an empty space, make it look red
+otherwise don't draw anything on it
+
+ok profiling
+
+array->grid takes 20% of our time
+new-value-at-position takes 61% of our time
+let's try loop/recur again
+
+ok i did that on a manual js array instead of doing apply array
+i didn't benchmark before/after, that was a mistake
+but anyway it looks like that was a speedup
+now we spend half of our time in the clojure = function, half in array->grid
+benchmarking before fixing the = bit:
+(calling (automata 50 50 0.45 500) 100 times)
+
+{:id :automata, :n-calls 100, :min "13ms", :max "50ms", :mad
+"4.87ms", :mean "21.67ms", :time% 100, :time "2.17s"}
+
+lessons from slack:
+set! is javascript =
+coercive-= is ==
+identical? is ===
+
+after removing cljs eq:
+{:id :automata, :n-calls 100, :min "5ms", :max "19ms", :mad
+"1.85ms", :mean "8.01ms", :time% 99, :time "801ms"}

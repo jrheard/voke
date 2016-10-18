@@ -85,9 +85,9 @@
   (let [arr (make-array width)]
     (loop [i 0]
       (when (< i width)
-        ; todo nix rand-nth-weighted, implement in plain js (?)
-        (aset arr i (rand-nth-weighted {false (- 1 full-probability)
-                                        true  full-probability}))
+        (aset arr i (if (< (rand) full-probability)
+                      true
+                      false))
         (recur (inc i))))
     arr))
 
@@ -99,15 +99,33 @@
         (recur (inc i))))
     arr))
 
-(comment
+(defn -get-neighbors [js-grid x y w h]
+  (let [neighbors #js []]
+    (loop [i (dec x)
+           j (dec y)]
+      (when (and (< i (+ x 2))
+                 (< j (+ y 2)))
 
-  (-make-row 10 0.5)
+        (cond
+          (and (identical? i x)
+               (identical? j y)) nil
 
-  (array->grid (-make-js-grid 5 5 0.5))
+          (or (< i 0)
+              (>= i w)
+              (< j 0)
+              (>= j h)) (.push neighbors true)
 
-  (apply array (range 5))
+          :else (.push neighbors (-> js-grid
+                                     (aget j)
+                                     (aget i))))
 
-  )
+        (if (identical? i (inc x))
+          (recur (dec x)
+                 (inc j))
+          (recur (inc i)
+                 j))))
+
+    neighbors))
 
 (defn ^:export automata
   [w h initial-wall-probability iterations]
@@ -117,20 +135,9 @@
                                 (let [cell-is-full? (-> grid
                                                         (aget y)
                                                         (aget x))
-                                      neighbors (apply array (for [i (range (dec x)
-                                                                            (+ x 2))
-                                                                   j (range (dec y)
-                                                                            (+ y 2))
-                                                                   :when (not= [i j] [x y])]
-                                                               (if (or (< i 0)
-                                                                       (>= i w)
-                                                                       (< j 0)
-                                                                       (>= j h))
-                                                                 true
-                                                                 (-> grid
-                                                                     (aget j)
-                                                                     (aget i)))))
+                                      neighbors (-get-neighbors grid x y w h)
                                       num-full-neighbors (.-length (.filter neighbors #(= % true)))]
+
                                   (cond
                                     (and cell-is-full?
                                          (> num-full-neighbors 2)) true
@@ -170,7 +177,8 @@
       (drunkards-walk grid 150))
     (js/console.profileEnd))
 
-  ; master benchmarking command
+  (identical? 1 1)
+
   (profile
     {}
     (let [grid (full-grid 30 30)]
@@ -185,22 +193,5 @@
       (p :automata
          (automata 50 50 0.45 500)
          nil)))
-
-  (profile
-    {}
-    (p :full-grid
-       (dotimes [_ 100]
-         (full-grid 50 50))))
-
-
-  (profile
-    {}
-    (dotimes [_ 1000]
-      (p :manual
-         (-make-js-grid 50 50 0.45))
-      (p :apply
-         (-make-js-grid2 50 50 0.45))
-      )
-    )
   )
 
