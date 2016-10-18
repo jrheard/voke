@@ -55,7 +55,7 @@
                                    [:north :south :east :west])))]
 
         (recur (assoc-in grid [y x] :empty)
-               (conj historical-active-cells [x y])
+               (conj historical-active-cells [[x y] :full])
                (case direction
                  :east (bound-between (inc x) 0 (dec w))
                  :west (bound-between (dec x) 0 (dec w))
@@ -75,18 +75,48 @@
   :ret ::generated-level)
 
 (defn automata
-  [w h initial-wall-probability]
-  ; TODO this will necessitate having multiple cells active in history at once
-  (let [generate-row (fn [] (take w (repeatedly #(rand-nth-weighted {:empty (- 1 initial-wall-probability)
-                                                                     :full  initial-wall-probability}))))
-        initial-grid (take h (repeatedly generate-row))]
+  [w h initial-wall-probability iterations]
+  (let [generate-row (fn [] (vec
+                              (take w
+                                    (repeatedly #(rand-nth-weighted {:empty (- 1 initial-wall-probability)
+                                                                     :full  initial-wall-probability})))))
+        initial-grid (vec (take h (repeatedly generate-row)))
+        new-value-at-position (fn [grid x y]
+                                (let [cell-is-full? (= (get-in grid [y x]) :full)
+                                      neighbors (for [i (range (dec x)
+                                                               (+ x 2))
+                                                      j (range (dec y)
+                                                               (+ y 2))
+                                                      :when (not= [i j] [x y])]
+                                                  (if (or (< i 0)
+                                                          (>= i w)
+                                                          (< j 0)
+                                                          (>= j h))
+                                                    :full
+                                                    (get-in grid [j i])))
+                                      num-full-neighbors (count (filter #(= % :full) neighbors))]
+                                  (cond
+                                    (and cell-is-full?
+                                         (> num-full-neighbors 2)) :full
+                                    (and (not cell-is-full?)
+                                         (> num-full-neighbors 5)) :full
+                                    :else :empty)))]
 
-    {::grid initial-grid
-     ::historical-active-cells []
-     }
-    )
+    (loop [i 0
+           grid initial-grid
+           active-cells []]
+      (js/console.log i (count active-cells))
+      (if (= i iterations)
+        {::grid         grid
+         ::initial-grid initial-grid
+         ::history      active-cells}
 
-  )
+        (let [x (rand-int w)
+              y (rand-int h)
+              new-value (new-value-at-position grid x y)]
+          (recur (inc i)
+                 (assoc-in grid [y x] new-value)
+                 (conj active-cells [[x y] new-value])))))))
 
 
 #_(stest/instrument [`drunkards-walk

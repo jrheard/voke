@@ -18,27 +18,31 @@
                                       ::active-cell   nil
                                       ::id            0}))
 
-(defn reset-visualization-state! []
-  (swap! visualization-state (fn [old-state]
-                               {::generate/grid (generate/full-grid @grid-width @grid-height)
-                                ::active-cell   nil
-                                ::id            (inc (old-state ::id))})))
+(defn reset-visualization-state!
+  ([] (reset-visualization-state! (generate/full-grid @grid-width @grid-height)))
+  ([initial-grid]
+   (swap! visualization-state (fn [old-state]
+                                {::generate/grid initial-grid
+                                 ::active-cell   nil
+                                 ::id            (inc (old-state ::id))}))))
 
 ;; Async code
 
-(defn animate-dungeon-history [historical-active-cells]
-  (let [visualization-id ((reset-visualization-state!) ::id)]
+(defn animate-dungeon-history [generated-level]
+  (let [initial-grid (or (generated-level ::generate/initial-grid)
+                         (generate/full-grid @grid-width @grid-height))
+        visualization-id ((reset-visualization-state! initial-grid) ::id)]
 
-    (go-loop [history historical-active-cells]
+    (go-loop [history (generated-level ::generate/history)]
       (when (and (seq history)
                  (= (@visualization-state ::id) visualization-id))
         (<! (timeout @ms-per-tick))
 
-        (let [[x y] (first history)]
+        (let [[[x y] new-value] (first history)]
           (swap! visualization-state (fn [state]
                                        (if (= (state ::id) visualization-id)
                                          (-> state
-                                             (assoc-in [::generate/grid y x] :empty)
+                                             (assoc-in [::generate/grid y x] new-value)
                                              (assoc ::active-cell [x y]))
                                          state))))
         (recur (rest history))))))
@@ -89,11 +93,10 @@
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (let [new-dungeon (generate/automata @grid-width @grid-height 0.45)]
-                    (reset-visualization-state!)
-                    (swap! visualization-state assoc ::generate/grid (new-dungeon ::generate/grid))
-                    #_(animate-dungeon-history (new-dungeon ::generate/history))
+                  (let [new-dungeon (generate/automata @grid-width @grid-height 0.45 5000)]
+                    #_(animate-dungeon-history new-dungeon)
 
+                    (reset-visualization-state! (new-dungeon ::generate/grid))
                     ))}
      "generate"]]
    [grid visualization-state]])
