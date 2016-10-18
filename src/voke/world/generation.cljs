@@ -82,15 +82,22 @@
                   (if full? :full :empty))))))
 
 (defn -make-js-row [width full-probability]
-  (apply array
-         (take width
-               (repeatedly #(rand-nth-weighted {false (- 1 full-probability)
-                                                true  full-probability})))))
+  (let [arr (make-array width)]
+    (loop [i 0]
+      (when (< i width)
+        ; todo nix rand-nth-weighted, implement in plain js (?)
+        (aset arr i (rand-nth-weighted {false (- 1 full-probability)
+                                        true  full-probability}))
+        (recur (inc i))))
+    arr))
 
 (defn -make-js-grid [width height full-probability]
-  (apply array
-         (take height
-               (repeatedly #(-make-js-row width full-probability)))))
+  (let [arr (make-array height)]
+    (loop [i 0]
+      (when (< i height)
+        (aset arr i (-make-js-row width full-probability))
+        (recur (inc i))))
+    arr))
 
 (comment
 
@@ -184,5 +191,16 @@
     (p :full-grid
        (dotimes [_ 100]
          (full-grid 50 50))))
+
+
+  (profile
+    {}
+    (dotimes [_ 1000]
+      (p :manual
+         (-make-js-grid 50 50 0.45))
+      (p :apply
+         (-make-js-grid2 50 50 0.45))
+      )
+    )
   )
 

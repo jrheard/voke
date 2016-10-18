@@ -5641,3 +5641,70 @@ now we spend a *ton* of our time in (apply array (foo bar baz)) calls
 is there a way to make js arrays faster than this?
 look at that tomorrow
 AND REFACTOR ALL OF GENERATION AND VISUALIZATION AND GIVE THINGS BETTER NAMES
+
+converting js array initialization to not use (apply array) brings us to
+{:id :automata, :n-calls 100, :min "22ms", :max "128ms",
+:mad "7.9ms", :mean "40.07ms", :time% 100, :time "4.01s"}
+which seems worse?
+anyway kill rand-nth-weighted, reimplement in js
+
+brief notes, might as well take this down:
+
+(defn -make-js-row [width full-probability]
+  (let [arr (make-array width)]
+    (loop [i 0]
+      (when (< i width)
+        ; todo nix rand-nth-weighted, implement in plain js (?)
+        (aset arr i (rand-nth-weighted {false (- 1 full-probability)
+                                        true  full-probability}))
+        (recur (inc i))))
+    arr))
+
+(defn -make-js-grid [width height full-probability]
+  (let [arr (make-array height)]
+    (loop [i 0]
+      (when (< i height)
+        (aset arr i (-make-js-row width full-probability))
+        (recur (inc i))))
+    arr))
+
+
+(defn -make-js-row2 [width full-probability]
+  (apply array
+         (take width
+               (repeatedly #(rand-nth-weighted {false (- 1 full-probability)
+                                                true  full-probability})))))
+
+(defn -make-js-grid2 [width height full-probability]
+  (apply array
+         (take height
+               (repeatedly #(-make-js-row2 width full-probability)))))
+
+(profile
+{}
+(dotimes [_ 1000]
+  (p :manual
+     (-make-js-grid 50 50 0.45))
+  (p :apply
+     (-make-js-grid2 50 50 0.45))
+  )
+)
+
+; {:id :apply, :n-calls 1000, :min "10ms", :max "74ms", :mad
+; "3.02ms", :mean "14.26ms", :time% 56, :time "14.26s"}
+; {:id :manual, :n-calls 1000, :min "8ms", :max "54ms", :mad
+; "2.52ms", :mean "11.35ms", :time% 44, :time "11.35s"}
+
+also i poked around on klipse - (for) is definitely much faster than
+loop/recur on a handmade array - for returns a lazy / chunked sequence, which is nonzero overhead
+loop/recur just makes and modifies an array
+it's faster than doseq, too
+so favor loop/recur when you need perf
+
+======
+
+10/18/16
+
+http://blog.klipse.tech//klipse/2016/10/16/klipse-is-fast.html
+
+http://blog.klipse.tech/clojurescript/2016/04/09/clojurescript-protocols-secret.html
