@@ -16,6 +16,8 @@
 (defonce grid-height (r/atom 30))
 (defonce num-empty-cells (r/atom 100))
 (defonce initial-fill-chance (r/atom 0.45))
+(defonce min-neighbors-to-survive (r/atom 2))
+(defonce min-neighbors-to-birth (r/atom 5))
 
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
                                       ::active-cell   nil
@@ -62,7 +64,6 @@
    (for [[x cell] (map-indexed vector a-row)]
      ^{:key ["cell" x y]} [:div.cell {:class (name cell)}])])
 
-; TODO rewrite when grid is 1d
 (defn grid [visualization-state]
   [:div.world
    (conj (for [[y a-row] (map-indexed vector (@visualization-state ::generate/grid))]
@@ -81,7 +82,7 @@
                           (when callback
                             (callback)))}]))
 
-(defn drunkards-ui [visualization-state]
+(defn ui [visualization-state]
   [:div.content
    [:p "Algorithm:"]
    [:div.btn-group
@@ -100,9 +101,9 @@
                               (reset! algorithm :cellular))}
      "Cellular Automata"]]
    [:p (str "Grid width: " @grid-width)]
-   [slider grid-width 25 50 1 reset-visualization-state!]
+   [slider grid-width 25 80 1 reset-visualization-state!]
    [:p (str "Grid height: " @grid-height)]
-   [slider grid-height 25 50 1 reset-visualization-state!]
+   [slider grid-height 25 80 1 reset-visualization-state!]
    [:p (str "Animation speed: " @ms-per-tick " ms per frame")]
    [slider ms-per-tick 16 250 1]
 
@@ -123,8 +124,14 @@
                                           (assoc ::generate/grid ((generate/automata @grid-width
                                                                                      @grid-height
                                                                                      @initial-fill-chance
+                                                                                     @min-neighbors-to-survive
+                                                                                     @min-neighbors-to-birth
                                                                                      0) ::generate/grid))
-                                          (assoc ::active-cell nil)))))]])
+                                          (assoc ::active-cell nil)))))]
+      [:p (str "Mininum # of neighbors for an alive cell to survive: " @min-neighbors-to-survive)]
+      [slider min-neighbors-to-survive 0 8 1]
+      [:p (str "Mininum # of neighbors for a cell to be born: " @min-neighbors-to-birth)]
+      [slider min-neighbors-to-birth 0 8 1]])
 
    [:div.button-wrapper
     [:a.generate-button
@@ -133,7 +140,12 @@
                   (.preventDefault e)
                   (let [new-dungeon (if (= @algorithm :drunkard)
                                       (generate/drunkards-walk @grid-width @grid-height @num-empty-cells)
-                                      (generate/automata @grid-width @grid-height @initial-fill-chance 10000))]
+                                      (generate/automata @grid-width
+                                                         @grid-height
+                                                         @initial-fill-chance
+                                                         @min-neighbors-to-survive
+                                                         @min-neighbors-to-birth
+                                                         10000))]
 
                     (if (= @algorithm :drunkard)
                       (animate-dungeon-history new-dungeon)
@@ -147,5 +159,5 @@
 ;; Main
 
 (defn ^:export main []
-  (r/render-component [drunkards-ui visualization-state]
+  (r/render-component [ui visualization-state]
                       (js/document.getElementById "content")))

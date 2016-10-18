@@ -5786,3 +5786,9 @@ http://blog.fikesfarm.com/posts/2016-04-14-static-free-clojurescript-repl.html
 
 cool seems like i can just leave this off in dev
 
+s3b4 looks interesting
+
+eh, having trouble focusing, think i might just take a break for the rest of the day
+TODO:
+smoothing phase
+

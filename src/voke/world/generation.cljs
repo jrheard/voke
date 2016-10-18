@@ -118,7 +118,7 @@
     neighbors))
 
 (defn ^:export automata
-  [w h initial-wall-probability iterations]
+  [w h initial-wall-probability min-neighbors-to-survive min-neighbors-to-birth iterations]
   (let [js-initial-grid (-make-js-grid w h initial-wall-probability)
         cljs-initial-grid (array->grid js-initial-grid)
         new-value-at-position (fn [grid x y]
@@ -130,9 +130,9 @@
 
                                   (cond
                                     (and cell-is-full?
-                                         (> num-full-neighbors 2)) true
+                                         (> num-full-neighbors min-neighbors-to-survive)) true
                                     (and (not cell-is-full?)
-                                         (> num-full-neighbors 5)) true
+                                         (> num-full-neighbors min-neighbors-to-birth)) true
                                     :else false)))]
 
     (loop [i 0
