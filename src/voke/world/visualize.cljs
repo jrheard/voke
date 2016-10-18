@@ -93,7 +93,7 @@
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (let [new-dungeon (generate/automata @grid-width @grid-height 0.45 5000)]
+                  (let [new-dungeon (generate/automata @grid-width @grid-height 0.45 10000)]
                     #_(animate-dungeon-history new-dungeon)
 
                     (reset-visualization-state! (new-dungeon ::generate/grid))

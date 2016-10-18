@@ -5617,3 +5617,27 @@ so yeah we should consider also having a final smoothing phase that uses the tra
 cellular automata approach
 
 cool let's give this a shot
+
+ok gave it a first pass
+likely pretty messy and wrong
+look at it again tomorrow
+
+gonna do a quick perf pass for funsies actually
+ALTHOUGH THIS ALL NEEDS TO BE CLEANED UP AND REFACTORED, READ THIS LINE TOMORROW, DO IT
+i just don't have the brainpower for that tonight
+
+currently, (automata 50 50 0.45 500) 100 times ->
+{:id :automata, :n-calls 100, :min "36ms", :max "124ms",
+:mad "9.9ms", :mean "56.36ms", :time% 100, :time "5.64s"}
+
+let's try with native js arrays
+
+after converting:
+{:id :automata, :n-calls 100, :min "25ms", :max "43ms", :mad
+"3.49ms", :mean "29.97ms", :time% 100, :time "3s"}
+
+and it looks like there's more room for improvement -
+now we spend a *ton* of our time in (apply array (foo bar baz)) calls
+is there a way to make js arrays faster than this?
+look at that tomorrow
+AND REFACTOR ALL OF GENERATION AND VISUALIZATION AND GIVE THINGS BETTER NAMES

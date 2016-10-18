@@ -74,48 +74,79 @@
                :num-empty-cells nat-int?)
   :ret ::generated-level)
 
-(defn automata
+(defn array->grid [an-array]
+  (into []
+        (for [row an-array]
+          (into []
+                (for [full? row]
+                  (if full? :full :empty))))))
+
+(defn -make-js-row [width full-probability]
+  (apply array
+         (take width
+               (repeatedly #(rand-nth-weighted {false (- 1 full-probability)
+                                                true  full-probability})))))
+
+(defn -make-js-grid [width height full-probability]
+  (apply array
+         (take height
+               (repeatedly #(-make-js-row width full-probability)))))
+
+(comment
+
+  (-make-row 10 0.5)
+
+  (array->grid (-make-js-grid 5 5 0.5))
+
+  (apply array (range 5))
+
+  )
+
+(defn ^:export automata
   [w h initial-wall-probability iterations]
-  (let [generate-row (fn [] (vec
-                              (take w
-                                    (repeatedly #(rand-nth-weighted {:empty (- 1 initial-wall-probability)
-                                                                     :full  initial-wall-probability})))))
-        initial-grid (vec (take h (repeatedly generate-row)))
+  (let [js-initial-grid (-make-js-grid w h initial-wall-probability)
+        cljs-initial-grid (array->grid js-initial-grid)
         new-value-at-position (fn [grid x y]
-                                (let [cell-is-full? (= (get-in grid [y x]) :full)
-                                      neighbors (for [i (range (dec x)
-                                                               (+ x 2))
-                                                      j (range (dec y)
-                                                               (+ y 2))
-                                                      :when (not= [i j] [x y])]
-                                                  (if (or (< i 0)
-                                                          (>= i w)
-                                                          (< j 0)
-                                                          (>= j h))
-                                                    :full
-                                                    (get-in grid [j i])))
-                                      num-full-neighbors (count (filter #(= % :full) neighbors))]
+                                (let [cell-is-full? (-> grid
+                                                        (aget y)
+                                                        (aget x))
+                                      neighbors (apply array (for [i (range (dec x)
+                                                                            (+ x 2))
+                                                                   j (range (dec y)
+                                                                            (+ y 2))
+                                                                   :when (not= [i j] [x y])]
+                                                               (if (or (< i 0)
+                                                                       (>= i w)
+                                                                       (< j 0)
+                                                                       (>= j h))
+                                                                 true
+                                                                 (-> grid
+                                                                     (aget j)
+                                                                     (aget i)))))
+                                      num-full-neighbors (.-length (.filter neighbors #(= % true)))]
                                   (cond
                                     (and cell-is-full?
-                                         (> num-full-neighbors 2)) :full
+                                         (> num-full-neighbors 2)) true
                                     (and (not cell-is-full?)
-                                         (> num-full-neighbors 5)) :full
-                                    :else :empty)))]
+                                         (> num-full-neighbors 5)) true
+                                    :else false)))]
 
     (loop [i 0
-           grid initial-grid
+           grid js-initial-grid
            active-cells []]
-      (js/console.log i (count active-cells))
       (if (= i iterations)
-        {::grid         grid
-         ::initial-grid initial-grid
+        {::grid         (array->grid grid)
+         ::initial-grid cljs-initial-grid
          ::history      active-cells}
 
         (let [x (rand-int w)
               y (rand-int h)
               new-value (new-value-at-position grid x y)]
           (recur (inc i)
-                 (assoc-in grid [y x] new-value)
+                 (do (-> grid
+                         (aget y)
+                         (aset x new-value))
+                     grid)
                  (conj active-cells [[x y] new-value])))))))
 
 
@@ -140,6 +171,14 @@
         (p :drunkard
            (drunkards-walk grid 150)
            nil))))
+
+  (profile
+    {}
+    (dotimes [_ 100]
+      (p :automata
+         (automata 50 50 0.45 500)
+         nil)))
+
   (profile
     {}
     (p :full-grid
