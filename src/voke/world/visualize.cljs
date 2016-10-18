@@ -6,6 +6,10 @@
             [voke.world.generation :as generate])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 
+; TODO it looks like a lot of this is really specific to drunken walk, and cellular automata
+; will need a different UI, so go through and centralize everything in one drunken-state atom
+; and make sure all of the names of variables, components, etc are specific enough to avoid confusion
+
 ;; Constants
 
 (def cell-size 15)
@@ -44,7 +48,7 @@
         (recur (rest history))))))
 
 (s/fdef animate-dungeon-history
-  :args (s/cat :historical-active-cells ::generate/historical-active-cells
+  :args (s/cat :historical-active-cells ::generate/history
                :w nat-int?
                :h nat-int?))
 
@@ -76,9 +80,9 @@
 (defn ui [visualization-state]
   [:div.content
    [:p (str "Grid width: " @grid-width)]
-   [slider grid-width 25 35 reset-visualization-state!]
+   [slider grid-width 25 50 reset-visualization-state!]
    [:p (str "Grid height: " @grid-height)]
-   [slider grid-height 25 35 reset-visualization-state!]
+   [slider grid-height 25 50 reset-visualization-state!]
    [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
    [:p "(doesn't take effect until the next time you press \"generate\")"]
    [slider num-empty-cells 10 300]
@@ -91,7 +95,7 @@
                   (.preventDefault e)
                   (let [new-dungeon (-> (@visualization-state ::generate/grid)
                                         (generate/drunkards-walk @num-empty-cells))]
-                    (animate-dungeon-history (new-dungeon ::generate/historical-active-cells))))}
+                    (animate-dungeon-history (new-dungeon ::generate/history))))}
      "generate"]]
    [grid visualization-state]])
 

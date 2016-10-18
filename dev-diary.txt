@@ -5508,3 +5508,112 @@ ok anyway now things are looking pretty and interactive
 grid generation takes too long for my taste though
 so let's do a cleanup pass and then convert to a 1d grid
 TODO be sure to benchmark grid generation before+after, and drunkard's before and after
+
+hm ok i actually just benchmarked grid generation and generating a 50x50 grid just takes 37ms, which is ok
+i think that the reason that modifying grid width takes so long is that it forces a redraw of every
+cell in the grid
+
+so anyway i think i'll put off going to 1d for now
+let's look into cellular automata, yeah?
+
+http://pcg.wikidot.com/pcg-algorithm:cellular-automata
+example is broken :(
+" All state transitions take place at the same time; everything looks at its neighbors and
+decides what to change to, then everything changes state at the same time."
+
+"The grid may be of any dimension (e.g. a line or a cube of cells)" interesting
+
+http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels
+
+so it looks like the variables involved are:
+* percentage chance at initialization time that a given cell is a wall
+* number of times you run the process
+* specific thresholds re: number of your neighbors that are / are not walls at each step of the process
+
+this page says "Very large maps tend to not look as natural, or may require some very fine tuning."
+that's a little concerning
+
+this page is pretty great though
+it suggests switching rules after a few generations, which is interesting
+
+jlund3's notes on this page re: flood fill / connectedness are great:
+"This algorithm creates good looking caves, but the problem is isolated caves. The way I
+solved this is by picking a random, open point on the map and flood filling. Any open point
+outside the flood filled portion gets turned back into a wall. I then check to see if the
+flood filled portion of the map is more than some threshold percent of the map. If the map
+is ~45% open it usually looks alright. If the percent is below this, I just start over.
+This turns out to work quite well. On large maps, almost always you will select the largest
+open connected area, and you won't have to restart the regeneration very often, if at all.
+On very small maps, this doesn't happen as often, but its also very quick to regenerate
+because the map is small. It ends up that this method just does the right thing to rectify
+the non-connected maps naturally!"
+
+i doubt it's that simple, but still looks like good advice
+
+https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
+has a handy generator near the top of the page that you can use to try out different parameters
+
+"If you look carefully, flipping the solid and empty blocks makes an island-generator too."
+heh cute
+
+this article is actually pretty good
+i like that he counts off-map points as being neighbors, makes walls form naturally around
+the edges of the map, good stuff
+
+seems like just running the simulation a bunch of times (eg like more than 5 times) makes
+for good, rounded cave systems
+
+he suggests placing treasure in places that are surrounded by lots of walls, because they're
+usually tucked into corners at the edges of the cave system
+anyway i like the article
+
+https://jeremykun.com/2012/07/29/the-cellular-automaton-method-for-cave-generation/
+
+lol:
+"The idea of randomized content generation (often called procedural generation) is not particularly
+new. It has been around at least since the 1980’s. Back then, computers simply didn’t have
+enough space to store large, complex levels in memory. To circumvent this problem, video
+game designers simply generated the world as the player moved through it."
+
+"Furthermore, we should note the automaton’s rapid convergence to a stable state. Unlike
+Conway’s Game of Life, in practice this automaton almost always converges within 15 steps,
+and this author has yet to see any oscillatory patterns."
+
+"There is no overpopulation that causes cells to die off, so once a cell is born it will
+always survive. The only cells that do not survive are those that begin isolated. In a sense,
+B678/S345678 is designed to prune the sparse areas of the grid, and fill in the dense areas
+by patching up holes."
+
+interesting okay fuck awesome great:
+he has a solution for using cellular automata on big grids
+
+"Since cellular automata are inherently local manipulations, we should not expect any modification
+of B678/S345678 to do this for us. Instead, we will use B678/345678 to create a low-resolution
+image, increase its resolution manually, and smooth it out with — you guessed it — another
+cellular automaton! We’ll design this automaton specifically for the purpose of smoothing out corners."
+
+interesting - on http://homepages.math.uic.edu/~jkun2/other/cellular-automata/ he suggests
+first running the initial ruleset, then *alternating* between increasing the resolution
+and running the second ruleset a few times (eg ~4)
+
+seems to work pretty well!
+
+ok let's reread http://www.gridsagegames.com/blog/2014/06/mapgen-cellular-automata/
+
+oh, _i_ see
+so this is actually really different from the versions described in all previous articles
+those operate on the whole map at once, in stages where every cell is considered and updated
+simultaneously, and you run like 2-10 iterations of that whole-map sweep
+
+but in this method, you pick cells at _random_ to consider, one at a time
+i didn't get that the first time i read evilscience's article
+
+"One of the variables you can tweak using this method that is not normally adjustable when
+using cellular automata is the number of cells randomly visited, which is where some of the
+additional variety comes in. Lowering the number of applications will result in some rougher
+maps, but a final smoothing phase can still operate on that and get some interesting results"
+
+so yeah we should consider also having a final smoothing phase that uses the traditional
+cellular automata approach
+
+cool let's give this a shot

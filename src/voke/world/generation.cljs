@@ -9,8 +9,8 @@
 (s/def ::height nat-int?)
 (s/def ::grid (s/coll-of (s/coll-of ::cell)))
 
-(s/def ::historical-active-cells (s/coll-of (s/coll-of ::cell)))
-(s/def ::grid-with-history (s/keys :req [::grid ::historical-active-cells]))
+(s/def ::history (s/coll-of ::cell))
+(s/def ::generated-level (s/keys :req [::grid ::history]))
 
 (defn full-grid [w h]
   (vec (repeat h
@@ -44,8 +44,8 @@
            empty-cells 0]
 
       (if (= empty-cells num-empty-cells)
-        {::grid                    grid
-         ::historical-active-cells historical-active-cells}
+        {::grid    grid
+         ::history historical-active-cells}
 
         (let [cell-was-full? (= (get-in grid [y x]) :full)
               horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
@@ -85,10 +85,6 @@
 (comment
   (tufte/add-basic-println-handler! {})
 
-  (stest/unstrument [`drunkards-walk
-                     `full-grid
-                     `count-empty-spaces])
-
   (let [grid (full-grid 30 30)]
     (js/console.profile "drunkard")
     (dotimes [_ 10]
@@ -102,5 +98,11 @@
       (dotimes [_ 100]
         (p :drunkard
            (drunkards-walk grid 150)
-           nil)))))
+           nil))))
+  (profile
+    {}
+    (p :full-grid
+       (dotimes [_ 100]
+         (full-grid 50 50))))
+  )
 
