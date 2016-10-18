@@ -31,52 +31,63 @@
   :args (s/cat :grid ::grid)
   :ret nat-int?)
 
-(def ^:export a-grid (full-grid 30 30))
+(defn ^:export drunkards-walk [w h num-empty-cells]
+  (loop [grid (full-grid w h)
+         historical-active-cells []
+         x (rand-int w)
+         y (rand-int h)
+         empty-cells 0]
 
-(defn ^:export drunkards-walk [grid num-empty-cells]
-  (let [height (count grid)
-        width (count (first grid))]
+    (if (= empty-cells num-empty-cells)
+      {::grid    grid
+       ::history historical-active-cells}
 
-    (loop [grid grid
-           historical-active-cells []
-           x (rand-int width)
-           y (rand-int height)
-           empty-cells 0]
+      (let [cell-was-full? (= (get-in grid [y x]) :full)
+            horizontal-direction-to-center (if (< x (/ w 2)) :east :west)
+            vertical-direction-to-center (if (< y (/ h 2)) :south :north)
+            direction (rand-nth-weighted
+                        (into {}
+                              (map (fn [direction]
+                                     (if (#{horizontal-direction-to-center vertical-direction-to-center}
+                                           direction)
+                                       [direction 1.4]
+                                       [direction 1.0]))
+                                   [:north :south :east :west])))]
 
-      (if (= empty-cells num-empty-cells)
-        {::grid    grid
-         ::history historical-active-cells}
-
-        (let [cell-was-full? (= (get-in grid [y x]) :full)
-              horizontal-direction-to-center (if (< x (/ width 2)) :east :west)
-              vertical-direction-to-center (if (< y (/ height 2)) :south :north)
-              direction (rand-nth-weighted
-                          (into {}
-                                (map (fn [direction]
-                                       (if (#{horizontal-direction-to-center vertical-direction-to-center}
-                                             direction)
-                                         [direction 1.4]
-                                         [direction 1.0]))
-                                     [:north :south :east :west])))]
-
-          (recur (assoc-in grid [y x] :empty)
-                 (conj historical-active-cells [x y])
-                 (case direction
-                   :east (bound-between (inc x) 0 (dec width))
-                   :west (bound-between (dec x) 0 (dec width))
-                   x)
-                 (case direction
-                   :north (bound-between (dec y) 0 (dec height))
-                   :south (bound-between (inc y) 0 (dec height))
-                   y)
-                 (if cell-was-full?
-                   (inc empty-cells)
-                   empty-cells)))))))
+        (recur (assoc-in grid [y x] :empty)
+               (conj historical-active-cells [x y])
+               (case direction
+                 :east (bound-between (inc x) 0 (dec w))
+                 :west (bound-between (dec x) 0 (dec w))
+                 x)
+               (case direction
+                 :north (bound-between (dec y) 0 (dec h))
+                 :south (bound-between (inc y) 0 (dec h))
+                 y)
+               (if cell-was-full?
+                 (inc empty-cells)
+                 empty-cells))))))
 
 (s/fdef drunkards-walk
-  :args (s/cat :grid ::grid
+  :args (s/cat :w nat-int?
+               :h nat-int?
                :num-empty-cells nat-int?)
-  :ret ::grid-with-history)
+  :ret ::generated-level)
+
+(defn automata
+  [w h initial-wall-probability]
+  ; TODO this will necessitate having multiple cells active in history at once
+  (let [generate-row (fn [] (take w (repeatedly #(rand-nth-weighted {:empty (- 1 initial-wall-probability)
+                                                                     :full  initial-wall-probability}))))
+        initial-grid (take h (repeatedly generate-row))]
+
+    {::grid initial-grid
+     ::historical-active-cells []
+     }
+    )
+
+  )
+
 
 #_(stest/instrument [`drunkards-walk
                      `full-grid

@@ -6,10 +6,6 @@
             [voke.world.generation :as generate])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 
-; TODO it looks like a lot of this is really specific to drunken walk, and cellular automata
-; will need a different UI, so go through and centralize everything in one drunken-state atom
-; and make sure all of the names of variables, components, etc are specific enough to avoid confusion
-
 ;; Constants
 
 (def cell-size 15)
@@ -93,9 +89,12 @@
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (let [new-dungeon (-> (@visualization-state ::generate/grid)
-                                        (generate/drunkards-walk @num-empty-cells))]
-                    (animate-dungeon-history (new-dungeon ::generate/history))))}
+                  (let [new-dungeon (generate/automata @grid-width @grid-height 0.45)]
+                    (reset-visualization-state!)
+                    (swap! visualization-state assoc ::generate/grid (new-dungeon ::generate/grid))
+                    #_(animate-dungeon-history (new-dungeon ::generate/history))
+
+                    ))}
      "generate"]]
    [grid visualization-state]])
 
@@ -104,13 +103,3 @@
 (defn ^:export main []
   (r/render-component [ui visualization-state]
                       (js/document.getElementById "content")))
-
-
-(comment
-  (reset! dungeon
-          (-> (generate/full-grid 30 30)
-              (generate/drunkards-walk 200))))
-
-
-
-
