@@ -5780,3 +5780,9 @@ so now we get:
 
 and array->grid is about 30% of our time.
 i think this is about as fast as we'd ever want this to be for now, stopping here. nice!
+
+http://blog.fikesfarm.com/posts/2015-11-03-planck-static-function-dispatch.html
+http://blog.fikesfarm.com/posts/2016-04-14-static-free-clojurescript-repl.html
+
+cool seems like i can just leave this off in dev
+

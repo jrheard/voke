@@ -9,10 +9,13 @@
 ;; Constants
 
 (def cell-size 15)
+
+(defonce algorithm (r/atom :drunkard))
 (defonce ms-per-tick (r/atom 16))
 (defonce grid-width (r/atom 30))
 (defonce grid-height (r/atom 30))
 (defonce num-empty-cells (r/atom 100))
+(defonce initial-fill-chance (r/atom 0.45))
 
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
                                       ::active-cell   nil
@@ -69,40 +72,80 @@
            ^{:key "active-cell"} [:div.cell.active {:style {:left (* cell-size x)
                                                             :top  (* cell-size y)}}]))])
 
-(defn slider [an-atom min max callback]
+(defn slider [an-atom min max step callback]
   (let [_ @an-atom]
-    [:input {:type      "range" :value @an-atom :min min :max max
+    [:input {:type      "range" :value @an-atom :min min :max max :step step
              :style     {:width "100%"}
              :on-change (fn [e]
-                          (reset! an-atom (js/parseInt (.-target.value e)))
-                          (callback))}]))
+                          (reset! an-atom (js/parseFloat (.-target.value e)))
+                          (when callback
+                            (callback)))}]))
 
-(defn ui [visualization-state]
+(defn drunkards-ui [visualization-state]
   [:div.content
+   [:p "Algorithm:"]
+   [:div.btn-group
+    [:a.btn.pill {:href     "#"
+                  :class    (when (= @algorithm :drunkard)
+                              "selected")
+                  :on-click (fn [e]
+                              (.preventDefault e)
+                              (reset! algorithm :drunkard))}
+     "Drunkard's Walk"]
+    [:a.btn.pill {:href     "#"
+                  :class    (when (= @algorithm :cellular)
+                              "selected")
+                  :on-click (fn [e]
+                              (.preventDefault e)
+                              (reset! algorithm :cellular))}
+     "Cellular Automata"]]
    [:p (str "Grid width: " @grid-width)]
-   [slider grid-width 25 50 reset-visualization-state!]
+   [slider grid-width 25 50 1 reset-visualization-state!]
    [:p (str "Grid height: " @grid-height)]
-   [slider grid-height 25 50 reset-visualization-state!]
-   [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
-   [:p "(doesn't take effect until the next time you press \"generate\")"]
-   [slider num-empty-cells 10 300]
+   [slider grid-height 25 50 1 reset-visualization-state!]
    [:p (str "Animation speed: " @ms-per-tick " ms per frame")]
-   [slider ms-per-tick 5 250]
+   [slider ms-per-tick 16 250 1]
+
+   (when (= @algorithm :drunkard)
+     [:div.drunkard-specific
+      [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
+      [:p "(doesn't take effect until the next time you press \"generate\")"]
+      [slider num-empty-cells 10 300 1]])
+
+   (when (= @algorithm :cellular)
+     [:div.cellular-specific
+      [:p (str "Chance for a given cell to be filled during intialization pass: "
+               @initial-fill-chance)]
+      [slider initial-fill-chance 0 1 0.01
+       (fn []
+         (swap! visualization-state (fn [state]
+                                      (-> state
+                                          (assoc ::generate/grid ((generate/automata @grid-width
+                                                                                     @grid-height
+                                                                                     @initial-fill-chance
+                                                                                     0) ::generate/grid))
+                                          (assoc ::active-cell nil)))))]])
+
    [:div.button-wrapper
     [:a.generate-button
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (let [new-dungeon (generate/automata @grid-width @grid-height 0.45 10000)]
-                    #_(animate-dungeon-history new-dungeon)
+                  (let [new-dungeon (if (= @algorithm :drunkard)
+                                      (generate/drunkards-walk @grid-width @grid-height @num-empty-cells)
+                                      (generate/automata @grid-width @grid-height @initial-fill-chance 10000))]
 
-                    (reset-visualization-state! (new-dungeon ::generate/grid))
-                    ))}
+                    (if (= @algorithm :drunkard)
+                      (animate-dungeon-history new-dungeon)
+                      (swap! visualization-state (fn [state]
+                                                   (-> state
+                                                       (assoc ::generate/grid (new-dungeon ::generate/grid))
+                                                       (assoc ::active-cell nil)))))))}
      "generate"]]
    [grid visualization-state]])
 
 ;; Main
 
 (defn ^:export main []
-  (r/render-component [ui visualization-state]
+  (r/render-component [drunkards-ui visualization-state]
                       (js/document.getElementById "content")))

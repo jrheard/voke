@@ -9,27 +9,13 @@
 (s/def ::height nat-int?)
 (s/def ::grid (s/coll-of (s/coll-of ::cell)))
 
-(s/def ::history (s/coll-of ::cell))
+(s/def ::vector2 (s/cat :x nat-int? :y nat-int?))
+(s/def ::history (s/cat :position ::vector2 :new-value ::cell))
 (s/def ::generated-level (s/keys :req [::grid ::history]))
 
 (defn full-grid [w h]
   (vec (repeat h
                (vec (repeat w :full)))))
-
-(s/fdef full-grid
-  :args (s/cat :w nat-int? :h nat-int?)
-  :ret ::grid)
-
-(defn count-empty-spaces [grid]
-  (apply +
-         (map (fn [line]
-                (count
-                  (filter #(= % :empty) line)))
-              grid)))
-
-(s/fdef count-empty-spaces
-  :args (s/cat :grid ::grid)
-  :ret nat-int?)
 
 (defn ^:export drunkards-walk [w h num-empty-cells]
   (loop [grid (full-grid w h)
@@ -55,7 +41,7 @@
                                    [:north :south :east :west])))]
 
         (recur (assoc-in grid [y x] :empty)
-               (conj historical-active-cells [[x y] :full])
+               (conj historical-active-cells [[x y] :empty])
                (case direction
                  :east (bound-between (inc x) 0 (dec w))
                  :west (bound-between (dec x) 0 (dec w))
@@ -74,6 +60,8 @@
                :num-empty-cells nat-int?)
   :ret ::generated-level)
 
+;; Cellular automata
+
 (defn array->grid [an-array]
   (into []
         (map (fn [row]
@@ -82,11 +70,6 @@
                             (if (true? cell) :full :empty)))
                      row)))
         an-array))
-
-(comment
-
-  (map (fn [x] (if (true? x) :full :empty)))
-  )
 
 (defn -make-js-row [width full-probability]
   (let [arr (make-array width)]
@@ -143,7 +126,7 @@
                                                         (aget y)
                                                         (aget x))
                                       neighbors (-get-neighbors grid x y w h)
-                                      num-full-neighbors (.-length (.filter neighbors #(identical? % true)))]
+                                      num-full-neighbors (.-length (.filter neighbors true?))]
 
                                   (cond
                                     (and cell-is-full?
@@ -170,10 +153,7 @@
                      grid)
                  (conj active-cells [[x y] new-value])))))))
 
-
-#_(stest/instrument [`drunkards-walk
-                     `full-grid
-                     `count-empty-spaces])
+#_(stest/instrument [`drunkards-walk])
 
 (comment
   (tufte/add-basic-println-handler! {})
