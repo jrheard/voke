@@ -117,45 +117,50 @@
 
     neighbors))
 
-(defn -automata-smoothing-pass [js-grid w h survival-threshold birth-threshold]
+(defn -new-value-at-position
+  [js-grid x y w h survival-threshold birth-threshold]
+  (let [cell-is-full? (-> js-grid
+                          (aget y)
+                          (aget x))
+        neighbors (-get-neighbors js-grid x y w h)
+        num-full-neighbors (.-length (.filter neighbors true?))]
 
-  )
+    (cond
+      (and cell-is-full?
+           (> num-full-neighbors survival-threshold)) true
+      (and (not cell-is-full?)
+           (> num-full-neighbors birth-threshold)) true
+      :else false)))
+
+(defn -automata-smoothing-pass
+  [js-grid w h survival-threshold birth-threshold])
+
+(defn -run-automata-rules-on-random-individual-cells
+  [js-grid w h survival-threshold birth-threshold iterations]
+  (loop [i 0
+         active-cells []]
+    (if (= i iterations)
+      active-cells
+
+      (let [x (rand-int w)
+            y (rand-int h)
+            new-value (-new-value-at-position js-grid x y w h survival-threshold birth-threshold)]
+        (-> js-grid
+            (aget y)
+            (aset x new-value))
+        (recur (inc i)
+               (conj active-cells [[x y] new-value]))))))
 
 (defn ^:export automata
   [w h initial-wall-probability survival-threshold birth-threshold iterations smoothing-passes]
-  (let [js-initial-grid (-make-js-grid w h initial-wall-probability)
-        cljs-initial-grid (array->grid js-initial-grid)
-        new-value-at-position (fn [grid x y]
-                                (let [cell-is-full? (-> grid
-                                                        (aget y)
-                                                        (aget x))
-                                      neighbors (-get-neighbors grid x y w h)
-                                      num-full-neighbors (.-length (.filter neighbors true?))]
+  (let [js-grid (-make-js-grid w h initial-wall-probability)
+        cljs-initial-grid (array->grid js-grid)
+        history (-run-automata-rules-on-random-individual-cells
+                  js-grid w h survival-threshold birth-threshold iterations)]
 
-                                  (cond
-                                    (and cell-is-full?
-                                         (> num-full-neighbors survival-threshold)) true
-                                    (and (not cell-is-full?)
-                                         (> num-full-neighbors birth-threshold)) true
-                                    :else false)))]
-
-    (loop [i 0
-           grid js-initial-grid
-           active-cells []]
-      (if (= i iterations)
-        {::grid         (array->grid grid)
-         ::initial-grid cljs-initial-grid
-         ::history      active-cells}
-
-        (let [x (rand-int w)
-              y (rand-int h)
-              new-value (new-value-at-position grid x y)]
-          (recur (inc i)
-                 (do (-> grid
-                         (aget y)
-                         (aset x new-value))
-                     grid)
-                 (conj active-cells [[x y] new-value])))))))
+    {::grid         (array->grid js-grid)
+     ::initial-grid cljs-initial-grid
+     ::history      history}))
 
 #_(stest/instrument [`drunkards-walk])
 

@@ -23,6 +23,7 @@
                 :figwheel     {:on-jsload "voke.world.visualize/main"}
                 :compiler     {:preloads             [devtools.preload]
                                ;:main                 voke.core
+                               :static-fns           true
                                :main                 voke.world.visualize
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/voke.js"
