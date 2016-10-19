@@ -6,18 +6,28 @@
             [voke.world.generation :as generate])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
 
+; This is a tool I built to help me play around with and understand various random-level-generation
+; algorithms. The code in this file is messy/gross/bad because it isn't "production" code, just
+; "throwaway dev tool" code. Don't judge me :)
+
+
 ;; Constants
 
 (def cell-size 15)
 
 (defonce algorithm (r/atom :drunkard))
 (defonce ms-per-tick (r/atom 16))
-(defonce grid-width (r/atom 30))
-(defonce grid-height (r/atom 30))
+(defonce grid-width (r/atom 50))
+(defonce grid-height (r/atom 50))
+
+; drunkard's
 (defonce num-empty-cells (r/atom 100))
+
+; automata
 (defonce initial-fill-chance (r/atom 0.45))
 (defonce min-neighbors-to-survive (r/atom 2))
 (defonce min-neighbors-to-birth (r/atom 5))
+(defonce num-iterations (r/atom 5000))
 
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
                                       ::active-cell   nil
@@ -30,6 +40,19 @@
                                 {::generate/grid initial-grid
                                  ::active-cell   nil
                                  ::id            (inc (old-state ::id))}))))
+
+(defn draw-automata-grid! []
+  (let [new-dungeon (generate/automata @grid-width
+                                       @grid-height
+                                       @initial-fill-chance
+                                       @min-neighbors-to-survive
+                                       @min-neighbors-to-birth
+                                       @num-iterations)]
+    (swap! visualization-state (fn [state]
+                                 (-> state
+                                     (assoc ::generate/grid (new-dungeon ::generate/grid))
+                                     (assoc ::active-cell nil))))))
+
 
 ;; Async code
 
@@ -117,42 +140,24 @@
      [:div.cellular-specific
       [:p (str "Chance for a given cell to be filled during intialization pass: "
                @initial-fill-chance)]
-      [slider initial-fill-chance 0 1 0.01
-       (fn []
-         (swap! visualization-state (fn [state]
-                                      (-> state
-                                          (assoc ::generate/grid ((generate/automata @grid-width
-                                                                                     @grid-height
-                                                                                     @initial-fill-chance
-                                                                                     @min-neighbors-to-survive
-                                                                                     @min-neighbors-to-birth
-                                                                                     0) ::generate/grid))
-                                          (assoc ::active-cell nil)))))]
+      [slider initial-fill-chance 0 1 0.01 draw-automata-grid!]
       [:p (str "Mininum # of neighbors for an alive cell to survive: " @min-neighbors-to-survive)]
-      [slider min-neighbors-to-survive 0 8 1]
+      [slider min-neighbors-to-survive 0 8 1 draw-automata-grid!]
       [:p (str "Mininum # of neighbors for a cell to be born: " @min-neighbors-to-birth)]
-      [slider min-neighbors-to-birth 0 8 1]])
+      [slider min-neighbors-to-birth 0 8 1 draw-automata-grid!]
+      [:p (str "Number of times to apply automata rules to random individual cells: " @num-iterations)]
+      [slider num-iterations 0 40000 100 draw-automata-grid!]
+      ])
 
    [:div.button-wrapper
     [:a.generate-button
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (let [new-dungeon (if (= @algorithm :drunkard)
-                                      (generate/drunkards-walk @grid-width @grid-height @num-empty-cells)
-                                      (generate/automata @grid-width
-                                                         @grid-height
-                                                         @initial-fill-chance
-                                                         @min-neighbors-to-survive
-                                                         @min-neighbors-to-birth
-                                                         10000))]
-
-                    (if (= @algorithm :drunkard)
-                      (animate-dungeon-history new-dungeon)
-                      (swap! visualization-state (fn [state]
-                                                   (-> state
-                                                       (assoc ::generate/grid (new-dungeon ::generate/grid))
-                                                       (assoc ::active-cell nil)))))))}
+                  (if (= @algorithm :drunkard)
+                    (animate-dungeon-history
+                      (generate/drunkards-walk @grid-width @grid-height @num-empty-cells))
+                    (draw-automata-grid!)))}
      "generate"]]
    [grid visualization-state]])
 

@@ -5804,6 +5804,7 @@ add support for a smoothing phase; can be super-simple/dumb at first, can be fle
   time to think harder about names again, i've really been letting that slide so far
 
 OH ALSO LOOK INTO FLOOD FILL AND FIGURE OUT WHEN TO USE IT
+also need to do some thinking about how to connect caves together, and which ones to fill in, etc
 
 make the UI a little easier for people who aren't me to understand
 make the whole thing redraw whenever any of the automata-specific sliders are touched
@@ -5842,3 +5843,18 @@ i think he practiced this too much
 he casually mentions https://github.com/stuartsierra/dependency - this looks really really useful!
 
 anyway it looks like the upshot is that onyx is a useful tool for processing streaming data in clojure
+apparently it does batch too
+
+ok anyway back to the tool
+playing around with the different variables - initial chance, survival threshold, birth threshold, iterations
+0.45 s3 b4 iter10000 is looking pretty good!
+
+https://www.evernote.com/shard/s11/sh/4766f63d-d93a-4d37-9e36-9d008e60faed/633ce93e72c0fc9c
+^ iter40000 there
+s3 b4 definitely look like the right thresholds, iter40000 looks good too
+although there's an interesting relationship between grid size and desired # iterations
+i don't fully understand it yet but it seems like the larger the grid, the more iterations
+you need in order to hollow out the right amount of space
+which makes sense, there are more cells you need to visit, so you need more random iterations
+
+let's take a look at the smoothing phase, maybe that'll help a lot actually
