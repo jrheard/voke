@@ -36,7 +36,7 @@
                               (map (fn [direction]
                                      (if (#{horizontal-direction-to-center vertical-direction-to-center}
                                            direction)
-                                       [direction 1.4]
+                                       [direction 1.2]
                                        [direction 1.0]))
                                    [:north :south :east :west])))]
 
@@ -117,8 +117,12 @@
 
     neighbors))
 
+(defn -automata-smoothing-pass [js-grid w h survival-threshold birth-threshold]
+
+  )
+
 (defn ^:export automata
-  [w h initial-wall-probability min-neighbors-to-survive min-neighbors-to-birth iterations]
+  [w h initial-wall-probability survival-threshold birth-threshold iterations smoothing-passes]
   (let [js-initial-grid (-make-js-grid w h initial-wall-probability)
         cljs-initial-grid (array->grid js-initial-grid)
         new-value-at-position (fn [grid x y]
@@ -130,9 +134,9 @@
 
                                   (cond
                                     (and cell-is-full?
-                                         (> num-full-neighbors min-neighbors-to-survive)) true
+                                         (> num-full-neighbors survival-threshold)) true
                                     (and (not cell-is-full?)
-                                         (> num-full-neighbors min-neighbors-to-birth)) true
+                                         (> num-full-neighbors birth-threshold)) true
                                     :else false)))]
 
     (loop [i 0

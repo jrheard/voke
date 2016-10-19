@@ -13,21 +13,21 @@
 
 ;; Constants
 
-(def cell-size 15)
+(def cell-size 10)
 
 (defonce algorithm (r/atom :drunkard))
 (defonce ms-per-tick (r/atom 16))
-(defonce grid-width (r/atom 50))
-(defonce grid-height (r/atom 50))
+(defonce grid-width (r/atom 80))
+(defonce grid-height (r/atom 80))
 
 ; drunkard's
-(defonce num-empty-cells (r/atom 100))
+(defonce num-empty-cells (r/atom 400))
 
 ; automata
 (defonce initial-fill-chance (r/atom 0.45))
-(defonce min-neighbors-to-survive (r/atom 2))
-(defonce min-neighbors-to-birth (r/atom 5))
-(defonce num-iterations (r/atom 5000))
+(defonce min-neighbors-to-survive (r/atom 3))
+(defonce min-neighbors-to-birth (r/atom 4))
+(defonce num-iterations (r/atom 10000))
 
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
                                       ::active-cell   nil
@@ -47,7 +47,8 @@
                                        @initial-fill-chance
                                        @min-neighbors-to-survive
                                        @min-neighbors-to-birth
-                                       @num-iterations)]
+                                       @num-iterations
+                                       nil)]
     (swap! visualization-state (fn [state]
                                  (-> state
                                      (assoc ::generate/grid (new-dungeon ::generate/grid))
@@ -124,9 +125,9 @@
                               (reset! algorithm :cellular))}
      "Cellular Automata"]]
    [:p (str "Grid width: " @grid-width)]
-   [slider grid-width 25 80 1 reset-visualization-state!]
+   [slider grid-width 25 100 1 reset-visualization-state!]
    [:p (str "Grid height: " @grid-height)]
-   [slider grid-height 25 80 1 reset-visualization-state!]
+   [slider grid-height 25 100 1 reset-visualization-state!]
    [:p (str "Animation speed: " @ms-per-tick " ms per frame")]
    [slider ms-per-tick 16 250 1]
 
@@ -134,7 +135,7 @@
      [:div.drunkard-specific
       [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
       [:p "(doesn't take effect until the next time you press \"generate\")"]
-      [slider num-empty-cells 10 300 1]])
+      [slider num-empty-cells 10 1000 1]])
 
    (when (= @algorithm :cellular)
      [:div.cellular-specific
