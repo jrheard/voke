@@ -5791,4 +5791,54 @@ s3b4 looks interesting
 eh, having trouble focusing, think i might just take a break for the rest of the day
 TODO:
 smoothing phase
+look at http://www.evilscience.co.uk/wp-content/uploads/2014/02/app.png
+and http://www.evilscience.co.uk/a-c-algorithm-to-build-roguelike-cave-systems-part-1/ again
 
+=======
+
+10/19/16
+
+plans for today:
+add support for a smoothing phase; can be super-simple/dumb at first, can be fleshed out later.
+  will reuse lots of logic from the current automata function.
+  time to think harder about names again, i've really been letting that slide so far
+
+OH ALSO LOOK INTO FLOOD FILL AND FIGURE OUT WHEN TO USE IT
+
+make the UI a little easier for people who aren't me to understand
+make the whole thing redraw whenever any of the automata-specific sliders are touched
+add animation support to the automata visualization, and add a slider that lets you determine
+  how many cells are animated per frame (eg 1, 5, 10, etc)
+add support for a history slider (TODO think more about how this will work, best way of integrating with UI)
+
+but first, let's finally work through austin's devs tutorial
+
+except actually first let's go eat some dim sum
+delicious
+ok, devs time
+
+https://github.com/austinhaas/DEVS/blob/master/doc/tutorial.clj
+aw dang he wants me to work through this interactively
+okok one sec
+
+ok, that was interesting
+not 100% sure what to make of it
+super well-done/formatted tutorial though!
+
+http://www.onyxplatform.org/learn/
+https://www.youtube.com/watch?v=YlfA8hFs2HY
+talks about difference between batch and streaming
+batch is relatively well-understood, streaming less so
+in streaming, it's very possible you can never see the whole data set because it's infinite or
+very large/long-lived (eg all tweets)
+and so while in batch land can be just stateless immutable transformations of data, in streaming
+land you have to keep state
+makes sense
+
+i don't understand much of what he says starting around minute 9
+i wish he used simpler words
+i think he practiced this too much
+
+he casually mentions https://github.com/stuartsierra/dependency - this looks really really useful!
+
+anyway it looks like the upshot is that onyx is a useful tool for processing streaming data in clojure
