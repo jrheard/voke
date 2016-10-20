@@ -5858,3 +5858,59 @@ you need in order to hollow out the right amount of space
 which makes sense, there are more cells you need to visit, so you need more random iterations
 
 let's take a look at the smoothing phase, maybe that'll help a lot actually
+
+started cleaning up in preparation for smoothing phase
+i kinda wanna do another perf pass though
+measuring 200 invocations of (automata 100 100 0.45 3 4 20000 nil)
+
+{:id :automata, :n-calls 200, :min "41ms", :max "215ms",
+:mad "13.99ms", :mean "65.36ms", :time% 100, :time "13.07s"}
+
+NOTE we spend 27% of our time in the garbage collector
+10% of our time in conj
+7% of our time in =
+5% of our time in array->grid
+35% of our time in -new-value-at-position
+which says it spends 28% (of the whole bucket of 100%) in "self time"
+and 5% in -get-neighbors
+
+so i guess the first step is to figure out why we're doing so much gc and fix that
+
+i'm gonna do a prod build real quick to see what the profiles there look like
+yeah, on prod we spend 35% of our time in GC
+
+http://rundis.github.io/blog/2015/clojurescript_performance_tuning.html
+
+"A couple of function showed a lot of own-time in the profiler. I really couldn’t figure
+out why though. They didn’t seem to do much, but delegate to other functions. I tried a range
+of things until I stumbled accross this blogpost by Stuart Sierra."
+links to https://stuartsierra.com/2015/06/01/clojure-donts-optional-arguments-with-varargs
+not relevant to me though
+
+googling around for info on js gc issues
+
+https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/ is
+probably not relevant since i don't think i have a _leak_, but whatever, i'll read this
+
+"There are 4 types of data types in JavaScript: Boolean, String, Number, and Object. First
+3 are simple types, and they can only hold on to the data that is assigned to them (i.e.
+string of text). Objects, and everything else in JavaScript is an object (i.e. Arrays are
+Objects), can keep references (pointers) to other objects."
+
+heh here's what my timeline looks like, note the blue memory graph:
+https://www.evernote.com/shard/s11/sh/f10c0c33-5bea-42e6-81cb-0d1912b0a8c6/a17df90c6da1cc8b
+
+oh fuck nice - the timeline view lets me do this:
+https://www.evernote.com/shard/s11/sh/edc9be6e-d8f7-4182-af0a-9ce23cc226d6/b4aa93fe109daef9
+i always thought bottom-up view was worthless but now i see what it's for, nice
+or anyway i think i do
+
+oh wow, the profile tab has several awesome things i didn't know about
+heap snapshot
+allocation timeline
+allocation profile
+
+let's try them out, shall we
+
+the allocation profile one indicates that it basically all comes from array->grid?
+https://www.evernote.com/l/AAuZTK7NlexG_bP6qP1lR1yJoJ7DY2CsSWg

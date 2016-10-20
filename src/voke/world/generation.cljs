@@ -132,8 +132,23 @@
            (> num-full-neighbors birth-threshold)) true
       :else false)))
 
+(defn -copy-js-grid [js-grid]
+  (let [height (.-length js-grid)
+        new-grid (make-array height)]
+
+    (loop [i 0]
+      (if (= i height)
+        new-grid
+
+        (aset new-grid
+              i
+              (.slice (aget js-grid i)))))))
+
 (defn -automata-smoothing-pass
-  [js-grid w h survival-threshold birth-threshold])
+  [js-grid w h survival-threshold birth-threshold]
+  (let [new-grid (-copy-js-grid js-grid)]
+    )
+  )
 
 (defn -run-automata-rules-on-random-individual-cells
   [js-grid w h survival-threshold birth-threshold iterations]
@@ -185,9 +200,9 @@
 
   (profile
     {}
-    (dotimes [_ 100]
+    (dotimes [_ 200]
       (p :automata
-         (automata 50 50 0.45 500)
+         (automata 100 100 0.45 3 4 20000 nil)
          nil)))
   )
 
