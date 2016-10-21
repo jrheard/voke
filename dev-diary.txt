@@ -5914,3 +5914,30 @@ let's try them out, shall we
 
 the allocation profile one indicates that it basically all comes from array->grid?
 https://www.evernote.com/l/AAuZTK7NlexG_bP6qP1lR1yJoJ7DY2CsSWg
+TODO LOOK INTO THIS
+
+https://docs.google.com/presentation/d/1wUVmf78gG-ra5aOxvTfYdiLkdGaR9OhXRnOlIcEmu2s/pub?start=false&loop=false&delayms=3000&slide=id.g31ec7af_0_29
+has info on leaks
+
+=======
+
+10/20/16
+
+https://hacks.mozilla.org/2012/11/tracking-down-memory-leaks-in-node-js-a-node-js-holiday-season/
+
+TODO try just removing the array->grid calls and see what that does to perf (and to reported gc)
+
+{:id :automata, :n-calls 200, :min "47ms", :max "183ms",
+:mad "22.04ms", :mean "90.39ms", :time% 100, :time "18.08s"}
+
+shaved a little time off, not much though
+
+gc-wise, it now says 48% of our allocations are in COMPILER (?) and 52% in new-value-at-position
+and lo and behold, our memory allocation looks much less insane when graphed:
+https://www.evernote.com/l/AAvSfj1nfOdFa7pNTiBepKtqIRwfquegx_M
+
+{:id :automata, :n-calls 200, :min "36ms", :max "126ms",
+:mad "11.13ms", :mean "56.32ms", :time% 100, :time "11.26s"}
+
+so yeah, it definitely looks like there's something going on here
+wonder if it's fixable?
