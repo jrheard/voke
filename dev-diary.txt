@@ -5990,3 +5990,61 @@ if that's the case, and the last tab of the visualization tool won't have slider
 then i should just have it write to a canvas directly
 this way it can write to a nice big huge grid
 i might give that a shot right now tbh
+
+ok, nice, did that
+profiling yet again
+we spend the vast majority of our time in automata-smoothing-pass, which is to be expected
+also, i should definitely bump up the number of random-cell iterations pre smoothing, i'll do that first
+did that, not sure if it makes a difference? i miss sliders :/
+gonna try a prod build and profile that if i can
+
+ok i have a profile here
+before i try something - i think if i replace an = or two in smoothing-pass with identical?, we'll save
+20% of our time - i need to get some benchmark timings
+based on (automata 400 400 0.45 4 5 400000 12)
+
+calling that 10 times yields:
+{:id :big-grid, :n-calls 10, :min "4s", :max "5.5s", :mad
+"510.8ms", :mean "4.69s", :time% 100, :time "46.9s"}
+
+now let's try identical?
+
+{:id :big-grid, :n-calls 10, :min "2.96s", :max "3.55s",
+:mad "124ms", :mean "3.18s", :time% 100, :time "31.84s"}
+
+niiiiice
+
+ok, now it's down to new-value-at-position
+
+is there anything we can do to make this function faster?
+
+it spends 6% of our time in get-neighbors, and 35% of our time in new-value-at-position "self time"
+let's research terms like "js profiling self time" to see if there are any tips on how to diagnose this
+
+yeah not really
+the only thing that's jumping out at me is this bit:
+(.-length (.filter neighbors true?))
+let's have neighbors just return the number of full neighbors directly
+
+hm, have i made this somehow.. slower?
+{:id :big-grid, :n-calls 10, :min "4.45s", :max "5.01s",
+:mad "132.38ms", :mean "4.63s", :time% 100, :time "46.28s"}
+yeah this is worse. what gives? profile time
+
+oh, i think that this completely fucked up timings, interesting:
+[new-i new-j] (if (identical? i (inc x))
+                            [(dec x) (inc j)]
+                            [(inc i) j])
+because end up constructing and calling nth on a cljs persistent vector a jillion times in a tight loop
+so: don't do unpacking like this in a tight loop!
+
+niiiice, now we're down to this:
+{:id :big-grid, :n-calls 10, :min "1.44s", :max "2.29s",
+:mad "222.74ms", :mean "1.71s", :time% 100, :time "17.06s"}
+
+so we're down from mean time 4.69 to mean time 1.71s (although we're only doing 10 iterations)
+but anyway it definitely looks like we've at least made this 2x faster
+so that's cool!
+new-value-at-position now only has 6% self time
+num-full-neighbors is where most of the self time lives now, which makes sense
+20% in the garbage collector, though! TODO: take a look at allocation profiles again

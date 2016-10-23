@@ -24,7 +24,7 @@
          y (rand-int h)
          empty-cells 0]
 
-    (if (= empty-cells num-empty-cells)
+    (if (identical? empty-cells num-empty-cells)
       {::grid    grid
        ::history historical-active-cells}
 
@@ -89,42 +89,45 @@
         (recur (inc i))))
     arr))
 
-(defn -get-neighbors [js-grid x y w h]
-  (let [neighbors #js []]
-    (loop [i (dec x)
-           j (dec y)]
-      (when (and (< i (+ x 2))
-                 (< j (+ y 2)))
+(defn -num-full-neighbors [js-grid x y w h]
+  (loop [num-full 0
+         i (dec x)
+         j (dec y)]
+    (if (and (< i (+ x 2))
+             (< j (+ y 2)))
 
-        (cond
-          (and (identical? i x)
-               (identical? j y)) nil
+      (let [this-cell-counts? (cond
+                                (and (identical? i x)
+                                     (identical? j y)) false
 
-          (or (< i 0)
-              (>= i w)
-              (< j 0)
-              (>= j h)) (.push neighbors true)
+                                ; Off-grid cells count as filled-in neighbors.
+                                (or (< i 0)
+                                    (>= i w)
+                                    (< j 0)
+                                    (>= j h)) true
 
-          :else (.push neighbors (-> js-grid
-                                     (aget j)
-                                     (aget i))))
+                                :else (-> js-grid
+                                          (aget j)
+                                          (aget i)))]
 
-        (if (identical? i (inc x))
-          (recur (dec x)
-                 (inc j))
-          (recur (inc i)
-                 j))))
+        (recur (if this-cell-counts?
+                 (inc num-full)
+                 num-full)
+               (if (identical? i (inc x))
+                 (dec x)
+                 (inc i))
+               (if (identical? i (inc x))
+                 (inc j)
+                 j)))
 
-    neighbors))
+      num-full)))
 
 (defn -new-value-at-position
   [js-grid x y w h survival-threshold birth-threshold]
   (let [cell-is-full? (-> js-grid
                           (aget y)
                           (aget x))
-        neighbors (-get-neighbors js-grid x y w h)
-        num-full-neighbors (.-length (.filter neighbors true?))]
-
+        num-full-neighbors (-num-full-neighbors js-grid x y w h)]
     (cond
       (and cell-is-full?
            (>= num-full-neighbors survival-threshold)) true
@@ -137,7 +140,7 @@
         new-grid (make-array height)]
 
     (loop [i 0]
-      (if (= i height)
+      (if (identical? i height)
         new-grid
 
         (do
@@ -155,15 +158,15 @@
         (-> new-grid
             (aget y)
             (aset x (-new-value-at-position js-grid x y w h survival-threshold birth-threshold)))
-        (recur (if (= (dec x) w) 0 (inc x))
-               (if (= (dec x) w) (inc y) y))))
+        (recur (if (identical? (dec x) w) 0 (inc x))
+               (if (identical? (dec x) w) (inc y) y))))
     new-grid))
 
 (defn -run-automata-rules-on-random-individual-cells
   [js-grid w h survival-threshold birth-threshold iterations]
   (loop [i 0
          active-cells []]
-    (if (= i iterations)
+    (if (identical? i iterations)
       active-cells
 
       (let [x (rand-int w)
@@ -184,7 +187,7 @@
 
         smoothed-js-grid (loop [i 0
                                 grid js-grid]
-                           (if (= i smoothing-passes)
+                           (if (identical? i smoothing-passes)
                              grid
                              (recur (inc i)
                                     (-automata-smoothing-pass grid w h survival-threshold birth-threshold))))]
@@ -216,6 +219,13 @@
         (p :drunkard
            (drunkards-walk grid 150)
            nil))))
+
+  (profile
+    {}
+    (dotimes [_ 10]
+      (p :big-grid
+         (automata 400 400 0.45 4 5 400000 12)
+         nil)))
 
   (profile
     {}

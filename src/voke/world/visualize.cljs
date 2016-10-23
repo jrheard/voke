@@ -172,7 +172,7 @@
                                  ctx (.getContext canvas "2d")
                                  side-length 400
                                  cell-size 2
-                                 grid ((generate/automata side-length side-length 0.45 4 5 40000 8)
+                                 grid ((generate/automata side-length side-length 0.45 4 5 400000 12)
                                         ::generate/grid)]
                              (.clearRect ctx 0 0 (* side-length cell-size) (* side-length cell-size))
 
