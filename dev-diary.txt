@@ -5941,3 +5941,39 @@ https://www.evernote.com/l/AAvSfj1nfOdFa7pNTiBepKtqIRwfquegx_M
 
 so yeah, it definitely looks like there's something going on here
 wonder if it's fixable?
+
+=====
+
+10/23/16
+
+https://www.youtube.com/watch?v=L3ugr9BJqIs
+
+good stuff. good explanation of the 3-snapshot technique, i didn't realize that the whole point
+was about "allocations between snapshot 1 and 2 _that are still around in snapshot 3_".
+
+i talked with dnolen on slack yesterday re: the allocations i'm seeing; he wasn't surprised, since my
+code isn't doing all that much work otherwise. i still think it'd be good+fun to look into using
+chrome devtools, just for fun.
+
+things to look into using:
+containment view
+dominators view
+
+i poked around in the memory view, this time manipulating the cellular automata vis's sliders manually
+instead of calling automata in a loop, and this time the memory allocation profile said that we do
+all our allocations in reagent/react, by making a ton of react elements. this probably makes a lot of sense
+- i don't think react+reagent were made with this use case in mind.
+seems like an acceptable limitation to live with since this is just a visualization tool -
+we'll just have to keep the grid sizes relatively low in situations where the vis has interactive
+sliders and so its parameters can change very frequently.
+
+i think we should still be able to get away with generating+visualizing really big grids in this tool
+as long as they're just kicked off by a big "generate" button.
+
+so i think this tool's headers/tabs will eventually look like:
+
+drunkard's | cellular | tunneler | foo | voke dungeon generation
+
+where the first N-1 tabs have lots of sliders and let you visualize how these things work
+on a smaller grid, and the last one just has a "generate" button and generates a big 400x400 (or
+whatever) map
