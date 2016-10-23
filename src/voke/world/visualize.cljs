@@ -132,9 +132,11 @@
    [:p "Algorithm:"]
    [:div.btn-group
     [tab :drunkard "Drunkard's Walk"]
-    [tab :cellular "Cellular Automata"]]
+    [tab :cellular "Cellular Automata"]
+    [tab :final "Voke algorithm"]]
 
-   (common-visualization-sliders)
+   (when (not= @selected-tab :final)
+     (common-visualization-sliders))
 
    (when (= @selected-tab :drunkard)
      [:div.drunkard-specific
@@ -162,12 +164,46 @@
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (if (= @selected-tab :drunkard)
-                    (animate-dungeon-history
-                      (generate/drunkards-walk @grid-width @grid-height @num-empty-cells))
-                    (draw-automata-grid!)))}
+                  (condp = @selected-tab
+                    :drunkard (animate-dungeon-history
+                                (generate/drunkards-walk @grid-width @grid-height @num-empty-cells))
+                    :automata (draw-automata-grid!)
+                    :final (let [canvas (js/document.getElementById "visualization-canvas")
+                                 ctx (.getContext canvas "2d")
+                                 side-length 400
+                                 grid ((generate/automata side-length side-length 0.45 4 5 40000 0)
+                                        ::generate/grid)]
+                             ; TODO fill in the canvas
+                             (set! (.-fillStyle ctx) "#CCC")
+
+                             (loop [x 0
+                                    y 0]
+
+                               (when (< y side-length)
+                                 (when (= (-> grid
+                                              (get y)
+                                              (get x))
+                                          :empty)
+
+                                   (doto ctx
+                                     (.beginPath)
+                                     (.rect (* x 2) (* y 2) 2 2)
+                                     (.fill)))
+
+                                 (recur (if (= (dec x) side-length) 0 (inc x))
+                                        (if (= (dec x) side-length) (inc y) y)))))))}
      "generate"]]
-   [grid visualization-state]])
+
+   ; full #333, empty #ccc
+
+   (if (= @selected-tab :final)
+     [:canvas {:id     "visualization-canvas"
+               :width  800
+               :height 800
+               :style  {:border           "none"
+                        :background-color "#333"}
+               }]
+     [grid visualization-state])])
 
 ;; Main
 
