@@ -5977,3 +5977,16 @@ drunkard's | cellular | tunneler | foo | voke dungeon generation
 where the first N-1 tabs have lots of sliders and let you visualize how these things work
 on a smaller grid, and the last one just has a "generate" button and generates a big 400x400 (or
 whatever) map
+
+ok, smoothing seems to be working
+gonna do another perf pass
+one behavior note - lots of empty spots along edges of the grid, should add another pass that fills 'em in
+by hand
+eh, ignore the perf pass bit, turns out adding a console.log call to each iteration of the
+smoothing pass function slowed us down a lot, but now that that's removed most of the overhead
+appears to be in react/reagent
+
+if that's the case, and the last tab of the visualization tool won't have sliders of any sort,
+then i should just have it write to a canvas directly
+this way it can write to a nice big huge grid
+i might give that a shot right now tbh

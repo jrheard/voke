@@ -151,14 +151,12 @@
   (let [new-grid (-copy-js-grid js-grid)]
     (loop [x 0
            y 0]
-      (js/console.log x y)
       (when (< y h)
         (-> new-grid
             (aget y)
             (aset x (-new-value-at-position js-grid x y w h survival-threshold birth-threshold)))
         (recur (if (= (dec x) w) 0 (inc x))
                (if (= (dec x) w) (inc y) y))))
-    
     new-grid))
 
 (defn -run-automata-rules-on-random-individual-cells

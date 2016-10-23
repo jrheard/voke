@@ -15,7 +15,7 @@
 
 (def cell-size 10)
 
-(defonce algorithm (r/atom :drunkard))
+(defonce selected-tab (r/atom :drunkard))
 (defonce ms-per-tick (r/atom 16))
 (defonce grid-width (r/atom 80))
 (defonce grid-height (r/atom 80))
@@ -107,38 +107,42 @@
                           (when callback
                             (callback)))}]))
 
-(defn ui [visualization-state]
-  [:div.content
-   [:p "Algorithm:"]
-   [:div.btn-group
-    [:a.btn.pill {:href     "#"
-                  :class    (when (= @algorithm :drunkard)
-                              "selected")
-                  :on-click (fn [e]
-                              (.preventDefault e)
-                              (reset! algorithm :drunkard))}
-     "Drunkard's Walk"]
-    [:a.btn.pill {:href     "#"
-                  :class    (when (= @algorithm :cellular)
-                              "selected")
-                  :on-click (fn [e]
-                              (.preventDefault e)
-                              (reset! algorithm :cellular))}
-     "Cellular Automata"]]
+(defn common-visualization-sliders []
+  [:div.common-sliders
    [:p (str "Grid width: " @grid-width)]
    [slider grid-width 25 100 1 reset-visualization-state!]
    [:p (str "Grid height: " @grid-height)]
    [slider grid-height 25 100 1 reset-visualization-state!]
    [:p (str "Animation speed: " @ms-per-tick " ms per frame")]
-   [slider ms-per-tick 16 250 1]
+   [slider ms-per-tick 16 250 1]])
 
-   (when (= @algorithm :drunkard)
+(defn tab
+  [tab-kw text]
+  [:a.btn.pill {:href     "#"
+                :class    (when (= @selected-tab tab-kw)
+                            "selected")
+                :on-click (fn [e]
+                            (.preventDefault e)
+                            (reset! selected-tab tab-kw)
+                            (reset-visualization-state!))}
+   text])
+
+(defn ui [visualization-state]
+  [:div.content
+   [:p "Algorithm:"]
+   [:div.btn-group
+    [tab :drunkard "Drunkard's Walk"]
+    [tab :cellular "Cellular Automata"]]
+
+   (common-visualization-sliders)
+
+   (when (= @selected-tab :drunkard)
      [:div.drunkard-specific
       [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
       [:p "(doesn't take effect until the next time you press \"generate\")"]
       [slider num-empty-cells 10 1000 1]])
 
-   (when (= @algorithm :cellular)
+   (when (= @selected-tab :cellular)
      [:div.cellular-specific
       [:p (str "Chance for a given cell to be filled during intialization pass: "
                @initial-fill-chance)]
@@ -158,7 +162,7 @@
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (if (= @algorithm :drunkard)
+                  (if (= @selected-tab :drunkard)
                     (animate-dungeon-history
                       (generate/drunkards-walk @grid-width @grid-height @num-empty-cells))
                     (draw-automata-grid!)))}
