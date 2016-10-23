@@ -25,8 +25,8 @@
 
 ; automata
 (defonce initial-fill-chance (r/atom 0.45))
-(defonce min-neighbors-to-survive (r/atom 3))
-(defonce min-neighbors-to-birth (r/atom 4))
+(defonce min-neighbors-to-survive (r/atom 4))
+(defonce min-neighbors-to-birth (r/atom 5))
 (defonce num-iterations (r/atom 10000))
 
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)

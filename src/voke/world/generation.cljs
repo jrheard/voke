@@ -127,9 +127,9 @@
 
     (cond
       (and cell-is-full?
-           (> num-full-neighbors survival-threshold)) true
+           (>= num-full-neighbors survival-threshold)) true
       (and (not cell-is-full?)
-           (> num-full-neighbors birth-threshold)) true
+           (>= num-full-neighbors birth-threshold)) true
       :else false)))
 
 (defn -copy-js-grid [js-grid]
