@@ -171,9 +171,11 @@
                     :final (let [canvas (js/document.getElementById "visualization-canvas")
                                  ctx (.getContext canvas "2d")
                                  side-length 400
-                                 grid ((generate/automata side-length side-length 0.45 4 5 40000 0)
+                                 cell-size 2
+                                 grid ((generate/automata side-length side-length 0.45 4 5 40000 8)
                                         ::generate/grid)]
-                             ; TODO fill in the canvas
+                             (.clearRect ctx 0 0 (* side-length cell-size) (* side-length cell-size))
+
                              (set! (.-fillStyle ctx) "#CCC")
 
                              (loop [x 0
@@ -187,7 +189,7 @@
 
                                    (doto ctx
                                      (.beginPath)
-                                     (.rect (* x 2) (* y 2) 2 2)
+                                     (.rect (* x cell-size) (* y cell-size) cell-size cell-size)
                                      (.fill)))
 
                                  (recur (if (= (dec x) side-length) 0 (inc x))
