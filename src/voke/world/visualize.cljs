@@ -28,6 +28,7 @@
 (defonce min-neighbors-to-survive (r/atom 4))
 (defonce min-neighbors-to-birth (r/atom 5))
 (defonce num-iterations (r/atom 10000))
+(defonce smoothing-passes (r/atom 0))
 
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
                                       ::active-cell   nil
@@ -48,7 +49,7 @@
                                        @min-neighbors-to-survive
                                        @min-neighbors-to-birth
                                        @num-iterations
-                                       nil)]
+                                       @smoothing-passes)]
     (swap! visualization-state (fn [state]
                                  (-> state
                                      (assoc ::generate/grid (new-dungeon ::generate/grid))
@@ -147,7 +148,9 @@
       [:p (str "Mininum # of neighbors for a cell to be born: " @min-neighbors-to-birth)]
       [slider min-neighbors-to-birth 0 8 1 draw-automata-grid!]
       [:p (str "Number of times to apply automata rules to random individual cells: " @num-iterations)]
-      [slider num-iterations 0 40000 100 draw-automata-grid!]
+      [slider num-iterations 0 40000 5000 draw-automata-grid!]
+      [:p (str "Number of smoothing passes: " @smoothing-passes)]
+      [slider smoothing-passes 0 5 1 draw-automata-grid!]
       ])
 
    [:div.button-wrapper

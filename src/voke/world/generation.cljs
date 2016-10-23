@@ -140,15 +140,26 @@
       (if (= i height)
         new-grid
 
-        (aset new-grid
-              i
-              (.slice (aget js-grid i)))))))
+        (do
+          (aset new-grid
+                i
+                (.slice (aget js-grid i)))
+          (recur (inc i)))))))
 
 (defn -automata-smoothing-pass
   [js-grid w h survival-threshold birth-threshold]
   (let [new-grid (-copy-js-grid js-grid)]
-    )
-  )
+    (loop [x 0
+           y 0]
+      (js/console.log x y)
+      (when (< y h)
+        (-> new-grid
+            (aget y)
+            (aset x (-new-value-at-position js-grid x y w h survival-threshold birth-threshold)))
+        (recur (if (= (dec x) w) 0 (inc x))
+               (if (= (dec x) w) (inc y) y))))
+    
+    new-grid))
 
 (defn -run-automata-rules-on-random-individual-cells
   [js-grid w h survival-threshold birth-threshold iterations]
@@ -171,9 +182,19 @@
   (let [js-grid (-make-js-grid w h initial-wall-probability)
         cljs-initial-grid (array->grid js-grid)
         history (-run-automata-rules-on-random-individual-cells
-                  js-grid w h survival-threshold birth-threshold iterations)]
+                  js-grid w h survival-threshold birth-threshold iterations)
 
-    {::grid         (array->grid js-grid)
+        smoothed-js-grid (loop [i 0
+                                grid js-grid]
+                           (if (= i smoothing-passes)
+                             grid
+                             (recur (inc i)
+                                    (-automata-smoothing-pass grid w h survival-threshold birth-threshold))))]
+
+    ; TODO consider integrating smoothing passes into the animation system
+    ; or just... don't?
+
+    {::grid         (array->grid smoothed-js-grid)
      ::initial-grid cljs-initial-grid
      ::history      history}))
 
