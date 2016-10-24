@@ -6125,3 +6125,22 @@ looks pretty useful
 ok things are looking pretty sweet atm
 TODO - kill the whole :history thing, no longer needed
 measure performance before/after
+
+ok, let's measure the current state of performance + memory usage
+
+calling this 200 times:
+(automata 100 100 0.45 3 4 20000 12 4 5)
+{:id :automata, :n-calls 200, :min "66ms", :max "155ms",
+:mad "10.13ms", :mean "85.79ms", :time% 100, :time "17.16s"}
+
+memory-wise, looks like we just allocate 67k from array->grid, which seems low+fine
+
+anyway now let's remove all history/etc code
+ok, done (i think, haven't reread the whole thing but it seems to run)
+now we have:
+
+{:id :automata, :n-calls 200, :min "43ms", :max "123ms",
+:mad "5.95ms", :mean "53.67ms", :time% 100, :time "10.73s"}
+
+noticeable speedup! about 60% of the time it used to take
+

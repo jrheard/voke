@@ -28,7 +28,7 @@
 (defonce first-pass-survival-threshold (r/atom 4))
 (defonce first-pass-birth-threshold (r/atom 5))
 (defonce smoothing-pass-survival-threshold (r/atom 4))
-(defonce smoothing-pass-birth-threshold (r/atom 4))
+(defonce smoothing-pass-birth-threshold (r/atom 5))
 (defonce num-iterations (r/atom 10000))
 (defonce smoothing-passes (r/atom 0))
 
@@ -84,9 +84,7 @@
                                        @smoothing-pass-survival-threshold
                                        @smoothing-pass-birth-threshold)
           :final (generate/automata 200 200 0.45 4 5 400000 12 4 5))]
-    (-> grid
-        ::generate/grid
-        draw-grid)))
+    (draw-grid grid)))
 
 ;; Reagent components
 
