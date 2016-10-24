@@ -6144,3 +6144,47 @@ now we have:
 
 noticeable speedup! about 60% of the time it used to take
 
+profiling now
+we spend 12% of our time in rand-int (definitely due to the slower seeded rng implementation)
+16% self time in new-value-at-position
+40% self time in num-full-neighbors
+
+oh wow, i never noticed this before - the chrome profiling tool has "focus this function"
+and "exclude this function" buttons, which seem very useful
+
+anyway that seems to be the whole story - those two functions are where the remaining time is spent
+
+interesting - the truth_ call i also see us spending some time in (about 7% self time)
+is what's emitted when you call (and foo bar)
+(thanks klipse!)
+i wonder if there's a way to restructure this cond for performance?
+
+blog.fikesfarm.com/posts/2015-12-04-boolean-type-hints-in-clojurescript.html
+seems very relevant!!!!!
+
+ok! with the help of that url and klipse, i've got:
+
+(let [foo (get [true] 0)]
+  (if foo 1 2))
+
+emits a truth_ call
+
+(let [foo ^boolean (get [true] 0)]
+  (if foo 1 2))
+
+does *not* emit a truth_ call
+let's try this out!
+
+huh - it doesn't seem to affect perf at all, according to tufte!
+without hint:
+{:id :automata, :n-calls 400, :min "43ms", :max "100ms",
+:mad "5.71ms", :mean "54.44ms", :time% 100, :time "21.78s"}
+with hint:
+{:id :automata, :n-calls 400, :min "43ms", :max "106ms",
+:mad "6.06ms", :mean "53.99ms", :time% 100, :time "21.6s"}
+
+let's look at chrome profiler
+
+hm, in chrome profiler i still see 7% of our time spent in truth_!
+i'm misunderstanding something - i think that this (and) call may be throwing a spanner in the works
+TODO continue to investigate

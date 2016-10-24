@@ -108,10 +108,12 @@
 
 (defn -new-value-at-position
   [js-grid x y w h survival-threshold birth-threshold]
-  (let [cell-is-full? (-> js-grid
-                          (aget y)
-                          (aget x))
+  (let [cell-is-full? ^boolean (-> js-grid
+                                   (aget y)
+                                   (aget x))
         num-full-neighbors (-num-full-neighbors js-grid x y w h)]
+    ; TODO think more about how this cond is structured
+    ; play with klipse to see exactly when truth_ is emitted
     (cond
       (and cell-is-full?
            (>= num-full-neighbors survival-threshold)) true
@@ -187,7 +189,7 @@
 
   (profile
     {}
-    (dotimes [_ 200]
+    (dotimes [_ 400]
       (p :automata
          (automata 100 100 0.45 3 4 20000 12 4 5)
          nil)))

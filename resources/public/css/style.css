@@ -20,6 +20,7 @@ display: block;
     text-align: center;
 }
 
+/* from some online button generator */
 .generate-button {
     margin: 20px auto;
 	-moz-box-shadow:inset 0px 1px 3px 0px #91b8b3;
@@ -63,34 +64,6 @@ display: block;
 
 input {
     margin: 6px 0;
-}
-
-.world {
-position: relative;
-}
-
-.row {
-    overflow: hidden;
-}
-
-.cell {
-    width: 10px;
-    height: 10px;
-    float: left;
-}
-
-.cell.full {
-    background-color: #333;
-}
-
-.cell.empty {
-    background-color: #CCC;
-}
-
-.cell.active {
-    position: absolute;
-    background-color: #7BCC70;
-    box-shadow: 0px 0px 10px #7BCC70;
 }
 
 /* from https://codepen.io/philhoyt/pen/wCIGc */
