@@ -6102,3 +6102,22 @@ testing it against (rand) yields:
 :mad "1.3μs", :mean "648ns", :time% 9, :time "648ms"}
 
 so it's definitely slower than the builtin rng, but not slow enough to matter afaict
+
+saw this fly by on slack: argument about component vs mount
+yogthos likes mount, everyone else likes component and is mad at him (?)
+https://www.reddit.com/r/Clojure/comments/41p73n/contrasting_component_and_mount/
+https://www.reddit.com/r/Clojure/comments/3zppdn/the_beauty_of_clojure/
+
+implicit vs explicit comes up a long in this argument
+mount implicit, component explicit
+i like explicit tbh
+
+yogthos says:
+I find that keeping resources at the edges makes things more
+testable, whether you pass resources as an argument or reference
+a var, you’re still tying them to your business logic
+I would argue that if you need resources for most of the testing, then there’s too much coupling going on
+
+poking at seeding now
+http://davidbau.com/archives/2010/01/30/random_seeds_coded_hints_and_quintillions.html#more
+looks pretty useful

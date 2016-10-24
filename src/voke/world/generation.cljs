@@ -223,19 +223,6 @@
 
   (profile
     {}
-    (let [foo (r/make-random 1234)]
-      (dotimes [_ 1000000]
-        (p :regular
-           (rand)
-           nil)
-        (p :new
-           (r/rand-double foo)
-           )
-        ))
-    )
-
-  (profile
-    {}
     (dotimes [_ 200]
       (p :automata
          (automata 100 100 0.45 3 4 20000 nil)
