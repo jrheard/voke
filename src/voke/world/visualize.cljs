@@ -12,14 +12,13 @@
 
 ;; Constants
 
-; TODO revisit *all* of these atoms
-; consolidate them and reconcile them with this "visualization state" atom
-
-(def cell-size 10)
 (def grid-width 100)
 (def grid-height 100)
 (def canvas-height 800)
 (def canvas-width 800)
+
+; TODO revisit *all* of these atoms
+; consolidate them and reconcile them with this "visualization state" atom
 
 (defonce selected-tab (r/atom :drunkard))
 (defonce ms-per-tick (r/atom 16))
@@ -80,11 +79,13 @@
       (.getContext "2d")))
 
 (defn draw-grid
-  [grid cell-size]
+  [grid]
   (let [ctx (get-ctx)
         width (count (first grid))
-        height (count grid)]
-    (.clearRect ctx 0 0 (* width cell-size) (* height cell-size))
+        height (count grid)
+        cell-width (/ canvas-width width)
+        cell-height (/ canvas-height height)]
+    (.clearRect ctx 0 0 canvas-width canvas-height)
 
     (set! (.-fillStyle ctx) "#CCC")
 
@@ -99,7 +100,7 @@
 
           (doto ctx
             (.beginPath)
-            (.rect (* x cell-size) (* y cell-size) cell-size cell-size)
+            (.rect (* x cell-width) (* y cell-height) cell-width cell-height)
             (.fill)))
 
         (recur (if (= (dec x) width) 0 (inc x))
@@ -114,23 +115,9 @@
                          @num-iterations
                          @smoothing-passes)
       ::generate/grid
-      (draw-grid (/ canvas-width grid-width))))
+      draw-grid))
 
 ;; Reagent components
-
-(defn row [a-row y]
-  [:div.row
-   (for [[x cell] (map-indexed vector a-row)]
-     ^{:key ["cell" x y]} [:div.cell {:class (name cell)}])])
-
-(defn grid [visualization-state]
-  [:div.world
-   (conj (for [[y a-row] (map-indexed vector (@visualization-state ::generate/grid))]
-           ^{:key ["row" y]} [row a-row y])
-
-         (when-let [[x y] (@visualization-state ::active-cell)]
-           ^{:key "active-cell"} [:div.cell.active {:style {:left (* cell-size x)
-                                                            :top  (* cell-size y)}}]))])
 
 (defn slider [an-atom min max step callback]
   (let [_ @an-atom]
@@ -163,8 +150,9 @@
    (when (= @selected-tab :drunkard)
      [:div.drunkard-specific
       [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
-      [:p "(doesn't take effect until the next time you press \"generate\")"]
-      [slider num-empty-cells 10 1000 1]])
+      [slider num-empty-cells 0 1000 50
+       #(draw-grid ((generate/drunkards-walk grid-width grid-height @num-empty-cells)
+                     ::generate/grid))]])
 
    (when (= @selected-tab :automata)
      [:div.cellular-specific
@@ -186,23 +174,18 @@
       :on-click (fn [e]
                   (.preventDefault e)
                   (condp = @selected-tab
-                    :drunkard (animate-dungeon-history
-                                (generate/drunkards-walk grid-width grid-height @num-empty-cells))
+                    :drunkard (draw-grid ((generate/drunkards-walk grid-width grid-height @num-empty-cells)
+                                           ::generate/grid))
                     :automata (draw-automata-grid!)
                     :final (draw-grid ((generate/automata 400 400 0.45 4 5 400000 12)
-                                        ::generate/grid)
-                                      2)))}
+                                        ::generate/grid))))}
      "generate"]]
 
-   ; full #333, empty #ccc
-
-   (if (not= @selected-tab :drunkard)
-     [:canvas {:id     "visualization-canvas"
-               :width  canvas-width
-               :height canvas-height
-               :style  {:border           "none"
-                        :background-color "#333"}}]
-     [grid visualization-state])])
+   [:canvas {:id     "visualization-canvas"
+             :width  canvas-width
+             :height canvas-height
+             :style  {:border           "none"
+                      :background-color "#333"}}]])
 
 ;; Main
 
