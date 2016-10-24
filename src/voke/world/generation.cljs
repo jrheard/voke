@@ -179,18 +179,20 @@
                (conj active-cells [[x y] new-value]))))))
 
 (defn ^:export automata
-  [w h initial-wall-probability survival-threshold birth-threshold iterations smoothing-passes]
+  [w h initial-wall-probability first-pass-survival-threshold first-pass-birth-threshold
+   iterations smoothing-passes smoothing-pass-survival-threshold smoothing-pass-birth-threshold]
   (let [js-grid (-make-js-grid w h initial-wall-probability)
         cljs-initial-grid (array->grid js-grid)
         history (-run-automata-rules-on-random-individual-cells
-                  js-grid w h survival-threshold birth-threshold iterations)
+                  js-grid w h first-pass-survival-threshold first-pass-birth-threshold iterations)
 
         smoothed-js-grid (loop [i 0
                                 grid js-grid]
                            (if (identical? i smoothing-passes)
                              grid
                              (recur (inc i)
-                                    (-automata-smoothing-pass grid w h survival-threshold birth-threshold))))]
+                                    (-automata-smoothing-pass
+                                      grid w h smoothing-pass-survival-threshold smoothing-pass-birth-threshold))))]
 
     ; TODO integrate smoothing passes into the animation system
 

@@ -28,8 +28,10 @@
 
 ; automata
 (defonce initial-fill-chance (r/atom 0.45))
-(defonce min-neighbors-to-survive (r/atom 4))
-(defonce min-neighbors-to-birth (r/atom 5))
+(defonce first-pass-survival-threshold (r/atom 4))
+(defonce first-pass-birth-threshold (r/atom 5))
+(defonce smoothing-pass-survival-threshold (r/atom 4))
+(defonce smoothing-pass-birth-threshold (r/atom 4))
 (defonce num-iterations (r/atom 10000))
 (defonce smoothing-passes (r/atom 0))
 
@@ -113,11 +115,13 @@
           :automata (generate/automata grid-width
                                        grid-height
                                        @initial-fill-chance
-                                       @min-neighbors-to-survive
-                                       @min-neighbors-to-birth
+                                       @first-pass-survival-threshold
+                                       @first-pass-birth-threshold
                                        @num-iterations
-                                       @smoothing-passes)
-          :final (generate/automata 200 200 0.45 4 5 400000 12))]
+                                       @smoothing-passes
+                                       @smoothing-pass-survival-threshold
+                                       @smoothing-pass-birth-threshold)
+          :final (generate/automata 200 200 0.45 4 5 400000 12 4 5))]
     (-> grid
         ::generate/grid
         draw-grid)))
@@ -161,14 +165,18 @@
       [:p (str "Chance for a given cell to be filled during intialization pass: "
                @initial-fill-chance)]
       [slider initial-fill-chance 0 1 0.01]
-      [:p (str "Mininum # of neighbors for an alive cell to survive: " @min-neighbors-to-survive)]
-      [slider min-neighbors-to-survive 0 8 1]
-      [:p (str "Mininum # of neighbors for a cell to be born: " @min-neighbors-to-birth)]
-      [slider min-neighbors-to-birth 0 8 1]
+      [:p (str "Mininum # of neighbors for an alive cell to survive (first pass): " @first-pass-survival-threshold)]
+      [slider first-pass-survival-threshold 0 8 1]
+      [:p (str "Mininum # of neighbors for a cell to be born (first pass): " @first-pass-birth-threshold)]
+      [slider first-pass-birth-threshold 0 8 1]
       [:p (str "Number of times to apply automata rules to random individual cells: " @num-iterations)]
       [slider num-iterations 0 40000 5000]
       [:p (str "Number of smoothing passes: " @smoothing-passes)]
-      [slider smoothing-passes 0 12 1]])
+      [slider smoothing-passes 0 12 1]
+      [:p (str "Mininum # of neighbors for an alive cell to survive (smoothing pass): " @smoothing-pass-survival-threshold)]
+      [slider smoothing-pass-survival-threshold 0 8 1]
+      [:p (str "Mininum # of neighbors for a cell to be born (smoothing pass): " @smoothing-pass-birth-threshold)]
+      [slider smoothing-pass-birth-threshold 0 8 1]])
 
    [:div.button-wrapper
     [:a.generate-button
