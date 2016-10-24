@@ -118,7 +118,7 @@
    (when (= @selected-tab :drunkard)
      [:div.drunkard-specific
       [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
-      [slider num-empty-cells 0 1000 10]])
+      [slider num-empty-cells 0 2000 10]])
 
    (when (= @selected-tab :automata)
      [:div.cellular-specific
