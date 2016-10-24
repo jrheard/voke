@@ -23,6 +23,8 @@
 
 (defonce selected-tab (r/atom :drunkard))
 
+(defonce rng-seed (atom (.valueOf (js/Date.))))
+
 ; drunkard's
 (defonce num-empty-cells (r/atom 400))
 
@@ -38,6 +40,9 @@
 (defonce visualization-state (r/atom {::generate/grid (generate/full-grid grid-width grid-height)
                                       ::active-cell   nil
                                       ::id            0}))
+
+(defn reset-rng-seed! []
+  (reset! rng-seed (.valueOf (js/Date.))))
 
 (defn reset-visualization-state!
   ([] (reset-visualization-state! (generate/full-grid grid-width grid-height)))
@@ -109,6 +114,7 @@
                (if (= (dec x) width) (inc y) y))))))
 
 (defn generate-grid-and-draw []
+  (Math/seedrandom (str @rng-seed))
   (let [grid
         (condp = @selected-tab
           :drunkard (generate/drunkards-walk grid-width grid-height @num-empty-cells)
@@ -183,6 +189,7 @@
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
+                  (reset-rng-seed!)
                   (generate-grid-and-draw))}
      "generate"]]
 

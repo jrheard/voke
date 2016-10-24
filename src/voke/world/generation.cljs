@@ -179,6 +179,14 @@
         (recur (inc i)
                (conj active-cells [[x y] new-value]))))))
 
+(comment
+  (.valueOf (js/Date.))
+
+  (Math/seedrandom (str 1477342218679))
+  (Math/random)
+
+  )
+
 (defn ^:export automata
   [w h initial-wall-probability first-pass-survival-threshold first-pass-birth-threshold
    iterations smoothing-passes smoothing-pass-survival-threshold smoothing-pass-birth-threshold]
