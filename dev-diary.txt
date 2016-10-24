@@ -6048,3 +6048,22 @@ so that's cool!
 new-value-at-position now only has 6% self time
 num-full-neighbors is where most of the self time lives now, which makes sense
 20% in the garbage collector, though! TODO: take a look at allocation profiles again
+
+i had a few ideas while i was walking around today, and i'm going to try to write them down
+before i forget them all (i may have already forgotten a few)
+
+* switch all grid drawing in the visualization tool from reagent to canvas
+    reagent is great for controlling UI, but it isn't made for turning a grid of 16000 divs on and off
+    TODO record fps before/after this change
+* some rejiggering of the various r/atoms will be necessary - figure out how to add a watch to all of them
+    that checks what tab is selected and redraws the canvas accordingly
+* remove the width/height sliders, just set those values to 100 and tune cell size to match
+* in order to better understand the effect of the various sliders, make it such that when they are
+    manipulated, the _same_ dungeon is redrawn - do this by sending along a seed for the random number
+    generator in these situations. in this way it will be more obvious what the effects of eg
+    greater or fewer random-cell iterations, or greater or fewer applications of the smoothing stage, etc
+    actually have on the generated level.
+
+i think that's everything!
+also at some point we'll probably want to read kyzrati's post on tunnelers, and implement that strategy
+and maybe even the BSP room-generation technique, and/or a combination thereof, just for fun
