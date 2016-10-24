@@ -1,7 +1,6 @@
 (ns voke.world.generation
   (:require [cljs.spec :as s]
             [cljs.spec.test :as stest]
-            [clojure.test.check.random :as r]
             [taoensso.tufte :as tufte :refer-macros [p profiled profile]]
             [voke.util :refer [bound-between rand-nth-weighted]]))
 
@@ -179,14 +178,6 @@
         (recur (inc i)
                (conj active-cells [[x y] new-value]))))))
 
-(comment
-  (.valueOf (js/Date.))
-
-  (Math/seedrandom (str 1477342218679))
-  (Math/random)
-
-  )
-
 (defn ^:export automata
   [w h initial-wall-probability first-pass-survival-threshold first-pass-birth-threshold
    iterations smoothing-passes smoothing-pass-survival-threshold smoothing-pass-birth-threshold]
@@ -208,8 +199,6 @@
     {::grid         (array->grid smoothed-js-grid)
      ::initial-grid cljs-initial-grid
      ::history      history}))
-
-#_(stest/instrument [`drunkards-walk])
 
 (comment
   (tufte/add-basic-println-handler! {})

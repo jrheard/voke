@@ -1,10 +1,7 @@
 (ns voke.world.visualize
-  (:require [cljs.spec :as s]
-            [cljs.core.async :refer [chan <! put!]]
-            [reagent.core :as r]
+  (:require [reagent.core :as r]
             [voke.util :refer [timeout]]
-            [voke.world.generation :as generate])
-  (:require-macros [cljs.core.async.macros :refer [go-loop]]))
+            [voke.world.generation :as generate]))
 
 ; This is a tool I built to help me play around with and understand various random-level-generation
 ; algorithms. The code in this file is messy/gross/bad because it isn't "production" code, just
@@ -16,10 +13,8 @@
 (def grid-height 100)
 (def canvas-height 800)
 (def canvas-width 800)
-(def ms-per-tick 16)
 
 ; TODO revisit *all* of these atoms
-; consolidate them and reconcile them with this "visualization state" atom
 
 (defonce selected-tab (r/atom :drunkard))
 
@@ -37,47 +32,8 @@
 (defonce num-iterations (r/atom 10000))
 (defonce smoothing-passes (r/atom 0))
 
-(defonce visualization-state (r/atom {::generate/grid (generate/full-grid grid-width grid-height)
-                                      ::active-cell   nil
-                                      ::id            0}))
-
 (defn reset-rng-seed! []
   (reset! rng-seed (.valueOf (js/Date.))))
-
-(defn reset-visualization-state!
-  ([] (reset-visualization-state! (generate/full-grid grid-width grid-height)))
-  ([initial-grid]
-   (swap! visualization-state (fn [old-state]
-                                {::generate/grid initial-grid
-                                 ::active-cell   nil
-                                 ::id            (inc (old-state ::id))}))))
-
-;; Async code
-
-(defn animate-dungeon-history [generated-level]
-  ; useless for now, voke.world.generation needs to be updated to pass along complete histories
-  (let [initial-grid (or (generated-level ::generate/initial-grid)
-                         (generate/full-grid grid-width grid-height))
-        visualization-id ((reset-visualization-state! initial-grid) ::id)]
-
-    (go-loop [history (generated-level ::generate/history)]
-      (when (and (seq history)
-                 (= (@visualization-state ::id) visualization-id))
-        (<! (timeout ms-per-tick))
-
-        (let [[[x y] new-value] (first history)]
-          (swap! visualization-state (fn [state]
-                                       (if (= (state ::id) visualization-id)
-                                         (-> state
-                                             (assoc-in [::generate/grid y x] new-value)
-                                             (assoc ::active-cell [x y]))
-                                         state))))
-        (recur (rest history))))))
-
-(s/fdef animate-dungeon-history
-  :args (s/cat :historical-active-cells ::generate/history
-               :w nat-int?
-               :h nat-int?))
 
 ;; Canvas manipulation
 
@@ -153,7 +109,7 @@
                             (generate-grid-and-draw))}
    text])
 
-(defn ui [visualization-state]
+(defn ui []
   [:div.content
    [:p "Algorithm:"]
    [:div.btn-group
@@ -164,7 +120,7 @@
    (when (= @selected-tab :drunkard)
      [:div.drunkard-specific
       [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
-      [slider num-empty-cells 0 1000 50]])
+      [slider num-empty-cells 0 1000 10]])
 
    (when (= @selected-tab :automata)
      [:div.cellular-specific
@@ -191,7 +147,7 @@
                   (.preventDefault e)
                   (reset-rng-seed!)
                   (generate-grid-and-draw))}
-     "generate"]]
+     "generate a new one"]]
 
    [:canvas {:id     "visualization-canvas"
              :width  canvas-width
@@ -202,5 +158,6 @@
 ;; Main
 
 (defn ^:export main []
-  (r/render-component [ui visualization-state]
-                      (js/document.getElementById "content")))
+  (r/render-component [ui]
+                      (js/document.getElementById "content"))
+  (generate-grid-and-draw))

@@ -6121,3 +6121,7 @@ I would argue that if you need resources for most of the testing, then there’s
 poking at seeding now
 http://davidbau.com/archives/2010/01/30/random_seeds_coded_hints_and_quintillions.html#more
 looks pretty useful
+
+ok things are looking pretty sweet atm
+TODO - kill the whole :history thing, no longer needed
+measure performance before/after

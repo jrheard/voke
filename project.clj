@@ -39,7 +39,8 @@
                                :output-dir    "resources/public/js/compiled/out-min"
                                :asset-path    "js/compiled/out-min"
                                :source-map    "resources/public/js/compiled/voke.js.map"
-                               :externs       ["externs/collision.js"]
+                               :externs       ["externs/collision.js"
+                                               "externs/seedrandom.js"]
                                :pretty-print  false}}
                {:id           "test"
                 :source-paths ["src" "test"]
