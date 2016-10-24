@@ -10,15 +10,19 @@
 ; algorithms. The code in this file is messy/gross/bad because it isn't "production" code, just
 ; "throwaway dev tool" code. Don't judge me :)
 
-
 ;; Constants
 
+; TODO revisit *all* of these atoms
+; consolidate them and reconcile them with this "visualization state" atom
+
 (def cell-size 10)
+(def grid-width 100)
+(def grid-height 100)
+(def canvas-height 800)
+(def canvas-width 800)
 
 (defonce selected-tab (r/atom :drunkard))
 (defonce ms-per-tick (r/atom 16))
-(defonce grid-width (r/atom 80))
-(defonce grid-height (r/atom 80))
 
 ; drunkard's
 (defonce num-empty-cells (r/atom 400))
@@ -30,37 +34,23 @@
 (defonce num-iterations (r/atom 10000))
 (defonce smoothing-passes (r/atom 0))
 
-(defonce visualization-state (r/atom {::generate/grid (generate/full-grid @grid-width @grid-height)
+(defonce visualization-state (r/atom {::generate/grid (generate/full-grid grid-width grid-height)
                                       ::active-cell   nil
                                       ::id            0}))
 
 (defn reset-visualization-state!
-  ([] (reset-visualization-state! (generate/full-grid @grid-width @grid-height)))
+  ([] (reset-visualization-state! (generate/full-grid grid-width grid-height)))
   ([initial-grid]
    (swap! visualization-state (fn [old-state]
                                 {::generate/grid initial-grid
                                  ::active-cell   nil
                                  ::id            (inc (old-state ::id))}))))
 
-(defn draw-automata-grid! []
-  (let [new-dungeon (generate/automata @grid-width
-                                       @grid-height
-                                       @initial-fill-chance
-                                       @min-neighbors-to-survive
-                                       @min-neighbors-to-birth
-                                       @num-iterations
-                                       @smoothing-passes)]
-    (swap! visualization-state (fn [state]
-                                 (-> state
-                                     (assoc ::generate/grid (new-dungeon ::generate/grid))
-                                     (assoc ::active-cell nil))))))
-
-
 ;; Async code
 
 (defn animate-dungeon-history [generated-level]
   (let [initial-grid (or (generated-level ::generate/initial-grid)
-                         (generate/full-grid @grid-width @grid-height))
+                         (generate/full-grid grid-width grid-height))
         visualization-id ((reset-visualization-state! initial-grid) ::id)]
 
     (go-loop [history (generated-level ::generate/history)]
@@ -81,6 +71,50 @@
   :args (s/cat :historical-active-cells ::generate/history
                :w nat-int?
                :h nat-int?))
+
+;; Canvas manipulation
+
+(defn get-ctx []
+  (-> "visualization-canvas"
+      (js/document.getElementById)
+      (.getContext "2d")))
+
+(defn draw-grid
+  [grid cell-size]
+  (let [ctx (get-ctx)
+        width (count (first grid))
+        height (count grid)]
+    (.clearRect ctx 0 0 (* width cell-size) (* height cell-size))
+
+    (set! (.-fillStyle ctx) "#CCC")
+
+    (loop [x 0
+           y 0]
+
+      (when (< y height)
+        (when (= (-> grid
+                     (get y)
+                     (get x))
+                 :empty)
+
+          (doto ctx
+            (.beginPath)
+            (.rect (* x cell-size) (* y cell-size) cell-size cell-size)
+            (.fill)))
+
+        (recur (if (= (dec x) width) 0 (inc x))
+               (if (= (dec x) width) (inc y) y))))))
+
+(defn draw-automata-grid! []
+  (-> (generate/automata grid-width
+                         grid-height
+                         @initial-fill-chance
+                         @min-neighbors-to-survive
+                         @min-neighbors-to-birth
+                         @num-iterations
+                         @smoothing-passes)
+      ::generate/grid
+      (draw-grid (/ canvas-width grid-width))))
 
 ;; Reagent components
 
@@ -107,15 +141,6 @@
                           (when callback
                             (callback)))}]))
 
-(defn common-visualization-sliders []
-  [:div.common-sliders
-   [:p (str "Grid width: " @grid-width)]
-   [slider grid-width 25 100 1 reset-visualization-state!]
-   [:p (str "Grid height: " @grid-height)]
-   [slider grid-height 25 100 1 reset-visualization-state!]
-   [:p (str "Animation speed: " @ms-per-tick " ms per frame")]
-   [slider ms-per-tick 16 250 1]])
-
 (defn tab
   [tab-kw text]
   [:a.btn.pill {:href     "#"
@@ -132,11 +157,8 @@
    [:p "Algorithm:"]
    [:div.btn-group
     [tab :drunkard "Drunkard's Walk"]
-    [tab :cellular "Cellular Automata"]
+    [tab :automata "Cellular Automata"]
     [tab :final "Voke algorithm"]]
-
-   (when (not= @selected-tab :final)
-     (common-visualization-sliders))
 
    (when (= @selected-tab :drunkard)
      [:div.drunkard-specific
@@ -144,7 +166,7 @@
       [:p "(doesn't take effect until the next time you press \"generate\")"]
       [slider num-empty-cells 10 1000 1]])
 
-   (when (= @selected-tab :cellular)
+   (when (= @selected-tab :automata)
      [:div.cellular-specific
       [:p (str "Chance for a given cell to be filled during intialization pass: "
                @initial-fill-chance)]
@@ -156,8 +178,7 @@
       [:p (str "Number of times to apply automata rules to random individual cells: " @num-iterations)]
       [slider num-iterations 0 40000 5000 draw-automata-grid!]
       [:p (str "Number of smoothing passes: " @smoothing-passes)]
-      [slider smoothing-passes 0 5 1 draw-automata-grid!]
-      ])
+      [slider smoothing-passes 0 12 1 draw-automata-grid!]])
 
    [:div.button-wrapper
     [:a.generate-button
@@ -166,45 +187,21 @@
                   (.preventDefault e)
                   (condp = @selected-tab
                     :drunkard (animate-dungeon-history
-                                (generate/drunkards-walk @grid-width @grid-height @num-empty-cells))
+                                (generate/drunkards-walk grid-width grid-height @num-empty-cells))
                     :automata (draw-automata-grid!)
-                    :final (let [canvas (js/document.getElementById "visualization-canvas")
-                                 ctx (.getContext canvas "2d")
-                                 side-length 400
-                                 cell-size 2
-                                 grid ((generate/automata side-length side-length 0.45 4 5 400000 12)
-                                        ::generate/grid)]
-                             (.clearRect ctx 0 0 (* side-length cell-size) (* side-length cell-size))
-
-                             (set! (.-fillStyle ctx) "#CCC")
-
-                             (loop [x 0
-                                    y 0]
-
-                               (when (< y side-length)
-                                 (when (= (-> grid
-                                              (get y)
-                                              (get x))
-                                          :empty)
-
-                                   (doto ctx
-                                     (.beginPath)
-                                     (.rect (* x cell-size) (* y cell-size) cell-size cell-size)
-                                     (.fill)))
-
-                                 (recur (if (= (dec x) side-length) 0 (inc x))
-                                        (if (= (dec x) side-length) (inc y) y)))))))}
+                    :final (draw-grid ((generate/automata 400 400 0.45 4 5 400000 12)
+                                        ::generate/grid)
+                                      2)))}
      "generate"]]
 
    ; full #333, empty #ccc
 
-   (if (= @selected-tab :final)
+   (if (not= @selected-tab :drunkard)
      [:canvas {:id     "visualization-canvas"
-               :width  800
-               :height 800
+               :width  canvas-width
+               :height canvas-height
                :style  {:border           "none"
-                        :background-color "#333"}
-               }]
+                        :background-color "#333"}}]
      [grid visualization-state])])
 
 ;; Main

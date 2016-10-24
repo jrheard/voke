@@ -6063,7 +6063,23 @@ before i forget them all (i may have already forgotten a few)
     generator in these situations. in this way it will be more obvious what the effects of eg
     greater or fewer random-cell iterations, or greater or fewer applications of the smoothing stage, etc
     actually have on the generated level.
+* when grids are generated, just draw the finished product on the screen immediately;
+    make a second "animate" button available that the user can click to animate the current grid's history
 
 i think that's everything!
 also at some point we'll probably want to read kyzrati's post on tunnelers, and implement that strategy
 and maybe even the BSP room-generation technique, and/or a combination thereof, just for fun
+
+also, TODO - the current algorithm generates a map that's pretty to look at and has nice big open-space caves,
+but has no sense of direction in it - you're not at all guidedfrom the start to the end. will have
+to come back and think more about this. kyzrati hints at forcing your caves to fit into a more vertical
+slice, which i think could help a lot
+
+current timeline stats with reagent vis indicate frames taking about 400-600 ms when you drag
+sliders around on the automata visualization, let's try converting to canvas now
+
+switched to canvas, frames now take about 60-90ms, and that's with a bigger grid and with
+a ton of smoothing passes (eg 12) applied. nice!
+
+now that this is so much more responsive, i *really* want to get that random seed feature described above in,
+but i should finish converting the whole thing to canvas (i.e. drunkards, setting aside animation for now)
