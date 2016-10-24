@@ -1,6 +1,7 @@
 (ns voke.world.generation
   (:require [cljs.spec :as s]
             [cljs.spec.test :as stest]
+            [clojure.test.check.random :as r]
             [taoensso.tufte :as tufte :refer-macros [p profiled profile]]
             [voke.util :refer [bound-between rand-nth-weighted]]))
 
@@ -205,14 +206,6 @@
 (comment
   (tufte/add-basic-println-handler! {})
 
-  (let [grid (full-grid 30 30)]
-    (js/console.profile "drunkard")
-    (dotimes [_ 10]
-      (drunkards-walk grid 150))
-    (js/console.profileEnd))
-
-  (identical? 1 1)
-
   (profile
     {}
     (let [grid (full-grid 30 30)]
@@ -227,6 +220,19 @@
       (p :big-grid
          (automata 400 400 0.45 4 5 400000 12)
          nil)))
+
+  (profile
+    {}
+    (let [foo (r/make-random 1234)]
+      (dotimes [_ 1000000]
+        (p :regular
+           (rand)
+           nil)
+        (p :new
+           (r/rand-double foo)
+           )
+        ))
+    )
 
   (profile
     {}

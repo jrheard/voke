@@ -6083,3 +6083,22 @@ a ton of smoothing passes (eg 12) applied. nice!
 
 now that this is so much more responsive, i *really* want to get that random seed feature described above in,
 but i should finish converting the whole thing to canvas (i.e. drunkards, setting aside animation for now)
+
+TODO doesn't look like it's possible to pick a seed in JS - look at http://stackoverflow.com/questions/521295/javascript-random-seeds
+https://github.com/clojure/test.check/blob/ebcc57dd631e25ee39bc059899e3bbd9ddf24ee9/src/main/clojure/clojure/test/check/random.cljs
+looks promising
+
+=====
+
+10/24/16
+
+quick rng notes before i forget
+https://github.com/clojure/test.check/blob/ebcc57dd631e25ee39bc059899e3bbd9ddf24ee9/src/main/clojure/clojure/test/check/random.cljs
+seems to come with a seedable rng
+testing it against (rand) yields:
+{:id :new, :n-calls 1000000, :min "0ns", :max "12ms", :mad
+"4.45μs", :mean "2.23μs", :time% 31, :time "2.23s"}
+{:id :regular, :n-calls 1000000, :min "0ns", :max "2ms",
+:mad "1.3μs", :mean "648ns", :time% 9, :time "648ms"}
+
+so it's definitely slower than the builtin rng, but not slow enough to matter afaict
