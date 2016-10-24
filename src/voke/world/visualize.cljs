@@ -106,24 +106,21 @@
         (recur (if (= (dec x) width) 0 (inc x))
                (if (= (dec x) width) (inc y) y))))))
 
-(defn draw-automata-grid! []
-  (-> (generate/automata grid-width
-                         grid-height
-                         @initial-fill-chance
-                         @min-neighbors-to-survive
-                         @min-neighbors-to-birth
-                         @num-iterations
-                         @smoothing-passes)
-      ::generate/grid
-      draw-grid))
-
 (defn generate-grid-and-draw []
-  (condp = @selected-tab
-    :drunkard (draw-grid ((generate/drunkards-walk grid-width grid-height @num-empty-cells)
-                           ::generate/grid))
-    :automata (draw-automata-grid!)
-    :final (draw-grid ((generate/automata 400 400 0.45 4 5 400000 12)
-                        ::generate/grid))))
+  (let [grid
+        (condp = @selected-tab
+          :drunkard (generate/drunkards-walk grid-width grid-height @num-empty-cells)
+          :automata (generate/automata grid-width
+                                       grid-height
+                                       @initial-fill-chance
+                                       @min-neighbors-to-survive
+                                       @min-neighbors-to-birth
+                                       @num-iterations
+                                       @smoothing-passes)
+          :final (generate/automata 200 200 0.45 4 5 400000 12))]
+    (-> grid
+        ::generate/grid
+        draw-grid)))
 
 ;; Reagent components
 
