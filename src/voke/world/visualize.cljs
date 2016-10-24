@@ -117,16 +117,23 @@
       ::generate/grid
       draw-grid))
 
+(defn generate-grid-and-draw []
+  (condp = @selected-tab
+    :drunkard (draw-grid ((generate/drunkards-walk grid-width grid-height @num-empty-cells)
+                           ::generate/grid))
+    :automata (draw-automata-grid!)
+    :final (draw-grid ((generate/automata 400 400 0.45 4 5 400000 12)
+                        ::generate/grid))))
+
 ;; Reagent components
 
-(defn slider [an-atom min max step callback]
+(defn slider [an-atom min max step]
   (let [_ @an-atom]
     [:input {:type      "range" :value @an-atom :min min :max max :step step
              :style     {:width "100%"}
              :on-change (fn [e]
                           (reset! an-atom (js/parseFloat (.-target.value e)))
-                          (when callback
-                            (callback)))}]))
+                          (generate-grid-and-draw))}]))
 
 (defn tab
   [tab-kw text]
@@ -136,7 +143,7 @@
                 :on-click (fn [e]
                             (.preventDefault e)
                             (reset! selected-tab tab-kw)
-                            (reset-visualization-state!))}
+                            (generate-grid-and-draw))}
    text])
 
 (defn ui [visualization-state]
@@ -150,35 +157,28 @@
    (when (= @selected-tab :drunkard)
      [:div.drunkard-specific
       [:p (str "Dig until there are " @num-empty-cells " empty cells in the grid")]
-      [slider num-empty-cells 0 1000 50
-       #(draw-grid ((generate/drunkards-walk grid-width grid-height @num-empty-cells)
-                     ::generate/grid))]])
+      [slider num-empty-cells 0 1000 50]])
 
    (when (= @selected-tab :automata)
      [:div.cellular-specific
       [:p (str "Chance for a given cell to be filled during intialization pass: "
                @initial-fill-chance)]
-      [slider initial-fill-chance 0 1 0.01 draw-automata-grid!]
+      [slider initial-fill-chance 0 1 0.01]
       [:p (str "Mininum # of neighbors for an alive cell to survive: " @min-neighbors-to-survive)]
-      [slider min-neighbors-to-survive 0 8 1 draw-automata-grid!]
+      [slider min-neighbors-to-survive 0 8 1]
       [:p (str "Mininum # of neighbors for a cell to be born: " @min-neighbors-to-birth)]
-      [slider min-neighbors-to-birth 0 8 1 draw-automata-grid!]
+      [slider min-neighbors-to-birth 0 8 1]
       [:p (str "Number of times to apply automata rules to random individual cells: " @num-iterations)]
-      [slider num-iterations 0 40000 5000 draw-automata-grid!]
+      [slider num-iterations 0 40000 5000]
       [:p (str "Number of smoothing passes: " @smoothing-passes)]
-      [slider smoothing-passes 0 12 1 draw-automata-grid!]])
+      [slider smoothing-passes 0 12 1]])
 
    [:div.button-wrapper
     [:a.generate-button
      {:href     "#"
       :on-click (fn [e]
                   (.preventDefault e)
-                  (condp = @selected-tab
-                    :drunkard (draw-grid ((generate/drunkards-walk grid-width grid-height @num-empty-cells)
-                                           ::generate/grid))
-                    :automata (draw-automata-grid!)
-                    :final (draw-grid ((generate/automata 400 400 0.45 4 5 400000 12)
-                                        ::generate/grid))))}
+                  (generate-grid-and-draw))}
      "generate"]]
 
    [:canvas {:id     "visualization-canvas"
