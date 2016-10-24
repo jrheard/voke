@@ -158,8 +158,8 @@
         (-> new-grid
             (aget y)
             (aset x (-new-value-at-position js-grid x y w h survival-threshold birth-threshold)))
-        (recur (if (identical? (dec x) w) 0 (inc x))
-               (if (identical? (dec x) w) (inc y) y))))
+        (recur (if (identical? (inc x) w) 0 (inc x))
+               (if (identical? (inc x) w) (inc y) y))))
     new-grid))
 
 (defn -run-automata-rules-on-random-individual-cells
@@ -192,8 +192,7 @@
                              (recur (inc i)
                                     (-automata-smoothing-pass grid w h survival-threshold birth-threshold))))]
 
-    ; TODO consider integrating smoothing passes into the animation system
-    ; or just... don't?
+    ; TODO integrate smoothing passes into the animation system
 
     {::grid         (array->grid smoothed-js-grid)
      ::initial-grid cljs-initial-grid

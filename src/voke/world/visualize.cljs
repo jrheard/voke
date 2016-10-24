@@ -16,12 +16,12 @@
 (def grid-height 100)
 (def canvas-height 800)
 (def canvas-width 800)
+(def ms-per-tick 16)
 
 ; TODO revisit *all* of these atoms
 ; consolidate them and reconcile them with this "visualization state" atom
 
 (defonce selected-tab (r/atom :drunkard))
-(defonce ms-per-tick (r/atom 16))
 
 ; drunkard's
 (defonce num-empty-cells (r/atom 400))
@@ -48,6 +48,7 @@
 ;; Async code
 
 (defn animate-dungeon-history [generated-level]
+  ; useless for now, voke.world.generation needs to be updated to pass along complete histories
   (let [initial-grid (or (generated-level ::generate/initial-grid)
                          (generate/full-grid grid-width grid-height))
         visualization-id ((reset-visualization-state! initial-grid) ::id)]
@@ -55,7 +56,7 @@
     (go-loop [history (generated-level ::generate/history)]
       (when (and (seq history)
                  (= (@visualization-state ::id) visualization-id))
-        (<! (timeout @ms-per-tick))
+        (<! (timeout ms-per-tick))
 
         (let [[[x y] new-value] (first history)]
           (swap! visualization-state (fn [state]
@@ -85,12 +86,11 @@
         height (count grid)
         cell-width (/ canvas-width width)
         cell-height (/ canvas-height height)]
-    (.clearRect ctx 0 0 canvas-width canvas-height)
 
+    (.clearRect ctx 0 0 canvas-width canvas-height)
     (set! (.-fillStyle ctx) "#CCC")
 
-    (loop [x 0
-           y 0]
+    (loop [x 0 y 0]
 
       (when (< y height)
         (when (= (-> grid
