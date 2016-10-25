@@ -84,13 +84,13 @@
 
 ;; Reagent components
 
-(defn slider [an-atom min max step]
-  (let [_ @an-atom]
-    [:input {:type      "range" :value @an-atom :min min :max max :step step
-             :style     {:width "100%"}
-             :on-change (fn [e]
-                          (reset! an-atom (js/parseFloat (.-target.value e)))
-                          (generate-grid-and-draw))}]))
+(defn slider
+  [an-atom min max step]
+  [:input {:type      "range" :value @an-atom :min min :max max :step step
+           :style     {:width "100%"}
+           :on-change (fn [e]
+                        (reset! an-atom (js/parseFloat (.-target.value e)))
+                        (generate-grid-and-draw))}])
 
 (defn tab
   [tab-kw text]
