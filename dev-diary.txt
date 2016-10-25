@@ -6210,3 +6210,58 @@ right syntax for using (into) - (into [] xform coll) instead of (into [] (xform 
 any other perf notes that can be scrounged from the past two week's worth of dev-diary entries
 
 also write a post about keeping a dev diary
+
+=======
+
+10/25/16
+
+spun up a github-pages repo, added the above blog post ideas to it as github issues
+
+let's get back to figuring out what's going on with this code:
+
+(defn -new-value-at-position
+  [js-grid x y w h survival-threshold birth-threshold]
+  (let [cell-is-full? (-> js-grid
+                          (aget y)
+                          (aget x))
+        num-full-neighbors (-num-full-neighbors js-grid x y w h)]
+    ; TODO think more about how this cond is structured
+    ; play with klipse to see exactly when truth_ is emitted
+    (cond
+      (and cell-is-full?
+           (>= num-full-neighbors survival-threshold)) true
+      (and (not cell-is-full?)
+           (>= num-full-neighbors birth-threshold)) true
+      :else false)))
+
+profiler says that we're spending a noticeable amount of time in truth_
+which, again, is documented here: blog.fikesfarm.com/posts/2015-12-04-boolean-type-hints-in-clojurescript.html
+
+had a hard time coming up with something that worked, but this does:
+
+(defn -new-value-at-position-inner [^boolean cell-was-full ^boolean meets-survival-threshold ^boolean meets-birth-treshold]
+  (or
+    (and cell-was-full meets-survival-threshold)
+    (and (not cell-was-full) meets-birth-treshold)))
+
+(defn -new-value-at-position
+  [js-grid x y w h survival-threshold birth-threshold]
+  (let [cell-is-full? (-> js-grid
+                          (aget y)
+                          (aget x))
+        num-full-neighbors (-num-full-neighbors js-grid x y w h)]
+    (-new-value-at-position-inner cell-is-full?
+                                  (>= num-full-neighbors survival-threshold)
+                                  (>= num-full-neighbors birth-threshold))))
+
+wow, this really seems to do the trick:
+{:id :automata, :n-calls 400, :min "33ms", :max "65ms", :mad
+"4.8ms", :mean "41.16ms", :time% 100, :time "16.46s"}
+
+let's try it again the way it was before:
+
+yeah, _wow_!
+{:id :automata, :n-calls 400, :min "43ms", :max "111ms",
+:mad "7.24ms", :mean "53.04ms", :time% 100, :time "21.22s"}
+
+noticeable difference! shaved off about 20%!
