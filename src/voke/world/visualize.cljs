@@ -3,10 +3,6 @@
             [voke.util :refer [timeout]]
             [voke.world.generation :as generate]))
 
-; This is a tool I built to help me play around with and understand various random-level-generation
-; algorithms. The code in this file is messy/gross/bad because it isn't "production" code, just
-; "throwaway dev tool" code. Don't judge me :)
-
 ;; Constants
 
 (def grid-width 100)
@@ -122,8 +118,7 @@
 
    (when (= @selected-tab :automata)
      [:div.cellular-specific
-      [:p (str "Chance for a given cell to be filled during intialization pass: "
-               @initial-fill-chance)]
+      [:p (str "Chance for a given cell to be filled during intialization pass: " @initial-fill-chance)]
       [slider initial-fill-chance 0 1 0.01]
       [:p (str "Mininum # of neighbors for an alive cell to survive (first pass): " @first-pass-survival-threshold)]
       [slider first-pass-survival-threshold 0 8 1]

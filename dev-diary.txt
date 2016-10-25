@@ -6188,3 +6188,25 @@ let's look at chrome profiler
 hm, in chrome profiler i still see 7% of our time spent in truth_!
 i'm misunderstanding something - i think that this (and) call may be throwing a spanner in the works
 TODO continue to investigate
+
+words for grep: BLOG STUFF BLOG NOTES
+jotting down ideas i had on the plane:
+eventually make the visualization tool into a blogpost
+left sidebar, right main content area with the grid in it
+add some explanation/narrative about the different algorithms
+include sliders inline with the prose
+right hand side has grid and generate-another button
+when we get to cellular, explain each phase one at a time, including like 1-3 sliders inline with each phase
+so the reader can play with them
+then at the end, draw all the sliders again in a master control box
+so the reader can play with the whole shebang
+it's fine to have two copies of each slider because reagent
+maybe include a reset button in this box that puts the sliders back to their defaults or something
+
+also have a separate post where we talk about perf investigations
+talk about how klipse was useful for seeing emitted js
+loop/recur on a mutable js array much faster than eg (for)
+right syntax for using (into) - (into [] xform coll) instead of (into [] (xform coll))
+any other perf notes that can be scrounged from the past two week's worth of dev-diary entries
+
+also write a post about keeping a dev diary
