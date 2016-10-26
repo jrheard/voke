@@ -107,7 +107,7 @@
       num-full)))
 
 (defn -new-value-at-position-inner [^boolean cell-was-full ^boolean meets-survival-threshold ^boolean meets-birth-treshold]
-  "See blog.fikesfarm.com/posts/2015-06-15-see-js-in-cljs-repl.html"
+  "See blog.fikesfarm.com/posts/2015-12-04-boolean-type-hints-in-clojurescript.html"
   (or
     (and cell-was-full meets-survival-threshold)
     (and (not cell-was-full) meets-birth-treshold)))

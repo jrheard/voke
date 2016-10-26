@@ -62,8 +62,8 @@
             (.rect (* x cell-width) (* y cell-height) cell-width cell-height)
             (.fill)))
 
-        (recur (if (= (dec x) width) 0 (inc x))
-               (if (= (dec x) width) (inc y) y))))))
+        (recur (if (identical? (dec x) width) 0 (inc x))
+               (if (identical? (dec x) width) (inc y) y))))))
 
 (defn generate-grid-and-draw []
   (Math/seedrandom (str @rng-seed))

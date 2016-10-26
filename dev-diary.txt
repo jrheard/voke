@@ -6265,3 +6265,6 @@ yeah, _wow_!
 :mad "7.24ms", :mean "53.04ms", :time% 100, :time "21.22s"}
 
 noticeable difference! shaved off about 20%!
+
+profiling indicates we still emit a truth_ in num-full-neighbors, let's see
+
