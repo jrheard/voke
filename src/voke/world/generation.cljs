@@ -73,6 +73,13 @@
         (recur (inc i))))
     arr))
 
+(defn ^boolean -cell-counts-as-full? [js-grid x y ^boolean cell-is-neighbor? ^boolean cell-is-off-grid?]
+  (or cell-is-off-grid?
+      (and cell-is-neighbor?
+           (-> js-grid
+               (aget y)
+               (aget x)))))
+
 (defn -num-full-neighbors [js-grid x y w h]
   (loop [num-full 0
          i (dec x)
@@ -80,29 +87,17 @@
     (if (and (< i (+ x 2))
              (< j (+ y 2)))
 
-      (let [this-cell-counts? (cond
-                                (and (identical? i x)
-                                     (identical? j y)) false
-
-                                ; Off-grid cells count as filled-in neighbors.
-                                (or (< i 0)
-                                    (>= i w)
-                                    (< j 0)
-                                    (>= j h)) true
-
-                                :else (-> js-grid
-                                          (aget j)
-                                          (aget i)))]
-
-        (recur (if this-cell-counts?
-                 (inc num-full)
-                 num-full)
-               (if (identical? i (inc x))
-                 (dec x)
-                 (inc i))
-               (if (identical? i (inc x))
-                 (inc j)
-                 j)))
+      (recur (if (-cell-counts-as-full? js-grid i j
+                                        (not (and (identical? i x)
+                                                  (identical? j y)))
+                                        (or (< i 0)
+                                            (>= i w)
+                                            (< j 0)
+                                            (>= j h)))
+               (inc num-full)
+               num-full)
+             (if (identical? i (inc x)) (dec x) (inc i))
+             (if (identical? i (inc x)) (inc j) j))
 
       num-full)))
 
