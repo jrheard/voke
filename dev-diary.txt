@@ -6268,3 +6268,60 @@ noticeable difference! shaved off about 20%!
 
 profiling indicates we still emit a truth_ in num-full-neighbors, let's see
 
+====
+
+10/26/16
+
+got rid of all the truth_s, everything's fast enough for now
+poking around at jekyll/blog stuff now
+going to keep notes in here even though this is a different repo, oh well
+
+https://www.taniarascia.com/make-a-static-website-with-jekyll/
+has good (very specific) info on setting up + theming a new jekyll install
+
+i don't understand what the deal is with bundle exec
+https://github.com/jekyll/jekyll-help/issues/225
+bundler.io/rationale.html
+
+"This is important: the Gemfile.lock makes your application a single
+package of both your own code and the third-party code it ran the last
+time you know for sure that everything worked. Specifying exact versions
+@of the third-party code you depend on in your Gemfile would not provide
+the same guarantee, because gems usually declare a range of versions
+for their dependencies."
+
+still looking around for reasons why jekyll / github pages might be a bad idea
+as far as i can tell, these are the only cons:
+* you can only blog from your laptop, can't do it from phones / internet cafes / whatever
+    (partially addressed by the github web edit UI, also i don't care about this)
+* big jekyll blogs with lots of posts can take a long time to build
+    there's an incremental build feature that fixes this
+
+that seems to be about it. seems like a safe bet, i'm the target demographic
+
+looking at jekyll themes now
+https://jekyllthemes.io/ is a decent list
+i like:
+https://jekyllthemes.io/theme/15489219/lanyon
+https://github.com/poole/lanyon
+
+i'll probably go with this one
+looking at others just in case
+yeah, all the others look like butt, and lanyon is _really_ good
+gonna use it
+
+https://help.github.com/articles/adding-a-jekyll-theme-to-your-github-pages-site/
+that page is dumb
+i think the idea is to just clone the theme repo
+
+cool, done
+
+pondering converting my old core.logic post to jekyll blog
+and making the code snippets interactive via klipse
+i think core.logic needs to be "bootstrap"/"self-host" compatible for that to happen
+and i don't think that it is yet
+questions:
+what does bootstrap-compatible mean?
+http://blog.klipse.tech/klipse/2016/10/16/klipse-is-fast.html seems to indicate that i can
+still use core.logic in klipse, but that it's slower to start up - is this true?
+

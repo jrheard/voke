@@ -26,7 +26,7 @@
 (defonce smoothing-pass-survival-threshold (r/atom 4))
 (defonce smoothing-pass-birth-threshold (r/atom 5))
 (defonce num-iterations (r/atom 10000))
-(defonce smoothing-passes (r/atom 0))
+(defonce smoothing-passes (r/atom 12))
 
 (defn reset-rng-seed! []
   (reset! rng-seed (.valueOf (js/Date.))))
