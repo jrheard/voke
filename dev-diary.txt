@@ -6353,3 +6353,32 @@ also need to figure out a way to merge this branch into voke master. i think tha
 a hack is totally okay - just have a check in the game loop's input handling that checks for
 the letter 'v', and kills the game and displays the tool when it detects a v keypress.
 we can have menus/etc later, no need to do them yet.
+
+interesting note in https://jekyllrb.com/docs/configuration/ about incremental regeneration:
+"Under the current implementation, incremental regeneration will only generate a document
+or page if either it, or one of its dependencies, is modified. Currently, the only types
+of dependencies tracked are includes (using the {% include %} tag) and layouts. This means
+that plain references to other documents (for example, the common case of iterating over
+site.posts in a post listings page) will not be detected as a dependency.
+To remedy some of these shortfalls, putting regenerate: true in the front-matter of a document
+will force Jekyll to regenerate it regardless of whether it has been modified. Note that
+this will generate the specified document only; references to other documents’ contents
+will not work since they won’t be re-rendered."
+
+https://jekyllrb.com/docs/templates/#post-url
+is handy for linking to other posts
+
+drafts are easy to work with, just make a file like _drafts/foo-bar.md and run jekyll serve
+with the --drafts option
+
+there's a gist tag built into jekyll, eg
+{% gist parkr/931c1c8d465a04042403 %}
+that's neat
+(does github pages support this?)
+
+oh shit, permalink styles in https://jekyllrb.com/docs/permalinks/
+i can just say 'none' to not have the date in my urls
+nice
+
+ok now i'm just trying to understand the significance of the gh-pages gem and after that
+i'll actually poke around and try to write this thing
