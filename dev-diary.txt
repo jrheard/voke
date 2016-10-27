@@ -6325,3 +6325,31 @@ what does bootstrap-compatible mean?
 http://blog.klipse.tech/klipse/2016/10/16/klipse-is-fast.html seems to indicate that i can
 still use core.logic in klipse, but that it's slower to start up - is this true?
 
+on the first:
+http://blog.fikesfarm.com/posts/2015-07-17-what-is-bootstrapped-clojurescript.html
+https://anmonteiro.com/2016/08/om-next-and-bootstrapped-clojurescript/
+https://github.com/omcljs/om/pull/752/files
+
+=====
+
+10/27/16
+
+ok, looking into doing a simple blog post on that first-pass drunkards implementation
+i'd like to have like six snippets, and each has a canvas that it writes to,
+but i want the code to look like (draw-grid a-grid) every time, not (draw-grid a-grid :canvas-1)
+viebel suggests adding a data-pre-run feature to klipse snippets that does eg (reset! canvas-id :canvas-1)
+and that sounds pretty reasonable to me. so i guess i get to learn how to develop klipse now
+
+i also need to finish reading the jekyll docs
+
+re: voke and maps, i think we're at a good stopping point at the moment - i eventually want
+to get maps to be more directed (kyzrati talks about this in
+http://www.gridsagegames.com/blog/2014/06/mapgen-cellular-automata/ and
+http://www.gridsagegames.com/blog/2014/07/dungeon-metrics/ )
+but there's no reason to focus on that when i'm not yet at a point where i can even actually
+_play_ these maps - let's focus on that first.
+
+also need to figure out a way to merge this branch into voke master. i think that for now
+a hack is totally okay - just have a check in the game loop's input handling that checks for
+the letter 'v', and kills the game and displays the tool when it detects a v keypress.
+we can have menus/etc later, no need to do them yet.
