@@ -6404,3 +6404,45 @@ just make it so that if you hit v in the regular voke game, the game is thrown a
 and we draw the visualization tool instead
 punt on menus/pause/etc for now
 maybe a `mode` atom so that we don't mess up on figwheel reloads
+
+http://www.squidi.net/three/entry.php?id=4
+nice, makes sense. good illustrations
+
+http://www.squidi.net/three/index.php lol jesus christ
+
+http://www.squidi.net/three/entry.php?id=158
+replicate teeth
+
+http://www.squidi.net/three/entry.php?id=163
+"I take the position that it is better to make a few smart decisions than lucking into success
+through a billion dumb ones. Since memory is cheap, we can keep track of a lot of information
+that will allow us to make smart decisions quickly. This procedural generation entry is about
+taking an oddly shaped zone and filling it in with a workable set of multi-room regions without
+guessing and testing."
+
+useful strategy for plopping prefab rooms into a prefab zone layout
+
+http://www.squidi.net/three/entry.php?id=164 neat for tile game zone generation
+
+http://www.squidi.net/three/entry.php?id=201
+issues with scaling low-resolution things
+
+http://www.squidi.net/three/entry.php?id=202
+****** come back to this guy's stuff if i ever want to think more about prefabs
+"I'm largely against the idea of procedurally generated content being an effort of guess
+and test. It drives me nuts that the current procedural generation environment is either
+guess and test or literally trying to find mountains in white noise. I spend a lot of my
+effort trying to devise ways in which you can get the results you want the first time. But
+computers are fast enough that the old guess and test approach could end up being quicker,
+conceptually simpler, and produce acceptable results with less code."
+
+this guy really likes prefabs
+
+"The benefit of using a stack instead of just starting over every time is that it ultimately
+creates a search through the available spaces. It may be that there's only two or three configurations
+that work, and you could randomly try to place the tree a thousand times without finding
+those few solutions, and wasting untold effort for little result. However, the stack works
+as sort of a controlled flood-fill, filling in the spaces as best as it can, and backing
+up when it hits a wall to try again."
+
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.703.368&rep=rep1&type=pdf
