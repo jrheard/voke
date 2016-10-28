@@ -6382,3 +6382,25 @@ nice
 
 ok now i'm just trying to understand the significance of the gh-pages gem and after that
 i'll actually poke around and try to write this thing
+
+=======
+
+10/28/16
+
+blog post is mostly written, just a few loose ends to tie up
+
+reading through all the eve stuff now
+eve looks neat
+i don't have strong feelings on the pros/cons of literate programming but the rest of eve looks cool
+
+ah, brief blog idea to ease my mind on what stuff'll look like on prod:
+scp it up to jrheard.com/blog_staging/
+and block off that directory via robots.txt
+
+coooool, blog post is ready to go, i'll post it monday morning.
+next up:
+get generation branch in a shape where it's ready to merge back into master
+just make it so that if you hit v in the regular voke game, the game is thrown away
+and we draw the visualization tool instead
+punt on menus/pause/etc for now
+maybe a `mode` atom so that we don't mess up on figwheel reloads
