@@ -33,14 +33,14 @@
 
 ;; Canvas manipulation
 
-(defn get-ctx []
-  (-> "visualization-canvas"
+(defn get-ctx [canvas-id]
+  (-> canvas-id
       (js/document.getElementById)
       (.getContext "2d")))
 
 (defn draw-grid
-  [grid]
-  (let [ctx (get-ctx)
+  [grid canvas-width canvas-height canvas-id]
+  (let [ctx (get-ctx canvas-id)
         width (count (first grid))
         height (count grid)
         cell-width (/ canvas-width width)
@@ -85,12 +85,13 @@
 ;; Reagent components
 
 (defn slider
-  [an-atom min max step]
-  [:input {:type      "range" :value @an-atom :min min :max max :step step
-           :style     {:width "100%"}
-           :on-change (fn [e]
-                        (reset! an-atom (js/parseFloat (.-target.value e)))
-                        (generate-grid-and-draw))}])
+  ([an-atom min max step]
+   (slider an-atom min max step generate-grid-and-draw))
+  ([an-atom min max step callback]
+   [:input {:type      "range" :value @an-atom :min min :max max :step step
+            :on-change (fn [e]
+                         (reset! an-atom (js/parseFloat (.-target.value e)))
+                         (callback))}]))
 
 (defn tab
   [tab-kw text]
@@ -154,3 +155,36 @@
   (r/render-component [ui]
                       (js/document.getElementById "content"))
   (generate-grid-and-draw))
+
+
+;; drunkard's blog
+
+(def drunkards-blog-empty-cells (r/atom 400))
+
+(defn drunkards-generate-and-draw []
+  (Math/seedrandom (str @rng-seed))
+  (let [grid (generate/drunkards-walk 100 100 @drunkards-blog-empty-cells)]
+    (draw-grid grid 400 400 "slider-canvas")))
+
+(defn drunkards-blog-slider-ui []
+  [:div.drunkard-s-blog
+   [:div.message
+    [:p (str "Dig until there are " @drunkards-blog-empty-cells " empty cells in the grid")]
+    [slider drunkards-blog-empty-cells 0 2000 10 drunkards-generate-and-draw]]
+   [:canvas {:id     "slider-canvas"
+             :width  400
+             :height 400}]
+   [:div.button-wrapper
+    [:a.button
+     {:href     "#"
+      :on-click (fn [e]
+                  (.preventDefault e)
+                  (reset-rng-seed!)
+                  (drunkards-generate-and-draw))}
+     "generate another"]]])
+
+
+(defn ^:export drunkards-blog []
+  (r/render-component [drunkards-blog-slider-ui]
+                      (js/document.getElementById "slider-ui"))
+  (drunkards-generate-and-draw))
