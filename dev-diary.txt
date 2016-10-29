@@ -6446,3 +6446,18 @@ as sort of a controlled flood-fill, filling in the spaces as best as it can, and
 up when it hits a wall to try again."
 
 http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.703.368&rep=rep1&type=pdf
+ha!
+they have this to say about cellular automata:
+"The small number of parameters, and the fact that they
+are relatively intuitive is an asset of this approach. However,
+this is also one of the downsides of the method: it is hard
+to fully understand the impact that a single parameter has on
+the generation process, since each parameter affects multiple
+features of the generated maps. It is not possible to create a
+map that has specific requirements, like a number of rooms
+with a certain connectivity. Therefore, gameplay features are
+somewhat disjoint from these control parameters. Any link
+between this generation method and gameplay features would
+have to be carried out through a process of trial and error."
+
+i should link to this paper when i publish my visualization tool :)
