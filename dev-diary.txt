@@ -6536,3 +6536,60 @@ end of article.
 the grammars idea is interesting - not relevant for voke, but good idea for room-based RPGs
 wonder how fun it would actually be though
 interesting stuff
+
+ok now i think i'm going to read every blog post bob nystrom has ever written
+
+http://journal.stuffwithstuff.com/2010/11/26/the-biology-of-sloppy-code/
+reminiscent of programmer-archaeologists in vernor vinge books
+
+http://journal.stuffwithstuff.com/2013/01/13/iteration-inside-and-out/
+discusses call stack
+
+http://journal.stuffwithstuff.com/2013/04/17/well-done/
+i like how this guy writes
+describes CSP here
+
+http://journal.stuffwithstuff.com/2013/08/26/what-is-open-recursion/
+really great writing in this one
+"The problem is that the definitions of the functions come one after the other. What you
+really want is to define them all in one lump where they can all see each other simultaneously.
+ In functional languages, the name for that “lump” is a “mutually recursive definition”. "
+
+http://journal.stuffwithstuff.com/2013/12/08/babys-first-garbage-collector/
+******* i love this article
+
+http://journal.stuffwithstuff.com/2014/04/22/zero-to-95688-how-i-wrote-game-programming-patterns/
+deferring editing for later rounds of revision is definitely a good idea and something
+i think i should focus more on
+
+"I read the entire chapter out loud. I can’t stress enough how helpful it is. You can read
+something ten times and think it’s fine but the first time you run it through your lips you’ll
+find all of the wrinkles. This fixes awkward repetition and bad cadence. If the prose reads
+naturally and easily, that’s not because it was easy and natural to write. It’s because I
+edited the hell out of it."
+******* this is a good idea
+
+"Now, if this was a movie, this is when the eighties instrumental rock would start and the
+montage would kick in. Before you know it, the book would be done
+ But, I tell you what, I lived that montage, and it did not pass quickly. Working on this
+ damned book was a pain in the ass every single day. "
+
+yeah i don't ever want to write a book
+
+http://journal.stuffwithstuff.com/2014/07/05/dropping-loot/
+
+"Instead of sequences of items, I now have a hierarchy of them. So, for example, a stilleto is:
+equipment/weapon/dagger/Stilleto
+I’m not generally a fan of hierarchies but I found it surprisingly easy to lump almost every
+item into one. Items also have a “level”, which describes their relative value. Higher level stuff is better."
+
+interesting
+will have to remember this idea
+
+http://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/
+interesting that he has a bunch of actors rather than going with strict entity/component/system
+he seems to be super into OOP so i guess i shouldn't be surprised
+
+interesting bit about actions succeeding/failing
+more interesting bit about proposing an alternate action on failure
+i like that a lot ********
