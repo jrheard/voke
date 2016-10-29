@@ -6461,3 +6461,78 @@ between this generation method and gameplay features would
 have to be carried out through a process of trial and error."
 
 i should link to this paper when i publish my visualization tool :)
+
+======
+
+10/29/16
+
+played around with the blogpost a bit more - embedded the drunkard's portion of the vis tool.
+i think it's fine now and i should stop messing with it.
+back to this academic article.
+
+it's talking about genetic algorithms now, that's interesting
+strings and fitness functions
+sounds a lot like just brute force / breadth-first-search, except with a little guiding function
+that tries to get you to a satisfactory solution without having to exhaust the entire space
+of checking every single possible permutation of the solutions available
+a* is a lot like that too i think - it's about getting a good answer in a performant way
+interesting
+
+they describe a few favorite fitness functions:
+
+"• F1 - maximize path length from entrance to exit;
+ • F2 - maximize accessibility of checkpoints;
+ • F3 - ”encourage paths to branch, run over checkpoints,
+ and then meet up again later”."
+
+"The genetic algorithm parameters mostly control how well
+ (and how fast) the solution reaches an acceptable result based
+ on the fitness, including the possibility of reaching local optima.
+ The main problem with these genetic algorithm parameters
+ is their apparent mismatch with backtracking: if a certain
+ result is obtained and needs to be adjusted, it is unclear which
+ parameters need to be altered."
+
+ "Sentient Sketchbook is a tool proposed by Liapis et al. [25],
+  aiming at supporting designers during the creation of game
+  levels. Game designers sketch low resolution maps, where
+  tiles represent passable or impassable sections, player bases
+  and resources. Sentient Sketchbook is able to add detail to the
+  coarse map sketch and test maps for playability, navigable
+  paths, game pace and player balance. Dungeons are one of the
+  available possible results of automatically detailing coarse map
+  sketches into final level maps. Tiles are converted into rooms,
+  dead ends and corridors."
+
+interesting idea - middle ground between handmade levels and completely generated levels
+
+design the stuff you really care about by hand, automate all the other stuff away
+neato
+
+"However, it is still unclear how low-resolution sketching and genetic-based
+ generation (steered by this sketching) would scale to larger
+ and more detailed maps."
+
+on constraints:
+"It is still up to the designer to not only create all the prefabs for level geometry sections
+ and objects, but also to express a meaningful set of constraints
+ for the generator. It is not straightforward for a designer to
+ translate gameplay concepts (like pacing or difficulty) into
+ topology, adjacency, etc."
+
+toward the end of the paper there's a TABLE I section that's really great
+
+"Cellular automata and constraintbased
+ approaches use a straightforward control mechanism
+ over their algorithm’s low level parameters, thus requiring a
+ full understanding of the generation process. For designers
+ to control them in a meaningfully way, they always need to
+ explicitly map that understanding to gameplay-related goals
+ (e.g. how does room adjacency better support the designed
+ mission)."
+ ****** QUOTE THIS
+
+end of article.
+the grammars idea is interesting - not relevant for voke, but good idea for room-based RPGs
+wonder how fun it would actually be though
+interesting stuff
