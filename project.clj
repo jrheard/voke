@@ -22,9 +22,8 @@
                 :source-paths ["src"]
                 :figwheel     {:on-jsload "voke.world.visualize/main"}
                 :compiler     {:preloads             [devtools.preload]
-                               ;:main                 voke.core
+                               :main                 voke.core
                                :static-fns           true
-                               :main                 voke.world.visualize
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/voke.js"
                                :output-dir           "resources/public/js/compiled/out"
@@ -33,8 +32,7 @@
                {:id           "min"
                 :source-paths ["src"]
                 :compiler     {:output-to     "resources/public/js/compiled/voke.js"
-                               ; :main          voke.core
-                               :main          voke.world.visualize
+                               :main          voke.core
                                :optimizations :advanced
                                :output-dir    "resources/public/js/compiled/out-min"
                                :asset-path    "js/compiled/out-min"

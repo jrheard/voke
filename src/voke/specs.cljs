@@ -98,7 +98,8 @@
 ;; Game state
 
 (s/def :game-state/entities (s/map-of :entity/id :entity/entity))
-(s/def :game-state/game-state (s/keys :req [:game-state/entities]))
+(s/def :game-state/mode #{:default :visualization})
+(s/def :game-state/game-state (s/keys :req [:game-state/entities :game-state/mode]))
 
 ;; Systems
 

@@ -6642,3 +6642,25 @@ http://ctrl500.com/tech/handcrafted-feel-dungeon-generation-unexplored-explores-
 ok this ctrl500 website/magazine just totally 100% blows
 the content is bad and poorly written
 oh well
+
+well, http://ctrl500.com/tech/teaching-the-ai-to-find-a-path-in-awesomenauts/ isn't as bad
+interesting re: local solver + global solver
+" For finding the global route towards the goal we used path finding nodes and standard A*
+to figure out which route to take over them. The nodes are spaced relatively far from each
+other and the local solver figures out how to get to the next node."
+also interesting that they can use a* - their game takes place in continuous space, not discrete
+i guess they just artificially split it up into discrete space for pathfinding purposes
+makes sense, i'll probably do the same
+
+oh uh
+"How do we generate the nodes and edges that A* needs to find a route from A to B? The answer
+is quite simple: our designers place them by hand. Awesomenauts has only five levels and
+a level needs well below one hundred path finding nodes, so this is quite doable."
+
+wellllll
+i thought they generated these but i guess they do it by hand
+i'll generate it though
+
+ok cool anyway
+i think i should really get around to merging this generation branch into master
+let's take a look at that

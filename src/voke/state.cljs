@@ -15,6 +15,7 @@
 (s/def :game-state-event/entity :entity/entity)
 (s/def :game-state-event/entity-id :entity/id)
 (s/def :game-state-event/update-fn fn?)
+(s/def :game-state-event/mode :game-state/mode)
 
 (def -base-event-keys [:game-state-event/type :game-state-event/origin])
 (defmulti event-type :game-state-event/type)
@@ -24,6 +25,8 @@
   (s/keys :req (conj -base-event-keys :game-state-event/entity-id :game-state-event/update-fn)))
 (defmethod event-type :remove [_]
   (s/keys :req (conj -base-event-keys :game-state-event/entity-id)))
+(defmethod event-type :mode [_]
+  (s/keys :req (conj -base-event-keys :game-state-event/mode)))
 
 (s/def :game-state-event/event (s/multi-spec event-type :game-state-event/type))
 
@@ -96,13 +99,22 @@
   :args (s/cat :state :game-state/game-state
                :remove-events (s/coll-of (event-with-type :remove))))
 
+(defn process-mode-events
+  [state mode-events]
+  (if (seq mode-events)
+    (assoc state
+           :game-state/mode
+           ((last mode-events) :game-state-event/mode))
+    state))
+
 ;; Public (but only intended to be used by voke.core)
 
 (defn make-game-state
   [entities]
   {:game-state/entities (into {}
                               (map (juxt :entity/id identity)
-                                   entities))})
+                                   entities))
+   :game-state/mode     :default})
 
 (s/fdef make-game-state
   :args (s/cat :entities (s/coll-of :entity/entity))
@@ -114,16 +126,19 @@
 
   Resets @buffer to []."
   [state]
+  ; i'm sure there's a more concise way to write this
   (let [buffer-contents @buffer
         add-events (filter #(= (% :game-state-event/type) :add) buffer-contents)
         update-events (filter #(= (% :game-state-event/type) :update) buffer-contents)
-        remove-events (filter #(= (% :game-state-event/type) :remove) buffer-contents)]
+        remove-events (filter #(= (% :game-state-event/type) :remove) buffer-contents)
+        mode-events (filter #(= (% :game-state-event/type) :mode) buffer-contents)]
     (reset! buffer [])
 
     (-> state
         (process-add-events add-events)
         (process-update-events update-events)
-        (process-remove-events remove-events))))
+        (process-remove-events remove-events)
+        (process-mode-events mode-events))))
 
 (s/fdef flush!
   :args (s/cat :state :game-state/game-state)
@@ -135,8 +150,8 @@
   [entity
    origin]
   (swap! buffer conj #:game-state-event {:type   :add
-                                        :origin origin
-                                        :entity entity}))
+                                         :origin origin
+                                         :entity entity}))
 
 (s/fdef add-entity!
   :args (s/cat :entity :entity/entity
@@ -173,3 +188,9 @@
 (s/fdef remove-entity!
   :args (s/cat :entity-id :entity/id
                :origin keyword?))
+
+(defn update-mode!
+  [mode origin]
+  (swap! buffer conj #:game-state-event {:type   :mode
+                                         :origin origin
+                                         :mode   mode}))

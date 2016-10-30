@@ -4,7 +4,7 @@
             [clojure.string :refer [starts-with?]]
             [cljs.core.async :refer [chan <! put!]]
             [goog.events :as events]
-            [voke.state :refer [update-entity!]]
+            [voke.state :refer [update-entity! update-mode!]]
             [voke.util :refer [in?]])
   (:import [goog.events KeyCodes])
   (:require-macros [cljs.core.async.macros :refer [go-loop]]))
@@ -36,6 +36,9 @@
       goog-event-type
       (fn [event]
         (let [code (.-keyCode event)]
+          (when (= code KeyCodes.BACKSLASH)
+            (update-mode! :visualization :keyboard-input))
+
           (when (contains? key-mappings code)
             (.preventDefault event)
             (let [event-type (cond
