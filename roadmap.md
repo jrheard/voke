@@ -7,7 +7,7 @@ Main features
 =============
 
 * Binding of Isaac style top-down twin-stick bullet-hell-lite roguelite gameplay
-* Randomly generated levels _vaguely_ in the vein of diablo (i.e. large maps as opposed to individual BoI style rooms)
+* Randomly generated levels _vaguely_ in the vein of diablo (i.e. large maps as opposed to individual BoI style rooms), maybe a cross between Diablo and Rimworld
 * Very basic xp/leveling system, a la Risk of Rain - no talent tree, manual stat allocation, etc, just cumulative stat increases
 
 Mechanics I'm definitely adding
@@ -23,6 +23,8 @@ Mechanics I'm undecided on
 
 * Mana, spells
   * Monsters will definitely have these, but not sure whether player will
+  * Read http://www.roguebasin.com/index.php?title=Programming_Roguelike_Magic when we get to this
+  * God, also read http://roguelikedeveloper.blogspot.com/2008/05/unangband-magic-system-part-one.html , which has sixteen+ parts
 
 Monster types
 -------------

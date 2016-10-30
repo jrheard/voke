@@ -5169,3 +5169,1498 @@ so that's the approach i'm going to look into first
 
 heh, i see viebel in slack talking about klipse again - maybe if this goes well i can show
 it off as a blog post? we'll see
+
+so yeah look into cellular automata and then spend a lot of time processing and implementing
+http://www.gridsagegames.com/blog/2014/07/dungeon-metrics/
+
+which come to think of it i'm still processing
+
+so he's talking about room connectivity, and how that's a useful metric
+the bit about seclusion is interesting, makes sense in tunneled levels
+
+http://www.gridsagegames.com/blog/2014/07/dungeon-prefabs/ is interesting, i prob won't use it though
+
+http://www.gridsagegames.com/blog/2016/03/generating-populating-caves/
+
+"“encounters,” wherein caves (analogous to rooms in room-and-corridor
+maps) each have their own content pulled from a pool of
+available encounters that themselves generally fall into one of four categories: fluff, rewards,
+risk vs. reward, and danger."
+
+sounds relevant
+
+"the cave generator itself, which isn’t even a part of the game engine (i.e. it can be run without Cogmind at all)"
+
+this is what i was planning for my generator too, cool
+i think it's just going to output a 2d vector of edn
+which can be used by the game engine to create a level, or visualized using dev tools of some sort
+
+http://www.gridsagegames.com/blog/2015/05/map-composition/
+
+ok spinning up https://github.com/jrheard/voke/issues/34 to track this issue and centralize related links
+
+http://dungeonmaker.sourceforge.net/DM2_Manual/index.html
+this claims to be the most advanced dungeon generator on the planet, but appears to be from 2005
+
+"I always like to watch the movie of creating a labyrinth/dungeon hybrid, because there are
+a lot of surprises, and some very tricky environments get created. But would these environments
+be fun to play in? I really don't know. No doubt it depends much on the game dynamics, and
+unconventional dungeons such as these would have to be playtested before any decision is
+made on including them in a game. The fact that the DungeonMaker is capable of making develishly
+difficult dungeons should not induce us to base a game on them. It may well be that simpler
+dungeons are more fun."
+
+i like that
+
+" The lower down you go, the better treasure you can get. Every dungeon has a number of magical
+artefacts and one major treasure. When you steal one of these, the AI will mount a serious
+attempt to corner and catch you, while they might otherwise have been content to just see
+you leave. If you steal the major treasure, the alarm will even go out to neighboring dungeons,
+and they will already be in an alert hunting stance when you enter them. "
+
+https://www.reddit.com/r/gamedev/comments/1dlwc4/procedural_dungeon_generation_algorithm_explained/
+
+this isn't going to be super relevant, he's got room-and-corridor levels, but probably still interesting
+
+"At this point we have 150 random cells in a small area, most are overlapping. Next we use
+simple separation steering behaviour to separate out all of the rectangles so that none are
+overlapping. This technique ensures that the cells are not overlapping, yet in general remain
+as tightly packed together as possible."
+
+this post is pretty good actually
+
+http://pcg.wikidot.com/pcg-algorithm:drunkard-walk
+heyyy what - procedural content generation wiki?!
+
+anyway this seems like a good algorithm to start with, since it's so easy
+update: it was really easy
+
+http://forums.roguetemple.com/index.php?topic=4128.0 makes more sense now
+
+http://pcg.wikidot.com/pcg-algorithm:dungeon-generation
+
+"There are two basic approaches to dungeon generation: place the rooms first, then attempt
+to connect them via corridors; or place the corridors using a maze generation algorithm,
+then unify sections of the maze to form rooms.
+ The first approach is easier to understand and by far more common, but it does not guarantee
+ connectivity between all parts of the dungeon for every dungeon generated, so may require
+ an existing dungeon layout be discarded and started again."
+
+"Depending on the complexity of dungeon layout attempted, the tunnelling code required to
+connect the rooms can get extremely complex and be prone to connection failures, and consequently
+disconnected segments of the dungeon. The usual approach is to use a spanning tree algorithm
+to validate that all rooms are connected correctly, by adding rooms at end endpoint of the
+corridor to the spanning tree."
+
+this is the second time i've seen spanning trees come up - this will likely be the data structure
+we use to figure out whether there's a clear path from the entrance to the exit
+
+http://www.roguebasin.com/index.php?title=Articles is a gold mine of general game concepts
+
+lol fuck i have 80 open tabs now
+
+"There are many algorithms that will generate a dungeon. What they do is to fill a dungeon
+with rooms passages, stairs, traps, doors, items, and monsters, often in that order. Which
+comes first can be an interesting decision."
+
+i think i want to do:
+
+stairs first
+then caves
+then passages
+then everything else
+
+http://www.roguebasin.com/index.php?title=Roguelike_Dev_FAQ#How_do_you_make_sure_all_your_rooms_and_passages_are_reachable.3F
+explains how floodfill is useful to figure out which rooms are reachable
+
+http://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation
+this is a really good explanation
+
+http://roguelikedeveloper.blogspot.com/2007/11/unangband-dungeon-generation-part-one.html lol jesus nine parts
+ok it looks like this will be worth reading, gonna come back to part 2
+
+"Cellular Automata Dungeons" is listed on the roguebasin of "things which are hard to code", auspicious
+
+http://www.roguebasin.com/index.php?title=Creating_Measurably_%22Fun%22_Maps
+"First connect the dungeon beginning to the dungeon ending. The beginning is generally the
+cave entrance or the stairs up or wherever the player begins that dungeon level at. The end
+cell is up to you to define. Connect these two cells using DSP and stash the returned path.
+Now you have two sets of nodes. Nodes on the path (path nodes) and nodes not on the path
+(pointless nodes). The key idea is to "solve" the pointless nodes such that the player either
+wants to or has to visit most of those pointless nodes (thereby adding them to the path nodes)."
+
+this is relevant to the gridsagegames concept of "seclusion", which he mainly talks about
+in tunneled maps
+
+"There are many ways to "solve" pointless nodes. Before we discuss them, you must group the
+pointless nodes into pointless areas. A pointless area is a collection of all pointless nodes
+that can reach each other without crossing any path nodes"
+
+http://www.roguebasin.com/index.php?title=Data_structures_for_the_map
+
+http://www.roguebasin.com/index.php?title=Delving_a_connected_cavern
+i can't see any of the generated dungeons :( so i am going to ignore this article
+
+http://www.roguebasin.com/index.php?title=Dungeon-Building_Algorithm
+
+http://www.roguebasin.com/index.php?title=Random_Walk_Cave_Generation
+mentions that dynamically resizing the map helps make drunkard's walk generation less bad
+
+http://www.roguebasin.com/index.php?title=The_Incredible_Power_of_Dijkstra_Maps
+****** this seems potentially relevant (eventually)
+"Most of the things a monster will do involve moving toward something or moving away from it."
+
+http://www.roguebasin.com/index.php?title=Programming_Roguelike_Magic
+"But once I started adding more spells, a lot of code needed to be unnecessarily duplicated.
+For example, a magic missile spell and a icebolt spell do not really differ very much, and
+neither do a fireball and a firebolt."
+
+http://www.avanderw.co.za/voronoi-dungeon-generator/
+i don't really like the maps this generates, too room-and-corridor for my taste
+
+ok, returning to http://roguelikedeveloper.blogspot.com/2007/11/unangband-dungeon-generation-part-one.html
+(i still haven't read the posts on cellular automata that i've had up for days and am planning to use!)
+
+this series is pretty boring tbh
+gridsagegames' articles are way better
+ok yeah i give up on this series
+
+http://www.gamasutra.com/blogs/AAdonaac/20150903/252889/Procedural_Dungeon_Generation_Algorithm.php
+******* SUPER GREAT stuff for room-and-corridor (not relevant here but still cool)
+
+ok i've read every non-cellular-automata tab
+so it's time to read those now
+my brain is tired though, gonna take a break
+
+========
+
+10/16/16
+
+i actually think i'm going to start first by spinning up a little tool to help visualize
+dungeon generation algorithms
+
+i'm planning on using either reagent [i should probably just do this] or some webgl react-y
+tool (i think gamma exists but is very new, maybe something else exists too, if none of these
+options are compelling then just use reagent) to draw the dungeon generation process on
+a web page.
+
+i plan to modify eg drunkards-walk to return {::grid grid, ::active-cells <list of cells
+that were actively being visited, in chronological order>}
+
+i haven't looked into cellular automata yet, but from the shape of the generated dungeons
+it looks like they might have several cells be visited at the same time, so maybe active-cells
+will end up being a list of lists, we'll see. anyway it should be pretty straightforward
+
+and so the visualizer will just draw a grid of squares where filled ones are dark,
+empty ones are lighter, and the currently visited cell is green; and there'll be
+a button you can press to generate a new dungeon, and (TODO think more about this)
+a rewind progress bar feature
+
+https://news.ycombinator.com/item?id=9753897 has gamma videos
+
+wow http://demo.thi.ng/ws-ldn-8/gol/ is pretty sick, i should look through this
+
+https://medium.com/@thi.ng/workshop-report-hi-perf-clojurescript-with-webgl-asm-js-and-emscripten-a545cca083bc#.47xf4fyka
+********* GOOD SHIT, RELEVANT TO PERF
+is by the guy who made the other webgl library
+
+this looks really relevant to me because it's describing operating on a ton of grid
+items / doing neighbor lookups / etc in cljs, which i'm going to be doing all the time
+
+he implements a macro version of get-in that's 5x faster
+
+"The more obvious improvement to speed up the simulation was using a flat 1D vector to encode
+the grid and calculate cell indices for the 2D coordinates, much like in a pixel buffer.
+This not just gives us better cache locality, but instead of get-in we could now just use
+nth, gain a ~6x speed up and somewhat simpler code."
+*************************************
+yeah i'll probably end up doing this
+
+he uses typed arrays, i haven't looked into that at all
+
+"avoid keywords or collections as functions (use get instead)"
+i should look into that - i prefer using collections as functions rather than using get
+because i don't like that (get foo bar) doesn't throw an error if foo is nil, but spec
+should solve that problem
+
+he talks about how you can use web workers to get more processing power
+
+ok uh anyway i think webgl is overkill for the visualization i have in mind, i'll just use reagent
+
+basic visualization up and running
+next up:
+animate world generation over time
+convert grid to 1d vector (compare drunkard speed before / after)
+
+======
+
+10/17/16
+
+ok, animation works, nice
+next up: performance pass
+plan:
+
+1. figure out how to accurately time eg 100 executions of drunkard's walk before optimization
+2. profile it
+implement each of the following items, timing execution before/after to measure speedup
+(pending what we find in profiling step)
+3. don't call count-empty-cells fn on every pass, just pass a num-empty-cells variable along
+    as part of the loop/recur's state
+4. convert data structure to 1d grid
+5. instead of using a cljs vector of :full :empty keywords, convert to a js array of 0 or 1
+   (it can still return a cljs vector of keywords though, just convert to that at the end)
+6. look into typed arrays
+
+but first i'm gonna clear my chrome tabs
+
+https://github.com/facundoolano/advenjure
+
+https://facundoolano.wordpress.com/2016/10/16/from-clojure-to-clojurescript/
+
+"I found that some built-ins I used to implement them, like read-string and eval, are not
+directly available in ClojureScript, but a bit of googling revealed how to bring them back."
+
+neat info about eval, read-string, saving game state to localstorage
+
+huh, i didn't know that javascript regexes don't support named capture groups
+apparently http://xregexp.com/ is a solution
+
+refers to http://www.spacjer.com/blog/2014/09/12/clojurescript-javascript-interop/
+(have i read this before?)
+******* good shit, great primer on basic js cljs interop
+
+https://github.com/ptaoussanis/tengen
+
+ok cool let's look into benchmarking a clojurescript function
+
+https://github.com/ptaoussanis/tufte potentially relevant
+wow this looks _great_
+i am going to use this
+note: be wary of https://github.com/ptaoussanis/tufte#how-does-tufte-compare-to-hugoduncancriterium though
+
+ok, timing 100 executions of drunkards-walk with 30x30 grid and 150 empty cells
+(this first run is taking so long that i'm doing other stuff on my computer while i wait for it,
+which is likely going to throw off the benchmark a bit)
+results:
+{:id :drunkard, :n-calls 100, :min "1.22s", :max "6.5s",
+:mad "677.51ms", :mean "2.36s", :time% 100, :time "236.06s"}
+
+ok, now let's profile it in chrome devtools
+hm, the output's really noisy if i try to do this:
+
+(let [grid (full-grid 30 30)]
+    (js/console.profile "drunkard")
+    (dotimes [_ 10]
+      (drunkards-walk grid 150))
+    (js/console.profileEnd))
+
+lots of schema and figwheel stuff.
+gonna turn off instrumentation and try to run this outside of figwheel
+oh lol turning off spec instrumentation already immediately makes this _way_ faster, oops
+let's benchmark it again before doing anything else
+
+{:id :drunkard, :n-calls 100, :min "158ms", :max "550ms",
+:mad "62.19ms", :mean "275.92ms", :time% 100, :time "27.59s"}
+
+ok, 10x faster. so yeah spec instrumentation adds a ton of overhead, gotta remember to turn it off
+let's keep going though
+trying profiling again
+
+running this directly in js console:
+console.profile("drunkard");
+for(var i = 0; i < 25; i++) {
+    voke.world.generation.drunkards_walk(voke.world.generation.a_grid, 150);
+}
+console.profileEnd();
+
+haha yeah it looks like 89% of our time is spent in count-empty-spaces
+so let's kill that
+now we get:
+
+{:id :drunkard, :n-calls 100, :min "7ms", :max "42ms", :mad
+"4.14ms", :mean "15.32ms", :time% 100, :time "1.53s"}
+
+so so far that's a 154x speedup, nice
+profiling again
+
+looks like we spend a surprising amount of time in rand-nth-weighted
+not going to bother optimizing that just yet, unless it turns out that cellular automata need it too
+wow and the bulk of the rest of our time is spent in the(into) call that just assembles the
+list of directions and weights
+so uh ok i'm going to stop here
+assoc-in and get-in take 4.94% and 3.8% of our time, respectively
+and conjing the cell onto historical active cells takes 3.68%
+
+soooo yeah, that was a pretty easy optimization pass
+let's add controls to the visualization UI for width, height, and target empty cells now
+
+lol gonna need to make the css a bit more intelligent
+hm i wonder how long generating a 100x100 grid takes
+TODO come back and benchmark
+
+ok i'm playing around with sliders
+having trouble getting the slider's displayed value to change when its backing atom changes
+seems like the <input> tag isn't being rerendered for some reason
+
+lol i forgot to use r/atom
+
+ok anyway now things are looking pretty and interactive
+grid generation takes too long for my taste though
+so let's do a cleanup pass and then convert to a 1d grid
+TODO be sure to benchmark grid generation before+after, and drunkard's before and after
+
+hm ok i actually just benchmarked grid generation and generating a 50x50 grid just takes 37ms, which is ok
+i think that the reason that modifying grid width takes so long is that it forces a redraw of every
+cell in the grid
+
+so anyway i think i'll put off going to 1d for now
+let's look into cellular automata, yeah?
+
+http://pcg.wikidot.com/pcg-algorithm:cellular-automata
+example is broken :(
+" All state transitions take place at the same time; everything looks at its neighbors and
+decides what to change to, then everything changes state at the same time."
+
+"The grid may be of any dimension (e.g. a line or a cube of cells)" interesting
+
+http://www.roguebasin.com/index.php?title=Cellular_Automata_Method_for_Generating_Random_Cave-Like_Levels
+
+so it looks like the variables involved are:
+* percentage chance at initialization time that a given cell is a wall
+* number of times you run the process
+* specific thresholds re: number of your neighbors that are / are not walls at each step of the process
+
+this page says "Very large maps tend to not look as natural, or may require some very fine tuning."
+that's a little concerning
+
+this page is pretty great though
+it suggests switching rules after a few generations, which is interesting
+
+jlund3's notes on this page re: flood fill / connectedness are great:
+"This algorithm creates good looking caves, but the problem is isolated caves. The way I
+solved this is by picking a random, open point on the map and flood filling. Any open point
+outside the flood filled portion gets turned back into a wall. I then check to see if the
+flood filled portion of the map is more than some threshold percent of the map. If the map
+is ~45% open it usually looks alright. If the percent is below this, I just start over.
+This turns out to work quite well. On large maps, almost always you will select the largest
+open connected area, and you won't have to restart the regeneration very often, if at all.
+On very small maps, this doesn't happen as often, but its also very quick to regenerate
+because the map is small. It ends up that this method just does the right thing to rectify
+the non-connected maps naturally!"
+
+i doubt it's that simple, but still looks like good advice
+
+https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664
+has a handy generator near the top of the page that you can use to try out different parameters
+
+"If you look carefully, flipping the solid and empty blocks makes an island-generator too."
+heh cute
+
+this article is actually pretty good
+i like that he counts off-map points as being neighbors, makes walls form naturally around
+the edges of the map, good stuff
+
+seems like just running the simulation a bunch of times (eg like more than 5 times) makes
+for good, rounded cave systems
+
+he suggests placing treasure in places that are surrounded by lots of walls, because they're
+usually tucked into corners at the edges of the cave system
+anyway i like the article
+
+https://jeremykun.com/2012/07/29/the-cellular-automaton-method-for-cave-generation/
+
+lol:
+"The idea of randomized content generation (often called procedural generation) is not particularly
+new. It has been around at least since the 1980’s. Back then, computers simply didn’t have
+enough space to store large, complex levels in memory. To circumvent this problem, video
+game designers simply generated the world as the player moved through it."
+
+"Furthermore, we should note the automaton’s rapid convergence to a stable state. Unlike
+Conway’s Game of Life, in practice this automaton almost always converges within 15 steps,
+and this author has yet to see any oscillatory patterns."
+
+"There is no overpopulation that causes cells to die off, so once a cell is born it will
+always survive. The only cells that do not survive are those that begin isolated. In a sense,
+B678/S345678 is designed to prune the sparse areas of the grid, and fill in the dense areas
+by patching up holes."
+
+interesting okay fuck awesome great:
+he has a solution for using cellular automata on big grids
+
+"Since cellular automata are inherently local manipulations, we should not expect any modification
+of B678/S345678 to do this for us. Instead, we will use B678/345678 to create a low-resolution
+image, increase its resolution manually, and smooth it out with — you guessed it — another
+cellular automaton! We’ll design this automaton specifically for the purpose of smoothing out corners."
+
+interesting - on http://homepages.math.uic.edu/~jkun2/other/cellular-automata/ he suggests
+first running the initial ruleset, then *alternating* between increasing the resolution
+and running the second ruleset a few times (eg ~4)
+
+seems to work pretty well!
+
+ok let's reread http://www.gridsagegames.com/blog/2014/06/mapgen-cellular-automata/
+
+oh, _i_ see
+so this is actually really different from the versions described in all previous articles
+those operate on the whole map at once, in stages where every cell is considered and updated
+simultaneously, and you run like 2-10 iterations of that whole-map sweep
+
+but in this method, you pick cells at _random_ to consider, one at a time
+i didn't get that the first time i read evilscience's article
+
+"One of the variables you can tweak using this method that is not normally adjustable when
+using cellular automata is the number of cells randomly visited, which is where some of the
+additional variety comes in. Lowering the number of applications will result in some rougher
+maps, but a final smoothing phase can still operate on that and get some interesting results"
+
+so yeah we should consider also having a final smoothing phase that uses the traditional
+cellular automata approach
+
+cool let's give this a shot
+
+ok gave it a first pass
+likely pretty messy and wrong
+look at it again tomorrow
+
+gonna do a quick perf pass for funsies actually
+ALTHOUGH THIS ALL NEEDS TO BE CLEANED UP AND REFACTORED, READ THIS LINE TOMORROW, DO IT
+i just don't have the brainpower for that tonight
+
+currently, (automata 50 50 0.45 500) 100 times ->
+{:id :automata, :n-calls 100, :min "36ms", :max "124ms",
+:mad "9.9ms", :mean "56.36ms", :time% 100, :time "5.64s"}
+
+let's try with native js arrays
+
+after converting:
+{:id :automata, :n-calls 100, :min "25ms", :max "43ms", :mad
+"3.49ms", :mean "29.97ms", :time% 100, :time "3s"}
+
+and it looks like there's more room for improvement -
+now we spend a *ton* of our time in (apply array (foo bar baz)) calls
+is there a way to make js arrays faster than this?
+look at that tomorrow
+AND REFACTOR ALL OF GENERATION AND VISUALIZATION AND GIVE THINGS BETTER NAMES
+
+converting js array initialization to not use (apply array) brings us to
+{:id :automata, :n-calls 100, :min "22ms", :max "128ms",
+:mad "7.9ms", :mean "40.07ms", :time% 100, :time "4.01s"}
+which seems worse?
+anyway kill rand-nth-weighted, reimplement in js
+
+brief notes, might as well take this down:
+
+(defn -make-js-row [width full-probability]
+  (let [arr (make-array width)]
+    (loop [i 0]
+      (when (< i width)
+        ; todo nix rand-nth-weighted, implement in plain js (?)
+        (aset arr i (rand-nth-weighted {false (- 1 full-probability)
+                                        true  full-probability}))
+        (recur (inc i))))
+    arr))
+
+(defn -make-js-grid [width height full-probability]
+  (let [arr (make-array height)]
+    (loop [i 0]
+      (when (< i height)
+        (aset arr i (-make-js-row width full-probability))
+        (recur (inc i))))
+    arr))
+
+
+(defn -make-js-row2 [width full-probability]
+  (apply array
+         (take width
+               (repeatedly #(rand-nth-weighted {false (- 1 full-probability)
+                                                true  full-probability})))))
+
+(defn -make-js-grid2 [width height full-probability]
+  (apply array
+         (take height
+               (repeatedly #(-make-js-row2 width full-probability)))))
+
+(profile
+{}
+(dotimes [_ 1000]
+  (p :manual
+     (-make-js-grid 50 50 0.45))
+  (p :apply
+     (-make-js-grid2 50 50 0.45))
+  )
+)
+
+; {:id :apply, :n-calls 1000, :min "10ms", :max "74ms", :mad
+; "3.02ms", :mean "14.26ms", :time% 56, :time "14.26s"}
+; {:id :manual, :n-calls 1000, :min "8ms", :max "54ms", :mad
+; "2.52ms", :mean "11.35ms", :time% 44, :time "11.35s"}
+
+also i poked around on klipse - (for) is definitely much faster than
+loop/recur on a handmade array - for returns a lazy / chunked sequence, which is nonzero overhead
+loop/recur just makes and modifies an array
+it's faster than doseq, too
+so favor loop/recur when you need perf
+
+======
+
+10/18/16
+
+http://blog.klipse.tech//klipse/2016/10/16/klipse-is-fast.html
+
+http://blog.klipse.tech/clojurescript/2016/04/09/clojurescript-protocols-secret.html
+
+ok, removed the call to rand-weighted and just used (rand) because that's all we needed, and now:
+{:id :manual, :n-calls 1000, :min "0ns", :max "10ms", :mad
+"436.97μs", :mean "306μs", :time% 96, :time "306ms"}
+
+so that's pretty fuckin decent!
+
+let's try profiling in the browser again
+
+oh also before i forget
+TODO update the visualization of automata such that:
+when a cell is visited and is turned into a wall, make it look green
+when it's turned into an empty space, make it look red
+otherwise don't draw anything on it
+
+ok profiling
+
+array->grid takes 20% of our time
+new-value-at-position takes 61% of our time
+let's try loop/recur again
+
+ok i did that on a manual js array instead of doing apply array
+i didn't benchmark before/after, that was a mistake
+but anyway it looks like that was a speedup
+now we spend half of our time in the clojure = function, half in array->grid
+benchmarking before fixing the = bit:
+(calling (automata 50 50 0.45 500) 100 times)
+
+{:id :automata, :n-calls 100, :min "13ms", :max "50ms", :mad
+"4.87ms", :mean "21.67ms", :time% 100, :time "2.17s"}
+
+lessons from slack:
+set! is javascript =
+coercive-= is ==
+identical? is ===
+
+after removing cljs eq:
+{:id :automata, :n-calls 100, :min "5ms", :max "19ms", :mad
+"1.85ms", :mean "8.01ms", :time% 99, :time "801ms"}
+
+ah, found another = call, now we get:
+
+{:id :automata, :n-calls 100, :min "4ms", :max "12ms", :mad
+"997μs", :mean "6.05ms", :time% 100, :time "605ms"}
+
+ok, now array->grid takes 66% of our time
+
+poked at it with help from david and alex in slack.
+before:
+
+(into []
+    (for [row an-array]
+      (into []
+            (for [full? row]
+              (if full? :full :empty)))))
+
+after:
+
+(into []
+        (map (fn [row]
+               (into []
+                     (map (fn [cell]
+                            (if (true? cell) :full :empty)))
+                     row)))
+        an-array)
+
+so now we get:
+{:id :automata, :n-calls 100, :min "1ms", :max "18ms", :mad
+"1.94ms", :mean "3.58ms", :time% 96, :time "358ms"}
+
+and array->grid is about 30% of our time.
+i think this is about as fast as we'd ever want this to be for now, stopping here. nice!
+
+http://blog.fikesfarm.com/posts/2015-11-03-planck-static-function-dispatch.html
+http://blog.fikesfarm.com/posts/2016-04-14-static-free-clojurescript-repl.html
+
+cool seems like i can just leave this off in dev
+
+s3b4 looks interesting
+
+eh, having trouble focusing, think i might just take a break for the rest of the day
+TODO:
+smoothing phase
+look at http://www.evilscience.co.uk/wp-content/uploads/2014/02/app.png
+and http://www.evilscience.co.uk/a-c-algorithm-to-build-roguelike-cave-systems-part-1/ again
+
+=======
+
+10/19/16
+
+plans for today:
+add support for a smoothing phase; can be super-simple/dumb at first, can be fleshed out later.
+  will reuse lots of logic from the current automata function.
+  time to think harder about names again, i've really been letting that slide so far
+
+OH ALSO LOOK INTO FLOOD FILL AND FIGURE OUT WHEN TO USE IT
+also need to do some thinking about how to connect caves together, and which ones to fill in, etc
+
+make the UI a little easier for people who aren't me to understand
+make the whole thing redraw whenever any of the automata-specific sliders are touched
+add animation support to the automata visualization, and add a slider that lets you determine
+  how many cells are animated per frame (eg 1, 5, 10, etc)
+add support for a history slider (TODO think more about how this will work, best way of integrating with UI)
+
+but first, let's finally work through austin's devs tutorial
+
+except actually first let's go eat some dim sum
+delicious
+ok, devs time
+
+https://github.com/austinhaas/DEVS/blob/master/doc/tutorial.clj
+aw dang he wants me to work through this interactively
+okok one sec
+
+ok, that was interesting
+not 100% sure what to make of it
+super well-done/formatted tutorial though!
+
+http://www.onyxplatform.org/learn/
+https://www.youtube.com/watch?v=YlfA8hFs2HY
+talks about difference between batch and streaming
+batch is relatively well-understood, streaming less so
+in streaming, it's very possible you can never see the whole data set because it's infinite or
+very large/long-lived (eg all tweets)
+and so while in batch land can be just stateless immutable transformations of data, in streaming
+land you have to keep state
+makes sense
+
+i don't understand much of what he says starting around minute 9
+i wish he used simpler words
+i think he practiced this too much
+
+he casually mentions https://github.com/stuartsierra/dependency - this looks really really useful!
+
+anyway it looks like the upshot is that onyx is a useful tool for processing streaming data in clojure
+apparently it does batch too
+
+ok anyway back to the tool
+playing around with the different variables - initial chance, survival threshold, birth threshold, iterations
+0.45 s3 b4 iter10000 is looking pretty good!
+
+https://www.evernote.com/shard/s11/sh/4766f63d-d93a-4d37-9e36-9d008e60faed/633ce93e72c0fc9c
+^ iter40000 there
+s3 b4 definitely look like the right thresholds, iter40000 looks good too
+although there's an interesting relationship between grid size and desired # iterations
+i don't fully understand it yet but it seems like the larger the grid, the more iterations
+you need in order to hollow out the right amount of space
+which makes sense, there are more cells you need to visit, so you need more random iterations
+
+let's take a look at the smoothing phase, maybe that'll help a lot actually
+
+started cleaning up in preparation for smoothing phase
+i kinda wanna do another perf pass though
+measuring 200 invocations of (automata 100 100 0.45 3 4 20000 nil)
+
+{:id :automata, :n-calls 200, :min "41ms", :max "215ms",
+:mad "13.99ms", :mean "65.36ms", :time% 100, :time "13.07s"}
+
+NOTE we spend 27% of our time in the garbage collector
+10% of our time in conj
+7% of our time in =
+5% of our time in array->grid
+35% of our time in -new-value-at-position
+which says it spends 28% (of the whole bucket of 100%) in "self time"
+and 5% in -get-neighbors
+
+so i guess the first step is to figure out why we're doing so much gc and fix that
+
+i'm gonna do a prod build real quick to see what the profiles there look like
+yeah, on prod we spend 35% of our time in GC
+
+http://rundis.github.io/blog/2015/clojurescript_performance_tuning.html
+
+"A couple of function showed a lot of own-time in the profiler. I really couldn’t figure
+out why though. They didn’t seem to do much, but delegate to other functions. I tried a range
+of things until I stumbled accross this blogpost by Stuart Sierra."
+links to https://stuartsierra.com/2015/06/01/clojure-donts-optional-arguments-with-varargs
+not relevant to me though
+
+googling around for info on js gc issues
+
+https://www.alexkras.com/simple-guide-to-finding-a-javascript-memory-leak-in-node-js/ is
+probably not relevant since i don't think i have a _leak_, but whatever, i'll read this
+
+"There are 4 types of data types in JavaScript: Boolean, String, Number, and Object. First
+3 are simple types, and they can only hold on to the data that is assigned to them (i.e.
+string of text). Objects, and everything else in JavaScript is an object (i.e. Arrays are
+Objects), can keep references (pointers) to other objects."
+
+heh here's what my timeline looks like, note the blue memory graph:
+https://www.evernote.com/shard/s11/sh/f10c0c33-5bea-42e6-81cb-0d1912b0a8c6/a17df90c6da1cc8b
+
+oh fuck nice - the timeline view lets me do this:
+https://www.evernote.com/shard/s11/sh/edc9be6e-d8f7-4182-af0a-9ce23cc226d6/b4aa93fe109daef9
+i always thought bottom-up view was worthless but now i see what it's for, nice
+or anyway i think i do
+
+oh wow, the profile tab has several awesome things i didn't know about
+heap snapshot
+allocation timeline
+allocation profile
+
+let's try them out, shall we
+
+the allocation profile one indicates that it basically all comes from array->grid?
+https://www.evernote.com/l/AAuZTK7NlexG_bP6qP1lR1yJoJ7DY2CsSWg
+TODO LOOK INTO THIS
+
+https://docs.google.com/presentation/d/1wUVmf78gG-ra5aOxvTfYdiLkdGaR9OhXRnOlIcEmu2s/pub?start=false&loop=false&delayms=3000&slide=id.g31ec7af_0_29
+has info on leaks
+
+=======
+
+10/20/16
+
+https://hacks.mozilla.org/2012/11/tracking-down-memory-leaks-in-node-js-a-node-js-holiday-season/
+
+TODO try just removing the array->grid calls and see what that does to perf (and to reported gc)
+
+{:id :automata, :n-calls 200, :min "47ms", :max "183ms",
+:mad "22.04ms", :mean "90.39ms", :time% 100, :time "18.08s"}
+
+shaved a little time off, not much though
+
+gc-wise, it now says 48% of our allocations are in COMPILER (?) and 52% in new-value-at-position
+and lo and behold, our memory allocation looks much less insane when graphed:
+https://www.evernote.com/l/AAvSfj1nfOdFa7pNTiBepKtqIRwfquegx_M
+
+{:id :automata, :n-calls 200, :min "36ms", :max "126ms",
+:mad "11.13ms", :mean "56.32ms", :time% 100, :time "11.26s"}
+
+so yeah, it definitely looks like there's something going on here
+wonder if it's fixable?
+
+=====
+
+10/23/16
+
+https://www.youtube.com/watch?v=L3ugr9BJqIs
+
+good stuff. good explanation of the 3-snapshot technique, i didn't realize that the whole point
+was about "allocations between snapshot 1 and 2 _that are still around in snapshot 3_".
+
+i talked with dnolen on slack yesterday re: the allocations i'm seeing; he wasn't surprised, since my
+code isn't doing all that much work otherwise. i still think it'd be good+fun to look into using
+chrome devtools, just for fun.
+
+things to look into using:
+containment view
+dominators view
+
+i poked around in the memory view, this time manipulating the cellular automata vis's sliders manually
+instead of calling automata in a loop, and this time the memory allocation profile said that we do
+all our allocations in reagent/react, by making a ton of react elements. this probably makes a lot of sense
+- i don't think react+reagent were made with this use case in mind.
+seems like an acceptable limitation to live with since this is just a visualization tool -
+we'll just have to keep the grid sizes relatively low in situations where the vis has interactive
+sliders and so its parameters can change very frequently.
+
+i think we should still be able to get away with generating+visualizing really big grids in this tool
+as long as they're just kicked off by a big "generate" button.
+
+so i think this tool's headers/tabs will eventually look like:
+
+drunkard's | cellular | tunneler | foo | voke dungeon generation
+
+where the first N-1 tabs have lots of sliders and let you visualize how these things work
+on a smaller grid, and the last one just has a "generate" button and generates a big 400x400 (or
+whatever) map
+
+ok, smoothing seems to be working
+gonna do another perf pass
+one behavior note - lots of empty spots along edges of the grid, should add another pass that fills 'em in
+by hand
+eh, ignore the perf pass bit, turns out adding a console.log call to each iteration of the
+smoothing pass function slowed us down a lot, but now that that's removed most of the overhead
+appears to be in react/reagent
+
+if that's the case, and the last tab of the visualization tool won't have sliders of any sort,
+then i should just have it write to a canvas directly
+this way it can write to a nice big huge grid
+i might give that a shot right now tbh
+
+ok, nice, did that
+profiling yet again
+we spend the vast majority of our time in automata-smoothing-pass, which is to be expected
+also, i should definitely bump up the number of random-cell iterations pre smoothing, i'll do that first
+did that, not sure if it makes a difference? i miss sliders :/
+gonna try a prod build and profile that if i can
+
+ok i have a profile here
+before i try something - i think if i replace an = or two in smoothing-pass with identical?, we'll save
+20% of our time - i need to get some benchmark timings
+based on (automata 400 400 0.45 4 5 400000 12)
+
+calling that 10 times yields:
+{:id :big-grid, :n-calls 10, :min "4s", :max "5.5s", :mad
+"510.8ms", :mean "4.69s", :time% 100, :time "46.9s"}
+
+now let's try identical?
+
+{:id :big-grid, :n-calls 10, :min "2.96s", :max "3.55s",
+:mad "124ms", :mean "3.18s", :time% 100, :time "31.84s"}
+
+niiiiice
+
+ok, now it's down to new-value-at-position
+
+is there anything we can do to make this function faster?
+
+it spends 6% of our time in get-neighbors, and 35% of our time in new-value-at-position "self time"
+let's research terms like "js profiling self time" to see if there are any tips on how to diagnose this
+
+yeah not really
+the only thing that's jumping out at me is this bit:
+(.-length (.filter neighbors true?))
+let's have neighbors just return the number of full neighbors directly
+
+hm, have i made this somehow.. slower?
+{:id :big-grid, :n-calls 10, :min "4.45s", :max "5.01s",
+:mad "132.38ms", :mean "4.63s", :time% 100, :time "46.28s"}
+yeah this is worse. what gives? profile time
+
+oh, i think that this completely fucked up timings, interesting:
+[new-i new-j] (if (identical? i (inc x))
+                            [(dec x) (inc j)]
+                            [(inc i) j])
+because end up constructing and calling nth on a cljs persistent vector a jillion times in a tight loop
+so: don't do unpacking like this in a tight loop!
+
+niiiice, now we're down to this:
+{:id :big-grid, :n-calls 10, :min "1.44s", :max "2.29s",
+:mad "222.74ms", :mean "1.71s", :time% 100, :time "17.06s"}
+
+so we're down from mean time 4.69 to mean time 1.71s (although we're only doing 10 iterations)
+but anyway it definitely looks like we've at least made this 2x faster
+so that's cool!
+new-value-at-position now only has 6% self time
+num-full-neighbors is where most of the self time lives now, which makes sense
+20% in the garbage collector, though! TODO: take a look at allocation profiles again
+
+i had a few ideas while i was walking around today, and i'm going to try to write them down
+before i forget them all (i may have already forgotten a few)
+
+* switch all grid drawing in the visualization tool from reagent to canvas
+    reagent is great for controlling UI, but it isn't made for turning a grid of 16000 divs on and off
+    TODO record fps before/after this change
+* some rejiggering of the various r/atoms will be necessary - figure out how to add a watch to all of them
+    that checks what tab is selected and redraws the canvas accordingly
+* remove the width/height sliders, just set those values to 100 and tune cell size to match
+* in order to better understand the effect of the various sliders, make it such that when they are
+    manipulated, the _same_ dungeon is redrawn - do this by sending along a seed for the random number
+    generator in these situations. in this way it will be more obvious what the effects of eg
+    greater or fewer random-cell iterations, or greater or fewer applications of the smoothing stage, etc
+    actually have on the generated level.
+* when grids are generated, just draw the finished product on the screen immediately;
+    make a second "animate" button available that the user can click to animate the current grid's history
+
+i think that's everything!
+also at some point we'll probably want to read kyzrati's post on tunnelers, and implement that strategy
+and maybe even the BSP room-generation technique, and/or a combination thereof, just for fun
+
+also, TODO - the current algorithm generates a map that's pretty to look at and has nice big open-space caves,
+but has no sense of direction in it - you're not at all guidedfrom the start to the end. will have
+to come back and think more about this. kyzrati hints at forcing your caves to fit into a more vertical
+slice, which i think could help a lot
+
+current timeline stats with reagent vis indicate frames taking about 400-600 ms when you drag
+sliders around on the automata visualization, let's try converting to canvas now
+
+switched to canvas, frames now take about 60-90ms, and that's with a bigger grid and with
+a ton of smoothing passes (eg 12) applied. nice!
+
+now that this is so much more responsive, i *really* want to get that random seed feature described above in,
+but i should finish converting the whole thing to canvas (i.e. drunkards, setting aside animation for now)
+
+TODO doesn't look like it's possible to pick a seed in JS - look at http://stackoverflow.com/questions/521295/javascript-random-seeds
+https://github.com/clojure/test.check/blob/ebcc57dd631e25ee39bc059899e3bbd9ddf24ee9/src/main/clojure/clojure/test/check/random.cljs
+looks promising
+
+=====
+
+10/24/16
+
+quick rng notes before i forget
+https://github.com/clojure/test.check/blob/ebcc57dd631e25ee39bc059899e3bbd9ddf24ee9/src/main/clojure/clojure/test/check/random.cljs
+seems to come with a seedable rng
+testing it against (rand) yields:
+{:id :new, :n-calls 1000000, :min "0ns", :max "12ms", :mad
+"4.45μs", :mean "2.23μs", :time% 31, :time "2.23s"}
+{:id :regular, :n-calls 1000000, :min "0ns", :max "2ms",
+:mad "1.3μs", :mean "648ns", :time% 9, :time "648ms"}
+
+so it's definitely slower than the builtin rng, but not slow enough to matter afaict
+
+saw this fly by on slack: argument about component vs mount
+yogthos likes mount, everyone else likes component and is mad at him (?)
+https://www.reddit.com/r/Clojure/comments/41p73n/contrasting_component_and_mount/
+https://www.reddit.com/r/Clojure/comments/3zppdn/the_beauty_of_clojure/
+
+implicit vs explicit comes up a long in this argument
+mount implicit, component explicit
+i like explicit tbh
+
+yogthos says:
+I find that keeping resources at the edges makes things more
+testable, whether you pass resources as an argument or reference
+a var, you’re still tying them to your business logic
+I would argue that if you need resources for most of the testing, then there’s too much coupling going on
+
+poking at seeding now
+http://davidbau.com/archives/2010/01/30/random_seeds_coded_hints_and_quintillions.html#more
+looks pretty useful
+
+ok things are looking pretty sweet atm
+TODO - kill the whole :history thing, no longer needed
+measure performance before/after
+
+ok, let's measure the current state of performance + memory usage
+
+calling this 200 times:
+(automata 100 100 0.45 3 4 20000 12 4 5)
+{:id :automata, :n-calls 200, :min "66ms", :max "155ms",
+:mad "10.13ms", :mean "85.79ms", :time% 100, :time "17.16s"}
+
+memory-wise, looks like we just allocate 67k from array->grid, which seems low+fine
+
+anyway now let's remove all history/etc code
+ok, done (i think, haven't reread the whole thing but it seems to run)
+now we have:
+
+{:id :automata, :n-calls 200, :min "43ms", :max "123ms",
+:mad "5.95ms", :mean "53.67ms", :time% 100, :time "10.73s"}
+
+noticeable speedup! about 60% of the time it used to take
+
+profiling now
+we spend 12% of our time in rand-int (definitely due to the slower seeded rng implementation)
+16% self time in new-value-at-position
+40% self time in num-full-neighbors
+
+oh wow, i never noticed this before - the chrome profiling tool has "focus this function"
+and "exclude this function" buttons, which seem very useful
+
+anyway that seems to be the whole story - those two functions are where the remaining time is spent
+
+interesting - the truth_ call i also see us spending some time in (about 7% self time)
+is what's emitted when you call (and foo bar)
+(thanks klipse!)
+i wonder if there's a way to restructure this cond for performance?
+
+blog.fikesfarm.com/posts/2015-12-04-boolean-type-hints-in-clojurescript.html
+seems very relevant!!!!!
+
+ok! with the help of that url and klipse, i've got:
+
+(let [foo (get [true] 0)]
+  (if foo 1 2))
+
+emits a truth_ call
+
+(let [foo ^boolean (get [true] 0)]
+  (if foo 1 2))
+
+does *not* emit a truth_ call
+let's try this out!
+
+huh - it doesn't seem to affect perf at all, according to tufte!
+without hint:
+{:id :automata, :n-calls 400, :min "43ms", :max "100ms",
+:mad "5.71ms", :mean "54.44ms", :time% 100, :time "21.78s"}
+with hint:
+{:id :automata, :n-calls 400, :min "43ms", :max "106ms",
+:mad "6.06ms", :mean "53.99ms", :time% 100, :time "21.6s"}
+
+let's look at chrome profiler
+
+hm, in chrome profiler i still see 7% of our time spent in truth_!
+i'm misunderstanding something - i think that this (and) call may be throwing a spanner in the works
+TODO continue to investigate
+
+words for grep: BLOG STUFF BLOG NOTES
+jotting down ideas i had on the plane:
+eventually make the visualization tool into a blogpost
+left sidebar, right main content area with the grid in it
+add some explanation/narrative about the different algorithms
+include sliders inline with the prose
+right hand side has grid and generate-another button
+when we get to cellular, explain each phase one at a time, including like 1-3 sliders inline with each phase
+so the reader can play with them
+then at the end, draw all the sliders again in a master control box
+so the reader can play with the whole shebang
+it's fine to have two copies of each slider because reagent
+maybe include a reset button in this box that puts the sliders back to their defaults or something
+
+also have a separate post where we talk about perf investigations
+talk about how klipse was useful for seeing emitted js
+loop/recur on a mutable js array much faster than eg (for)
+right syntax for using (into) - (into [] xform coll) instead of (into [] (xform coll))
+any other perf notes that can be scrounged from the past two week's worth of dev-diary entries
+
+also write a post about keeping a dev diary
+
+=======
+
+10/25/16
+
+spun up a github-pages repo, added the above blog post ideas to it as github issues
+
+let's get back to figuring out what's going on with this code:
+
+(defn -new-value-at-position
+  [js-grid x y w h survival-threshold birth-threshold]
+  (let [cell-is-full? (-> js-grid
+                          (aget y)
+                          (aget x))
+        num-full-neighbors (-num-full-neighbors js-grid x y w h)]
+    ; TODO think more about how this cond is structured
+    ; play with klipse to see exactly when truth_ is emitted
+    (cond
+      (and cell-is-full?
+           (>= num-full-neighbors survival-threshold)) true
+      (and (not cell-is-full?)
+           (>= num-full-neighbors birth-threshold)) true
+      :else false)))
+
+profiler says that we're spending a noticeable amount of time in truth_
+which, again, is documented here: blog.fikesfarm.com/posts/2015-12-04-boolean-type-hints-in-clojurescript.html
+
+had a hard time coming up with something that worked, but this does:
+
+(defn -new-value-at-position-inner [^boolean cell-was-full ^boolean meets-survival-threshold ^boolean meets-birth-treshold]
+  (or
+    (and cell-was-full meets-survival-threshold)
+    (and (not cell-was-full) meets-birth-treshold)))
+
+(defn -new-value-at-position
+  [js-grid x y w h survival-threshold birth-threshold]
+  (let [cell-is-full? (-> js-grid
+                          (aget y)
+                          (aget x))
+        num-full-neighbors (-num-full-neighbors js-grid x y w h)]
+    (-new-value-at-position-inner cell-is-full?
+                                  (>= num-full-neighbors survival-threshold)
+                                  (>= num-full-neighbors birth-threshold))))
+
+wow, this really seems to do the trick:
+{:id :automata, :n-calls 400, :min "33ms", :max "65ms", :mad
+"4.8ms", :mean "41.16ms", :time% 100, :time "16.46s"}
+
+let's try it again the way it was before:
+
+yeah, _wow_!
+{:id :automata, :n-calls 400, :min "43ms", :max "111ms",
+:mad "7.24ms", :mean "53.04ms", :time% 100, :time "21.22s"}
+
+noticeable difference! shaved off about 20%!
+
+profiling indicates we still emit a truth_ in num-full-neighbors, let's see
+
+====
+
+10/26/16
+
+got rid of all the truth_s, everything's fast enough for now
+poking around at jekyll/blog stuff now
+going to keep notes in here even though this is a different repo, oh well
+
+https://www.taniarascia.com/make-a-static-website-with-jekyll/
+has good (very specific) info on setting up + theming a new jekyll install
+
+i don't understand what the deal is with bundle exec
+https://github.com/jekyll/jekyll-help/issues/225
+bundler.io/rationale.html
+
+"This is important: the Gemfile.lock makes your application a single
+package of both your own code and the third-party code it ran the last
+time you know for sure that everything worked. Specifying exact versions
+@of the third-party code you depend on in your Gemfile would not provide
+the same guarantee, because gems usually declare a range of versions
+for their dependencies."
+
+still looking around for reasons why jekyll / github pages might be a bad idea
+as far as i can tell, these are the only cons:
+* you can only blog from your laptop, can't do it from phones / internet cafes / whatever
+    (partially addressed by the github web edit UI, also i don't care about this)
+* big jekyll blogs with lots of posts can take a long time to build
+    there's an incremental build feature that fixes this
+
+that seems to be about it. seems like a safe bet, i'm the target demographic
+
+looking at jekyll themes now
+https://jekyllthemes.io/ is a decent list
+i like:
+https://jekyllthemes.io/theme/15489219/lanyon
+https://github.com/poole/lanyon
+
+i'll probably go with this one
+looking at others just in case
+yeah, all the others look like butt, and lanyon is _really_ good
+gonna use it
+
+https://help.github.com/articles/adding-a-jekyll-theme-to-your-github-pages-site/
+that page is dumb
+i think the idea is to just clone the theme repo
+
+cool, done
+
+pondering converting my old core.logic post to jekyll blog
+and making the code snippets interactive via klipse
+i think core.logic needs to be "bootstrap"/"self-host" compatible for that to happen
+and i don't think that it is yet
+questions:
+what does bootstrap-compatible mean?
+http://blog.klipse.tech/klipse/2016/10/16/klipse-is-fast.html seems to indicate that i can
+still use core.logic in klipse, but that it's slower to start up - is this true?
+
+on the first:
+http://blog.fikesfarm.com/posts/2015-07-17-what-is-bootstrapped-clojurescript.html
+https://anmonteiro.com/2016/08/om-next-and-bootstrapped-clojurescript/
+https://github.com/omcljs/om/pull/752/files
+
+=====
+
+10/27/16
+
+ok, looking into doing a simple blog post on that first-pass drunkards implementation
+i'd like to have like six snippets, and each has a canvas that it writes to,
+but i want the code to look like (draw-grid a-grid) every time, not (draw-grid a-grid :canvas-1)
+viebel suggests adding a data-pre-run feature to klipse snippets that does eg (reset! canvas-id :canvas-1)
+and that sounds pretty reasonable to me. so i guess i get to learn how to develop klipse now
+
+i also need to finish reading the jekyll docs
+
+re: voke and maps, i think we're at a good stopping point at the moment - i eventually want
+to get maps to be more directed (kyzrati talks about this in
+http://www.gridsagegames.com/blog/2014/06/mapgen-cellular-automata/ and
+http://www.gridsagegames.com/blog/2014/07/dungeon-metrics/ )
+but there's no reason to focus on that when i'm not yet at a point where i can even actually
+_play_ these maps - let's focus on that first.
+
+also need to figure out a way to merge this branch into voke master. i think that for now
+a hack is totally okay - just have a check in the game loop's input handling that checks for
+the letter 'v', and kills the game and displays the tool when it detects a v keypress.
+we can have menus/etc later, no need to do them yet.
+
+interesting note in https://jekyllrb.com/docs/configuration/ about incremental regeneration:
+"Under the current implementation, incremental regeneration will only generate a document
+or page if either it, or one of its dependencies, is modified. Currently, the only types
+of dependencies tracked are includes (using the {% include %} tag) and layouts. This means
+that plain references to other documents (for example, the common case of iterating over
+site.posts in a post listings page) will not be detected as a dependency.
+To remedy some of these shortfalls, putting regenerate: true in the front-matter of a document
+will force Jekyll to regenerate it regardless of whether it has been modified. Note that
+this will generate the specified document only; references to other documents’ contents
+will not work since they won’t be re-rendered."
+
+https://jekyllrb.com/docs/templates/#post-url
+is handy for linking to other posts
+
+drafts are easy to work with, just make a file like _drafts/foo-bar.md and run jekyll serve
+with the --drafts option
+
+there's a gist tag built into jekyll, eg
+{% gist parkr/931c1c8d465a04042403 %}
+that's neat
+(does github pages support this?)
+
+oh shit, permalink styles in https://jekyllrb.com/docs/permalinks/
+i can just say 'none' to not have the date in my urls
+nice
+
+ok now i'm just trying to understand the significance of the gh-pages gem and after that
+i'll actually poke around and try to write this thing
+
+=======
+
+10/28/16
+
+blog post is mostly written, just a few loose ends to tie up
+
+reading through all the eve stuff now
+eve looks neat
+i don't have strong feelings on the pros/cons of literate programming but the rest of eve looks cool
+
+ah, brief blog idea to ease my mind on what stuff'll look like on prod:
+scp it up to jrheard.com/blog_staging/
+and block off that directory via robots.txt
+
+coooool, blog post is ready to go, i'll post it monday morning.
+next up:
+get generation branch in a shape where it's ready to merge back into master
+just make it so that if you hit v in the regular voke game, the game is thrown away
+and we draw the visualization tool instead
+punt on menus/pause/etc for now
+maybe a `mode` atom so that we don't mess up on figwheel reloads
+
+http://www.squidi.net/three/entry.php?id=4
+nice, makes sense. good illustrations
+
+http://www.squidi.net/three/index.php lol jesus christ
+
+http://www.squidi.net/three/entry.php?id=158
+replicate teeth
+
+http://www.squidi.net/three/entry.php?id=163
+"I take the position that it is better to make a few smart decisions than lucking into success
+through a billion dumb ones. Since memory is cheap, we can keep track of a lot of information
+that will allow us to make smart decisions quickly. This procedural generation entry is about
+taking an oddly shaped zone and filling it in with a workable set of multi-room regions without
+guessing and testing."
+
+useful strategy for plopping prefab rooms into a prefab zone layout
+
+http://www.squidi.net/three/entry.php?id=164 neat for tile game zone generation
+
+http://www.squidi.net/three/entry.php?id=201
+issues with scaling low-resolution things
+
+http://www.squidi.net/three/entry.php?id=202
+****** come back to this guy's stuff if i ever want to think more about prefabs
+"I'm largely against the idea of procedurally generated content being an effort of guess
+and test. It drives me nuts that the current procedural generation environment is either
+guess and test or literally trying to find mountains in white noise. I spend a lot of my
+effort trying to devise ways in which you can get the results you want the first time. But
+computers are fast enough that the old guess and test approach could end up being quicker,
+conceptually simpler, and produce acceptable results with less code."
+
+this guy really likes prefabs
+
+"The benefit of using a stack instead of just starting over every time is that it ultimately
+creates a search through the available spaces. It may be that there's only two or three configurations
+that work, and you could randomly try to place the tree a thousand times without finding
+those few solutions, and wasting untold effort for little result. However, the stack works
+as sort of a controlled flood-fill, filling in the spaces as best as it can, and backing
+up when it hits a wall to try again."
+
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.703.368&rep=rep1&type=pdf
+ha!
+they have this to say about cellular automata:
+"The small number of parameters, and the fact that they
+are relatively intuitive is an asset of this approach. However,
+this is also one of the downsides of the method: it is hard
+to fully understand the impact that a single parameter has on
+the generation process, since each parameter affects multiple
+features of the generated maps. It is not possible to create a
+map that has specific requirements, like a number of rooms
+with a certain connectivity. Therefore, gameplay features are
+somewhat disjoint from these control parameters. Any link
+between this generation method and gameplay features would
+have to be carried out through a process of trial and error."
+
+i should link to this paper when i publish my visualization tool :)
+
+======
+
+10/29/16
+
+played around with the blogpost a bit more - embedded the drunkard's portion of the vis tool.
+i think it's fine now and i should stop messing with it.
+back to this academic article.
+
+it's talking about genetic algorithms now, that's interesting
+strings and fitness functions
+sounds a lot like just brute force / breadth-first-search, except with a little guiding function
+that tries to get you to a satisfactory solution without having to exhaust the entire space
+of checking every single possible permutation of the solutions available
+a* is a lot like that too i think - it's about getting a good answer in a performant way
+interesting
+
+they describe a few favorite fitness functions:
+
+"• F1 - maximize path length from entrance to exit;
+ • F2 - maximize accessibility of checkpoints;
+ • F3 - ”encourage paths to branch, run over checkpoints,
+ and then meet up again later”."
+
+"The genetic algorithm parameters mostly control how well
+ (and how fast) the solution reaches an acceptable result based
+ on the fitness, including the possibility of reaching local optima.
+ The main problem with these genetic algorithm parameters
+ is their apparent mismatch with backtracking: if a certain
+ result is obtained and needs to be adjusted, it is unclear which
+ parameters need to be altered."
+
+ "Sentient Sketchbook is a tool proposed by Liapis et al. [25],
+  aiming at supporting designers during the creation of game
+  levels. Game designers sketch low resolution maps, where
+  tiles represent passable or impassable sections, player bases
+  and resources. Sentient Sketchbook is able to add detail to the
+  coarse map sketch and test maps for playability, navigable
+  paths, game pace and player balance. Dungeons are one of the
+  available possible results of automatically detailing coarse map
+  sketches into final level maps. Tiles are converted into rooms,
+  dead ends and corridors."
+
+interesting idea - middle ground between handmade levels and completely generated levels
+
+design the stuff you really care about by hand, automate all the other stuff away
+neato
+
+"However, it is still unclear how low-resolution sketching and genetic-based
+ generation (steered by this sketching) would scale to larger
+ and more detailed maps."
+
+on constraints:
+"It is still up to the designer to not only create all the prefabs for level geometry sections
+ and objects, but also to express a meaningful set of constraints
+ for the generator. It is not straightforward for a designer to
+ translate gameplay concepts (like pacing or difficulty) into
+ topology, adjacency, etc."
+
+toward the end of the paper there's a TABLE I section that's really great
+
+"Cellular automata and constraintbased
+ approaches use a straightforward control mechanism
+ over their algorithm’s low level parameters, thus requiring a
+ full understanding of the generation process. For designers
+ to control them in a meaningfully way, they always need to
+ explicitly map that understanding to gameplay-related goals
+ (e.g. how does room adjacency better support the designed
+ mission)."
+ ****** QUOTE THIS
+
+end of article.
+the grammars idea is interesting - not relevant for voke, but good idea for room-based RPGs
+wonder how fun it would actually be though
+interesting stuff
+
+ok now i think i'm going to read every blog post bob nystrom has ever written
+
+http://journal.stuffwithstuff.com/2010/11/26/the-biology-of-sloppy-code/
+reminiscent of programmer-archaeologists in vernor vinge books
+
+http://journal.stuffwithstuff.com/2013/01/13/iteration-inside-and-out/
+discusses call stack
+
+http://journal.stuffwithstuff.com/2013/04/17/well-done/
+i like how this guy writes
+describes CSP here
+
+http://journal.stuffwithstuff.com/2013/08/26/what-is-open-recursion/
+really great writing in this one
+"The problem is that the definitions of the functions come one after the other. What you
+really want is to define them all in one lump where they can all see each other simultaneously.
+ In functional languages, the name for that “lump” is a “mutually recursive definition”. "
+
+http://journal.stuffwithstuff.com/2013/12/08/babys-first-garbage-collector/
+******* i love this article
+
+http://journal.stuffwithstuff.com/2014/04/22/zero-to-95688-how-i-wrote-game-programming-patterns/
+deferring editing for later rounds of revision is definitely a good idea and something
+i think i should focus more on
+
+"I read the entire chapter out loud. I can’t stress enough how helpful it is. You can read
+something ten times and think it’s fine but the first time you run it through your lips you’ll
+find all of the wrinkles. This fixes awkward repetition and bad cadence. If the prose reads
+naturally and easily, that’s not because it was easy and natural to write. It’s because I
+edited the hell out of it."
+******* this is a good idea
+
+"Now, if this was a movie, this is when the eighties instrumental rock would start and the
+montage would kick in. Before you know it, the book would be done
+ But, I tell you what, I lived that montage, and it did not pass quickly. Working on this
+ damned book was a pain in the ass every single day. "
+
+yeah i don't ever want to write a book
+
+http://journal.stuffwithstuff.com/2014/07/05/dropping-loot/
+
+"Instead of sequences of items, I now have a hierarchy of them. So, for example, a stilleto is:
+equipment/weapon/dagger/Stilleto
+I’m not generally a fan of hierarchies but I found it surprisingly easy to lump almost every
+item into one. Items also have a “level”, which describes their relative value. Higher level stuff is better."
+
+interesting
+will have to remember this idea
+
+http://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/
+interesting that he has a bunch of actors rather than going with strict entity/component/system
+he seems to be super into OOP so i guess i shouldn't be surprised
+
+interesting bit about actions succeeding/failing
+more interesting bit about proposing an alternate action on failure
+i like that a lot ********
+
+good stuff in this post
+
+http://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/
+is this about inheritance?
+or IO/impurity in haskell?
+ah, async
+
+http://journal.stuffwithstuff.com/2015/09/08/the-hardest-program-ive-ever-written/
+i continue to be really impressed by this guy's writing style
+
+http://journal.stuffwithstuff.com/2016/06/16/long-names-are-long/
+simple guidelines on naming (no redunandcy, etc)
+
+=====
+
+10/30/16
+
+http://journal.stuffwithstuff.com/2015/09/07/what-the-hero-sees/
+post on fov
+interesting bit about octants / triangles / etc
+the examples in this article are all fucked up :/
+meh
+
+http://journal.stuffwithstuff.com/2014/12/21/rooms-and-mazes/
+"People get into procedural generation because it seems easier."
+places rooms randomly, certain number of attempts before giving up
+talks about sparseness / eliminating dead ends
+"Doing that is actually pretty easy. A dead end is just a tile that has walls on three sides.
+When you find one of those, you fill that tile back in. That may in turn make the tile it
+connects to a dead end. Keep doing this until you run out of dead ends and you’ll end up
+with lots of solid area where rooms can be placed."
+
+"a maze generator is a randomized flood fill algorithm."
+
+"If we use all of the connectors, our dungeon would be way too densely connected. Instead,
+we carve through just the connectors we need to get each region connected to the whole once.
+In fancy terms, we’re finding a spanning tree."
+
+interesting that it becomes really really easy to remove all of the dead ends in the maze
+once the rest of the work is done in his algorithm
+
+i'm kinda tempted to implement his algorithm just for funsies, it looks like a good time
+wouldn't be relevant for my game tho, makes more sense for 2d grid roguelikes
+
+http://ctrl500.com/tech/handcrafted-feel-dungeon-generation-unexplored-explores-cyclic-dungeon-generation/
+ok this ctrl500 website/magazine just totally 100% blows
+the content is bad and poorly written
+oh well
+
+well, http://ctrl500.com/tech/teaching-the-ai-to-find-a-path-in-awesomenauts/ isn't as bad
+interesting re: local solver + global solver
+" For finding the global route towards the goal we used path finding nodes and standard A*
+to figure out which route to take over them. The nodes are spaced relatively far from each
+other and the local solver figures out how to get to the next node."
+also interesting that they can use a* - their game takes place in continuous space, not discrete
+i guess they just artificially split it up into discrete space for pathfinding purposes
+makes sense, i'll probably do the same
+
+oh uh
+"How do we generate the nodes and edges that A* needs to find a route from A to B? The answer
+is quite simple: our designers place them by hand. Awesomenauts has only five levels and
+a level needs well below one hundred path finding nodes, so this is quite doable."
+
+wellllll
+i thought they generated these but i guess they do it by hand
+i'll generate it though
+
+ok cool anyway
+i think i should really get around to merging this generation branch into master
+let's take a look at that

@@ -1,0 +1,1 @@
+Math.seedrandom = function (seed) {};

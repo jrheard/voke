@@ -5,9 +5,10 @@
             :url  "http://choosealicense.com/licenses/mit/"}
 
   :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
-                 [org.clojure/clojurescript "1.9.229"]
+                 [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/core.async "0.2.395"
                   :exclusions [org.clojure/tools.reader]]
+                 [reagent "0.6.0"]
                  [cljsjs/pixi "3.0.10-0"]]
 
   :plugins [[lein-cljsbuild "1.1.4" :exclusions [[org.clojure/clojure]]]]
@@ -20,8 +21,9 @@
               [{:id           "dev"
                 :source-paths ["src"]
                 :figwheel     {:on-jsload "voke.core/main"}
-                :compiler     {:main                 voke.core
-                               :preloads             [devtools.preload]
+                :compiler     {:preloads             [devtools.preload]
+                               :main                 voke.core
+                               :static-fns           true
                                :asset-path           "js/compiled/out"
                                :output-to            "resources/public/js/compiled/voke.js"
                                :output-dir           "resources/public/js/compiled/out"
@@ -35,7 +37,8 @@
                                :output-dir    "resources/public/js/compiled/out-min"
                                :asset-path    "js/compiled/out-min"
                                :source-map    "resources/public/js/compiled/voke.js.map"
-                               :externs       ["externs/collision.js"]
+                               :externs       ["externs/collision.js"
+                                               "externs/seedrandom.js"]
                                :pretty-print  false}}
                {:id           "test"
                 :source-paths ["src" "test"]
@@ -51,5 +54,6 @@
 
   :profiles {:dev {:dependencies [[binaryage/devtools "0.8.2"]
                                   [figwheel-sidecar "0.5.7"]
+                                  [com.taoensso/tufte "1.0.2"]
                                   [org.clojure/test.check "0.9.0"]]
                    :plugins      [[lein-doo "0.1.7" :exclusions [[org.clojure/clojurescript]]]]}})

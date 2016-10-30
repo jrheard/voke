@@ -1,6 +1,127 @@
+body {
+    text-align: center;
+    font-family: helvetica, sans-serif;
+}
+
+#content {
+    text-align: left;
+    display: inline-block;
+    background-color: #EEE;
+    padding: 50px 100px;
+}
+
 canvas {
 border: solid 1px #666;
 margin: 0 auto;
 display: block;
 }
 
+.button-wrapper {
+    text-align: center;
+}
+
+/* from some online button generator */
+.generate-button {
+    margin: 20px auto;
+	-moz-box-shadow:inset 0px 1px 3px 0px #91b8b3;
+	-webkit-box-shadow:inset 0px 1px 3px 0px #91b8b3;
+	box-shadow:inset 0px 1px 3px 0px #91b8b3;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #768d87), color-stop(1, #6c7c7c));
+	background:-moz-linear-gradient(top, #768d87 5%, #6c7c7c 100%);
+	background:-webkit-linear-gradient(top, #768d87 5%, #6c7c7c 100%);
+	background:-o-linear-gradient(top, #768d87 5%, #6c7c7c 100%);
+	background:-ms-linear-gradient(top, #768d87 5%, #6c7c7c 100%);
+	background:linear-gradient(to bottom, #768d87 5%, #6c7c7c 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#768d87', endColorstr='#6c7c7c',GradientType=0);
+	background-color:#768d87;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	border:1px solid #566963;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Courier New;
+	user-select: none;
+	font-size:15px;
+	padding:11px 23px;
+	text-decoration:none;
+	text-shadow:0px -1px 0px #2b665e;
+}
+.generate-button:hover {
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #6c7c7c), color-stop(1, #768d87));
+	background:-moz-linear-gradient(top, #6c7c7c 5%, #768d87 100%);
+	background:-webkit-linear-gradient(top, #6c7c7c 5%, #768d87 100%);
+	background:-o-linear-gradient(top, #6c7c7c 5%, #768d87 100%);
+	background:-ms-linear-gradient(top, #6c7c7c 5%, #768d87 100%);
+	background:linear-gradient(to bottom, #6c7c7c 5%, #768d87 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#6c7c7c', endColorstr='#768d87',GradientType=0);
+	background-color:#6c7c7c;
+}
+.generate-button:active {
+	position:relative;
+	top:1px;
+}
+
+input {
+    margin: 6px 0;
+}
+
+/* from https://codepen.io/philhoyt/pen/wCIGc */
+.btn{
+	text-decoration:none;
+	color:#333;
+	font-size:15px;
+	padding:0 15px;
+	line-height:32px;
+	height: auto;
+	display:inline-block;
+	text-align:center;
+	background-color:#CCC;
+}
+
+.btn:hover,
+.btn.selected {
+	background-color:#888;
+	color:white;
+}
+
+.btn.pill{
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  border-radius: 16px;
+}
+
+.btn-group {
+text-align: center;
+margin: 5px 0 10px;
+}
+
+.btn-group > .btn.round:not(:first-child):not(:last-child), .btn-group > .btn.pill:not(:first-child):not(:last-child){
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+
+.btn-group > .btn.round:first-child, .btn-group > .btn.pill:first-child{
+  -webkit-border-top-right-radius: 0;
+  -webkit-border-bottom-right-radius: 0;
+  -moz-border-radius-topright: 0;
+  -moz-border-radius-bottomright: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.btn-group > .btn.round:last-child, .btn-group > .btn.pill:last-child{
+  -webkit-border-top-left-radius: 0;
+  -webkit-border-bottom-left-radius: 0;
+  -moz-border-radius-topleft: 0;
+  -moz-border-radius-bottomleft: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.btn-group .btn + .btn{
+	border-left: 1px solid rgba(0, 0, 0, .1);
+	margin-left:-1px;
+}

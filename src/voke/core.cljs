@@ -5,7 +5,8 @@
             [voke.clock :refer [add-time!]]
             [voke.state :refer [make-game-state add-entity!]]
             [voke.system.core :refer [initialize-systems! process-a-tick]]
-            [voke.system.rendering :refer [render-tick]]))
+            [voke.system.rendering :refer [render-tick]]
+            [voke.world.visualize :as visualize]))
 
 (defonce player (e/player 500 300))
 
@@ -35,6 +36,19 @@
   (initialize-systems! @game-state (player :entity/id))
   (reset! last-frame-time (js/performance.now)))
 
+(defn process-game-time [ts]
+  (swap! time-accumulator + (min (- ts @last-frame-time) 200))
+  (reset! last-frame-time ts)
+
+  (while (>= @time-accumulator timestep)
+    (add-time! timestep)
+    (swap! game-state process-a-tick)
+    (swap! game-state voke.state/flush!)
+
+    (swap! time-accumulator - timestep))
+
+  (render-tick @game-state))
+
 (defn ^:export main []
   (-initialize!)
 
@@ -43,27 +57,20 @@
     (stest/instrument `voke.state/flush!))
 
   (js/window.requestAnimationFrame
-    (fn process-frame [ts]
-      (swap! time-accumulator + (min (- ts @last-frame-time) 200))
-      (reset! last-frame-time ts)
+    (fn handle-frame [ts]
+      (if (= (@game-state :game-state/mode) :default)
+        (do
+          (process-game-time ts)
+          (reset! animation-frame-request-id
+                  (js/window.requestAnimationFrame handle-frame)))
 
-      (while (>= @time-accumulator timestep)
-        (add-time! timestep)
-        (swap! game-state process-a-tick)
-        (swap! game-state voke.state/flush!)
-
-        (swap! time-accumulator - timestep))
-
-      (render-tick @game-state)
-
-      (reset! animation-frame-request-id
-              (js/window.requestAnimationFrame process-frame)))))
+        (visualize/main)))))
 
 (comment
-
   (add-entity! (e/monster 800 600) :repl)
 
   (doseq [i (range 5)]
-    (add-entity! (e/monster 800 (+ 200 (* i 100)))))
+    (add-entity! (e/monster 800 (+ 200 (* i 100)))
+                 :repl))
   )
 
