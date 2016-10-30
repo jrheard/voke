@@ -20,7 +20,7 @@
   :cljsbuild {:builds
               [{:id           "dev"
                 :source-paths ["src"]
-                :figwheel     {:on-jsload "voke.world.visualize/main"}
+                :figwheel     {:on-jsload "voke.core/main"}
                 :compiler     {:preloads             [devtools.preload]
                                :main                 voke.core
                                :static-fns           true
