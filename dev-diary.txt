@@ -6593,3 +6593,52 @@ he seems to be super into OOP so i guess i shouldn't be surprised
 interesting bit about actions succeeding/failing
 more interesting bit about proposing an alternate action on failure
 i like that a lot ********
+
+good stuff in this post
+
+http://journal.stuffwithstuff.com/2015/02/01/what-color-is-your-function/
+is this about inheritance?
+or IO/impurity in haskell?
+ah, async
+
+http://journal.stuffwithstuff.com/2015/09/08/the-hardest-program-ive-ever-written/
+i continue to be really impressed by this guy's writing style
+
+http://journal.stuffwithstuff.com/2016/06/16/long-names-are-long/
+simple guidelines on naming (no redunandcy, etc)
+
+=====
+
+10/30/16
+
+http://journal.stuffwithstuff.com/2015/09/07/what-the-hero-sees/
+post on fov
+interesting bit about octants / triangles / etc
+the examples in this article are all fucked up :/
+meh
+
+http://journal.stuffwithstuff.com/2014/12/21/rooms-and-mazes/
+"People get into procedural generation because it seems easier."
+places rooms randomly, certain number of attempts before giving up
+talks about sparseness / eliminating dead ends
+"Doing that is actually pretty easy. A dead end is just a tile that has walls on three sides.
+When you find one of those, you fill that tile back in. That may in turn make the tile it
+connects to a dead end. Keep doing this until you run out of dead ends and you’ll end up
+with lots of solid area where rooms can be placed."
+
+"a maze generator is a randomized flood fill algorithm."
+
+"If we use all of the connectors, our dungeon would be way too densely connected. Instead,
+we carve through just the connectors we need to get each region connected to the whole once.
+In fancy terms, we’re finding a spanning tree."
+
+interesting that it becomes really really easy to remove all of the dead ends in the maze
+once the rest of the work is done in his algorithm
+
+i'm kinda tempted to implement his algorithm just for funsies, it looks like a good time
+wouldn't be relevant for my game tho, makes more sense for 2d grid roguelikes
+
+http://ctrl500.com/tech/handcrafted-feel-dungeon-generation-unexplored-explores-cyclic-dungeon-generation/
+ok this ctrl500 website/magazine just totally 100% blows
+the content is bad and poorly written
+oh well
