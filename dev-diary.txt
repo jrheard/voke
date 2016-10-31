@@ -6664,3 +6664,125 @@ i'll generate it though
 ok cool anyway
 i think i should really get around to merging this generation branch into master
 let's take a look at that
+
+cool, ezpz
+
+http://pcgbook.com/
+
+"A content generation problem might be to generate new grass with
+ a low level of detail which does not look completely weird within 50 milliseconds."
+
+http://pcgbook.com/wp-content/uploads/chapter02.pdf
+
+"In search-based procedural
+ content generation, an evolutionary algorithm or some other stochastic search/optimisation
+ algorithm is used to search for content with the desired qualities. The
+ basic metaphor is that of design as a search process: a good enough solution to the
+ design problem exists within some space of solutions, and if we keep iterating and
+ tweaking one or many possible solutions, keeping those changes which make the
+ solution(s) better and discarding those that are harmful, we will eventually arrive
+ at the desired solution."
+
+"Crafting an evaluation function that reliably measures the aspect of game quality that it is
+ meant to measure is often among the hardest tasks in developing a search-based
+ PCG method."
+
+the guys in that short paper from yesterday said something very similar about fitness
+functions in genetic algorithms
+
+oh hey lol it looks like they're talking about the exact same thing, just calling it search
+at least in the evolutionary search section
+
+god this is boring
+
+the writing is pretty clear though
+
+"It could be argued that an evolutionary algorithm is “overkill” for some content generation
+ problems. If your search space is very small and/or you have lots of time at
+ hand to produce your content, you could try an exhaustive search algorithm that
+ simply iterates through all possible configurations. In other cases, when it is easy to
+ find good solutions and it is more important to maintain high diversity in the generated
+ content, random search—simply sampling random points in the search space—
+ could work well. Even when using exhaustive or random search the content needs
+ to be represented in such a way that the space can be effectively searched/sampled
+ and an evaluation function is necessary to tell the bad content from the good."
+
+on starcraft:
+" Given the competitive nature of the game, it is
+ very important that the maps are fair. Therefore, evaluation functions were designed
+ to measure the fairness of the maps as well as their affordances for interesting and
+ diverse strategies."
+
+that's actually really interesting
+
+=====
+
+10/31/16
+
+http://pcgbook.com/wp-content/uploads/chapter03.pdf
+
+"In this chapter, we will study a variety of methods for procedurally creating dungeons
+ and platform game levels. Although these methods may be very disparate,
+ they have one feature in common: they are all constructive, producing only one output
+ instance per run, in contrast with e.g. search-based methods. They also have in
+ common that they are fast; some are even successful in creating levels at runtime. In
+ general, these methods provide (rather) limited control over the output and its properties."
+
+i wish this book had a lot more pictures! would make BSP discussion much more clear
+i think BSP would be a good technique for room placement in nystrom's algorithm
+trying random room placement seems to work fine for him, so i guess it's not actually _necessary_
+
+"create a room within the cell by randomly
+ choosing two points (top left and bottom right)
+ within its boundaries"
+
+makes sense
+ok cool there are actually a lot of pictures here
+
+on tunnelers:
+" The appearance
+ of the dungeon largely depends on the behaviour of the agent: an agent with a high
+ degree of stochasticity will result in very chaotic dungeons while an agent with
+ some “look-ahead” may avoid intersecting corridors or rooms."
+
+look-ahead idea is interesting
+
+good explanation of tunnelers
+great diagrams in this section
+
+interlude: dnolen on slack on externs:
+if you’re writing an app and you’re not publishing something who cares how complete your externs are
+all this time trying to avoid writing externs is just a huge waste of time - IMHO
+eventually we will automate what we can - but it’s really not
+that hard to write a couple of line for whatever you are using
+from some random library if that’s all you need
+
+back to the book
+this is all pretty familiar from that earlier paper
+i wonder if these are the same guys
+yyyyyyyyyyyyup
+gonna start skimming, i don't wanna spend the rest of my life reading this book
+yeah the rest of it didn't seem very relevant
+
+http://pcgbook.com/wp-content/uploads/interviews.pdf
+
+"I think PCG changes how you think about the world-writing for a game.
+ One of the surprises for us in writing Rogue is how little PCG it took to create a
+ game which people could play for hundreds of hours. We really barely got working
+ what we thought was the base game, and suddenly it was popular and everywhere,
+ before we got to what we had previously thought was going to be the part which
+ made it interesting."
+
+advice from the dwarf fortress dev:
+
+"I also think it is good to try your hand at your own algorithms when possible,
+since the output will have more character than something recognizable as Perlin
+noise or a Voronoi diagram etc., though just having anything you can iterate on is
+probably good enough, and of course existing algorithms form an important part
+of your PCG skills to build on. Sometimes you can get better results faster just by
+plowing ahead, though, rather than fishing around for something online. Most things
+haven’t been tried yet, and there’s a wide frontier of PCG in games to explore.
+If you are simulating something that can be related to a real-world process, keep
+that process in mind when you are trying to correct unacceptable defects in your
+output—the answer is often in some missing variable or relationship that the realworld
+analogy makes clear."
