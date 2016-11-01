@@ -6786,3 +6786,70 @@ If you are simulating something that can be related to a real-world process, kee
 that process in mind when you are trying to correct unacceptable defects in your
 output—the answer is often in some missing variable or relationship that the realworld
 analogy makes clear."
+
+https://groups.google.com/forum/#!msg/clojure/JU6EmjtbRiQ/WSrueFvsBQAJ
+on why spec's instrument doesn't check ret values
+
+"* clojure.spec/instrument helps check that your functions are _called_ correctly
+ * clojure.spec.test/check helps check that your functions are _implemented_ correctly"
+
+i _guess_ that makes sense
+
+https://codewords.recurse.com/issues/two/git-from-the-inside-out
+**********
+this is just really really really good
+also this website is beautiful
+i really really like everything about this
+
+https://maryrosecook.com/blog/post/a-practical-introduction-to-functional-programming
+
+"Functional code is characterised by one thing: the absence of side effects. It doesn’t rely
+on data outside the current function, and it doesn’t change data that exists outside the
+current function. Every other “functional” thing can be derived from this property."
+
+"An immutable piece of data is one that cannot be changed. Some languages, like Clojure,
+make all values immutable by default. Any “mutating” operations copy the value, change it
+and pass back the changed copy. This eliminates bugs that arise from a programmer’s incomplete
+model of the possible states their program may enter."
+
+https://codewords.recurse.com/issues/two/how-i-learned-to-stop-worrying-and-love-http
+good intro article to send people who are starting on this stuff for the first time
+
+https://codewords.recurse.com/issues/one/type-systems-and-logic
+what the fuck?
+
+https://codewords.recurse.com/issues/one/why-are-objects-so-hard-to-debug
+this guy's really trying to use all of his vocabulary words
+i mean, jeez
+stop it!
+god
+this would be a good article but it's way too pretentious
+ugh
+
+https://codewords.recurse.com/issues/three/unpacking-git-packfiles
+
+https://codewords.recurse.com/issues/three/making-modular-videogames
+"In my experience, the process of engineering a game usually involves writing increasingly
+disorienting spaghetti code in response to increasingly obscure technical problems. Even
+when it doesn’t, I’ve rarely felt that the code I’ve written has had real worth beyond the
+game it was written for. The code for an individual game can be highly specialized, and finding
+and extracting the bits that have wider applications can be non-trivial."
+he talks about entity/component here
+he calls it object/component though for some reason
+and all of his entities have an x/y position built in, which i don't think i agree with
+
+"I wanted to focus exclusively on 2D games; building a 3D framework seemed beyond the scope
+of the project and my grasp on mathematics"
+heh amen
+
+interesting bit about object graph, children, etc
+
+https://codewords.recurse.com/issues/five/why-do-neural-networks-think-a-panda-is-a-vulture
+panda-ostrich space
+
+https://codewords.recurse.com/issues/six/this-just-isnt-functional
+clojure protocols in js
+
+http://jvns.ca/blog/2015/11/22/how-i-got-better-at-debugging/
+
+http://jvns.ca/blog/2015/11/21/why-you-should-understand-a-little-about-tcp/
