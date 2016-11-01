@@ -6956,3 +6956,126 @@ talks about how you can have virtual slots, so you don't need to have a million 
 "create a projection from decision space to a 1d context map"
 "behaviors write world view into danger, interest maps"
 "evaluate maps for best decision" (danger maps used as a mask)
+
+gotta keep in mind his background - working on a racing game
+so he's mainly talking about this in the context of a game where the player is _inside_ a flock
+
+wow, the demo on http://howtorts.github.io/2014/01/03/steering-flocking.html -
+http://howtorts.github.io/examples/3-2-steering-behaviours-flock/index.html -
+works really well and performantly!
+i wonder if it'd work well for voke?
+does it use flow maps?
+no, just regular seeking for now
+
+http://www.slac.stanford.edu/cgi-wrap/getdoc/slac-r-186.pdf wow this is old
+
+https://en.wikipedia.org/wiki/Spatial_database#Spatial_index
+
+http://howtorts.github.io/2014/01/04/basic-flow-fields.html
+ok now we're talking about flow fields
+
+"Flow Fields are a technique for efficient crowd pathfinding. They are most suitable for
+situations where you want to move a large group of agents to a common destination, something
+very common in RTS games."
+
+the example isn't at all perfect, i see lots of guys going right through solid walls
+
+"Sometimes they’ll overlap the inpassable areas (we have no physics to prevent this) and
+they’ll also move through each other (no physics and no flocking behaviours to prevent this).
+We’ll add these in in a future article!"
+
+ok that's fair
+he reuses djikstra's code for this
+"We then go through each grid square, look at all its neighbours (including diagonals), choose
+the one with the lowest distance-to-destination and set our grid square to have a vector
+in this direction. We do not set Vectors for impassable grid squares."
+makes sense!
+
+"To smooth this vector we will use Bilinear Interpolation so we get influenced by the 4 grid
+squares we are nearest to, with the closest providing the most influence."
+
+http://howtorts.github.io/2014/01/05/flow-field-improvements.html
+
+"Your flowfield grid should be at least twice the resolution of your smallest obstacle"
+for tiebreaking
+
+"If your smallest unit is larger than a grid cell, there will be paths that should be traversable
+that will not be."
+
+http://howtorts.github.io/2014/01/09/continuum-crowds.html this is really cool to play with
+
+http://howtorts.github.io/2014/01/06/pathing-literature-review.html
+
+http://gdcvault.com/play/1014514/AI-Navigation-It-s-Not
+sc2 pathfinding
+also dragon age
+
+sc2 pathfinding:
+plan, steer, collide
+i think this is going to be way over my head
+
+"steering probably required the most work throughout the project"
+they have:
+following, flocking, grouping, separation, avoidance, arrival
+arrival is not standard
+
+on avoidance: you need to figure out who you can ignore
+all units moving in your same general direction, you can ignore
+all idle units that you can push out of the way, you can ignore
+(sc2 has pushing)
+plot a "sight horizon", put obstacles on the horizon, aim for the gaps
+read the minds of units moving toward us, see if they've already decided to avoid us
+in a particular direction; if so, respect that choice
+
+nearest neighbor searches - slowest part of the whole thing
+
+around 25 minute mark, good discussion of heirarchical/region-based pathfinding
+"we just always solved two path segments in advance"
+varies from game to game
+around 28 minute mark, talks about how to figure out where to cross between two regions
+"simple string pulling"
+
+dragon age origin guy
+overlays sectors on top of the grid-based world
+and sectors contain regions
+this looks familiar from rimworld!
+
+straight-line checks are good first step
+
+all three of these guys have mentioned that it's super important to have debug displays
+really interesting bit where he talks about how his character starts facing in a random direction
+fix is to end one step early and then go to goal
+**********
+this is a problem with continuous world vs discrete grid/mesh!!!!!
+
+traps - area of higher cost rather than an actual obstacle
+
+he talks about "unrolling" the map
+i'm thinking about spanning trees for some reason
+not sure if they're relevant
+
+"differential heuristics / alt" - lays the map out on a 1d projection
+
+http://howtorts.github.io/2014/01/14/avoidance-behaviours.html
+he does the same mind-reading thing the starcraft2 guy talks about
+i love the demos here!
+
+"I think we could do some fudging of the physics which would allow our agents to slide past
+each other better. Currently when two agents collide head on, they are both pushed backwards
+(in the opposite direction than they want to go), we could instead push them sideways (the
+right angle), which would let them slide past each other much easier! This is probably a
+cheaper way for a game to go, even if the physics aren’t quite real :) "
+
+makes sense
+
+http://howtorts.github.io/2014/01/30/Flow-Fields-LOS.html
+
+makes sense - you can do bfs to calc line of sight
+
+http://leifnode.com/2013/12/flow-field-pathfinding/
+***********
+"If the graph is dense, then allow a pathfinder to calculate paths in a non-blocking manner
+such that each unit sends a request to the pathfinder and idles until the pathfinder completes
+the request."
+this is interesting
+
