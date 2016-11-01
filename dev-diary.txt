@@ -6853,3 +6853,46 @@ clojure protocols in js
 http://jvns.ca/blog/2015/11/22/how-i-got-better-at-debugging/
 
 http://jvns.ca/blog/2015/11/21/why-you-should-understand-a-little-about-tcp/
+
+https://github.com/MysteryMachine/kushana
+
+ok, my current plan for tomorrow is:
+finish processing tabs (only a couple left!)
+start on cellular automata blog post
+
+at some point this week, i think i might take a look at implementing nystrom's algorithm for fun
+i'll have to learn about maze algorithms first though
+so maybe start with mazes, then nystrom's
+
+=======
+
+11/1/16
+
+https://www.youtube.com/watch?v=VZePNGQojfA
+just good general human-but-also-dev-but-also-ops advice
+a bit general on the advice though, wish he was more specific about what he means and why
+"why was this point-to-point? no reason. it should have been broadcast."
+what does he mean by broadcast?
+
+interesting story about the tv installation+delivery store situation
+scheduling service suddenly becomes _much_ more popular, has very few resources, shuts
+down the whole system
+
+good explanation of circuit breakers
+
+what the hell is spacemacs, anyway?
+http://jr0cket.co.uk/2015/08/spacemacs-first-impressions-from-an-emacs-driven-developer.html
+emacs config of some sort, targeted at vim users?
+prob not relevant to me, i've gotten used to cursive and like it
+https://www.reddit.com/r/emacs/comments/42rp0l/why_spacemacs/
+
+http://highscalability.com/blog/2016/10/12/lessons-learned-from-scaling-uber-to-2000-engineers-1000-ser.html
+good piece of writing - i agree with their take on the speaker, really well-phrased
+****** GREAT article
+
+let's take a look at this:
+https://github.com/viebel/klipse/pull/131/files/8d747475bdc227a4d7d6e5cc746217fad4205981..1e01f50e2813e96252a82aadb86b811b19631a0e
+looks pretty sick! looks like solving the infinite-loop problem in klipse is actually possible and will happen!
+pretty sweet stuff
+
+
