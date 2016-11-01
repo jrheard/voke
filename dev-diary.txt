@@ -6895,4 +6895,64 @@ https://github.com/viebel/klipse/pull/131/files/8d747475bdc227a4d7d6e5cc746217fa
 looks pretty sick! looks like solving the infinite-loop problem in klipse is actually possible and will happen!
 pretty sweet stuff
 
+http://howtorts.github.io/2013/12/22/following-a-path.html
 
+stumbled across https://jsperf.com/jsarray-shrink/2 just now
+i should use jsperf.com! this looks great!
+
+http://howtorts.github.io/2013/12/31/generating-a-path-dijkstra.html
+apparently djikstra's useful for a situation where obstacles can be added to the level online
+the idea is that you can generate a djikstra grid for the entire level, rather than one a* path per creep
+
+http://howtorts.github.io/2014/01/02/steering-introduction.html
+
+brainfm sux
+
+http://howtorts.github.io/2014/01/03/steering-flocking.html
+
+http://gdcvault.com/play/1018262/The-Next-Vector-Improvements-in
+****** GOOD TALK ON PATHFINDING/FLOCKING AI
+one agent has eg 4 different steering behaviors, each of which comes up with a force it wants
+to apply; and you've got an arbitration function whose job is to combine those behaviors
+mentions a "prioritized weighted sum of each of the force vectors"
+i think he's going to give some really good info on flocking behavior here
+flow fields - reminds me of djikstra grid
+this stuff makes sense for tower defense games, but i dunno if it makes sense for situations
+where your goal spot is moving around a lot (eg monsters chasing the player, player moves)
+
+three flocking behaviors: separation, alignment, cohesion
+"generation of the neighbor list can be optimized by space partitioning approaches
+such as KD trees or octrees"
+makes sense
+"changes infrequently - we can do things like cache this every five ticks or something"
+
+cohesion - points us at the average position of all of our neighbors
+interesting
+
+and alignment is like cohesion, but for "heading"
+
+"like any dynamic physics simulation, debugging steering can be a little tricky"
+"visual debugging information is absolutely mandatory!"
+"you should strive to show as much information as you can visually"
+makes sense
+
+flow fields are good for when you've got a lot of agents and a "reasonably static" game world
+
+second guy comes on, talking about more examples of steering behaviors:
+chase behavior (chase player / his allies)
+avoid behavior (avoid obstacles)
+balanced vector problem
+
+good speakers
+
+"merge contexts, not decisions"
+context behavior system
+"interest map" and "danger map"
+pyramid of interest
+separation of concerns, etc
+
+talks about how you can have virtual slots, so you don't need to have a million slots in your map
+
+"create a projection from decision space to a 1d context map"
+"behaviors write world view into danger, interest maps"
+"evaluate maps for best decision" (danger maps used as a mask)
