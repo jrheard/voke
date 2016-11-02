@@ -7079,3 +7079,51 @@ such that each unit sends a request to the pathfinder and idles until the pathfi
 the request."
 this is interesting
 
+https://slack.engineering/building-hybrid-applications-with-electron-dc67686de5fb#.oy3x7repc
+a lot more stuff about security on here than i expected
+i think i'll stick with making web pages
+
+oh http://tinykeep.com/dungen/ is sick
+
+http://gamedev.stackexchange.com/questions/61424/delaunay-triangulation-where-to-start
+ok i am just going to not thinking about pathfinding at all for like a *while*
+
+as soon as i finish these tabs
+
+https://github.com/vonWolfehaus/flow-field
+cool flock / flow-field js demo
+https://github.com/vonWolfehaus/flow-field/blob/master/scripts/components/behaviors/Flock.js flock js code
+***********
+
+http://gamedev.stackexchange.com/questions/1327/how-does-navigation-mesh-path-finding-work
+
+http://aigamedev.com/open/reviews/alienswarm-node-graph/
+"Yet, waypoint graphs are still regularly used in the games industry. I personally often
+recommend them — especially to independent developers — since they're a simple and effective
+approach to navigation, and if you're going to implement something yourself for a game, you
+might as well use waypoints and save yourself the torment of writing a robust navigation
+mesh that you may never make the most of!"
+
+this is probably really really good advice.
+
+http://gitlet.maryrosecook.com/docs/gitlet.html
+
+this is cool but i'm kind of bored, her prose explanation was great
+gonna close tab
+
+http://www.gamasutra.com/blogs/ItayKeren/20150511/243083/Scroll_Back_The_Theory_and_Practice_of_Cameras_in_SideScrollers.php
+*******
+really good article on cameras
+loooooong article wow
+i'm gonna ignore this for now
+
+so i'm not clear on exactly how the camera system will work
+i guess it listens for :movement events on the player's entity
+and... does what?
+does it call eg (render/set-camera x y)?
+i guess that could work...
+
+http://gamedev.stackexchange.com/questions/32693/implementing-features-in-an-entity-system
+these guys say make it an entity or a component
+https://www.reddit.com/r/gamedev/comments/2vf90e/how_to_manage_a_camera_in_ecs_based_game/
+these guys say don't make it do that
