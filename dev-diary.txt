@@ -7127,3 +7127,46 @@ http://gamedev.stackexchange.com/questions/32693/implementing-features-in-an-ent
 these guys say make it an entity or a component
 https://www.reddit.com/r/gamedev/comments/2vf90e/how_to_manage_a_camera_in_ecs_based_game/
 these guys say don't make it do that
+
+http://www.html5gamedevs.com/topic/556-using-virtual-cameras/
+" The best way to support cameras at the moment is to put everything in a container and move
+that around. So if the camera position is 10, 100 the container position would be set to -10, -100. "
+"I will look into adding an actual camera feature to pixi.js once I have finished the bits
+I'm working on at the moment, but hopefully this will do the trick as a temporary solution.."
+
+that's dated may 2013
+
+http://www.html5gamedevs.com/topic/23725-camera-for-pixijs/
+
+http://www.html5gamedevs.com/topic/6691-how-does-pixi-deal-with-items-positioned-off-the-screen/
+"Yes, there is no automagic culling in PIXI.js. You can implement culling on your own using `.visible` properties."
+
+"Additionally you can divide you world into something that I call the cameras. Cameras are
+display object containers that you move when you player moves.
+If a camera is outside the view (which is usually a simple logic to check) you remove it
+fro your stage. For additional performance you can perform checks from time to time  inside
+the camera and remove or add the element that should not be there.
+the cool thing about it is that you don`t have to do it every frame just every  15-20 frames."
+
+the terminology here is a little messy but i think this is an interesting strategy for culling
+
+this guy confirms that setting a-thing.visible to false short-circuits a lot of pixi logic
+and basically makes your app faster since it doesn't draw extraneous doodads
+
+https://github.com/fponticelli/ledge/issues/4
+
+"You create one Container for the camera (with a width and height that will match the size
+of the canvas) and a second Container for the world, which should have width and height >=
+the width and height of the camera. The camera never actually moves, instead you offset the
+world Container so that different sections move into and out of view."
+
+"Most positioned things in the game are attached to the "world" Container, but HUD-related
+things (mini-map, timeline, other fixed controls) are attached directly to the "camera" Container
+so that they don't move when the world Container's offset is changed."
+
+OK SO TODO FOR TOMORROW:
+i think i'm going to have a camera system that listens to movement events, and if they're
+from the player, notifies the rendering system that it should update its camera center position.
+
+per the above (pretty solid) summary, i'll need to have the rendering system use two containers,
+one for the whole game world and one for the UI/viewport.
