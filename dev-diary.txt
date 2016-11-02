@@ -7170,3 +7170,64 @@ from the player, notifies the rendering system that it should update its camera 
 
 per the above (pretty solid) summary, i'll need to have the rendering system use two containers,
 one for the whole game world and one for the UI/viewport.
+
+=====
+
+1/2/16
+
+been reading this series of posts https://limpet.net/mbrubeck/2014/08/23/toy-layout-engine-4-style.html
+
+https://doc.rust-lang.org/book/ownership.html
+" Ownership is how Rust achieves its largest goal, memory safety"
+it's not often that clear what a language's "largest goal" is, interesting that they can
+clearly state this one, and that this is the one they picked. makes sense tho
+
+"Rust has a focus on safety and speed. It accomplishes these goals through many ‘zero-cost
+abstractions’, which means that in Rust, abstractions cost as little as possible in order
+to make them work. The ownership system is a prime example of a zero-cost abstraction. All
+of the analysis we’ll talk about in this guide is done at compile time. You do not pay any
+run-time cost for any of these features."
+
+"Rust ensures that there is exactly one binding to any given resource"
+if you set v to vec![1, 2, 3] and set v2 to v, you can't use v any more
+huh
+
+i like the writing in this document:
+"When we transfer ownership to something else, we say that we’ve ‘moved’ the thing we refer
+to. You don’t need some sort of special annotation here, it’s the default thing that Rust does."
+
+all this is very clear so far
+
+https://doc.rust-lang.org/book/references-and-borrowing.html
+
+you can have as many immutable references as you want, but only one mutable reference at a time
+this makes sense
+the compiler can enforce this as an invariant at compile time
+pretty neat+smart!
+
+"The same problem occurs when the reference is declared before
+the variable it refers to. This is because resources within
+the same scope are freed in the opposite order they were declared"
+because stack
+
+https://doc.rust-lang.org/book/lifetimes.html
+never really seen anything like this before
+"Named lifetimes are a way of giving these scopes a name. Giving
+something a name is the first step towards being able to talk about it."
+
+oh wow, i hadn't noticed - all these code samples are runnable!
+not in-page, but they link to a tool that lets you run rust code
+nice!
+
+"When talking about lifetime elision, we use the terms input
+lifetime and output lifetime. An input lifetime is a lifetime
+associated with a parameter of a function, and an output lifetime
+is a lifetime associated with the return value of a function."
+
+dude that is a _great_ pair of sentences
+god this writing is top-notch
+
+https://doc.rust-lang.org/book/mutability.html
+"Mutability, the ability to change something, works a bit differently
+in Rust than in other languages. The first aspect of mutabilityis its non-default status"
+/swoon
