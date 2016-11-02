@@ -7237,3 +7237,23 @@ you can see the gaps now that you can move around!
 i see two ways forward:
 1. see if rbush throws a collision if two rectangels share the exact same start+end pixel
 2. if it does throw a collision, put things .0001 px away from each other and live in shame
+
+yeah, if they overlap they collide:
+
+foo = rbush(16);
+rbush {_maxEntries: 16, _minEntries: 7, data: Object}
+foo.insert([0, 0, 5, 5])
+rbush {_maxEntries: 16, _minEntries: 7, data: Object}
+foo.search([4, 4, 9, 9])
+[Array[4]]
+foo.search([5, 5, 9, 9])
+[Array[4]]
+foo.search([5.00001, 5, 9, 9])
+[]
+foo.search([5.0000000001, 5, 9, 9])
+[]
+
+well, i think it's actually fine if obstacles overlap. right?
+a) we can mark them as "can't collide with each other" in the collision system if we want, but
+b) i don't think the collision system's logic ever gets invokved on anything that isn't moving,
+and obstacles never move.

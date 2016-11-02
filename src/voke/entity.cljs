@@ -106,8 +106,8 @@
     #:component {:shape     #:shape{:width  width
                                     :height height
                                     :type   :rectangle
-                                    :center {:geometry/x x
-                                             :geometry/y y}}
+                                    :center {:geometry/x (+ x (/ width 2))
+                                             :geometry/y (+ y (/ height 2))}}
                  :collision {:collision/type :obstacle}
                  :render    {:render/fill 0x333333}}))
 
