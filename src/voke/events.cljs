@@ -4,6 +4,8 @@
 
 ;; Specs
 
+; TODO instead of :event/foo, do ::foo (aka :voke.events/foo)
+
 (s/def :event/type #{:movement :entity-added :entity-removed :contact :damage})
 (s/def :event/event (s/keys :req [:event/type]))
 

@@ -2,6 +2,9 @@
   (:require [cljs.spec :as s]
             [cljsjs.pixi]))
 
+(def viewport-width 1000)
+(def viewport-height 700)
+
 (defn make-renderer
   [width height node]
   (doto (js/PIXI.CanvasRenderer.
@@ -16,7 +19,7 @@
     (.addChild stage graphics)
     stage))
 
-(defonce renderer (make-renderer 1000 700 (js/document.getElementById "screen")))
+(defonce renderer (make-renderer viewport-width viewport-height (js/document.getElementById "screen")))
 (defonce graphics (js/PIXI.Graphics.))
 (defonce stage (make-stage graphics))
 
@@ -78,6 +81,15 @@
     (when (> index -1)
       (.splice graphics-data-list index 1)
       (.destroy graphics-data))))
+
+(defn update-camera-position!
+  [center-x center-y]
+  (-> stage
+      (aget "position")
+      (aset "x" (- (/ viewport-width 2) center-x)))
+  (-> stage
+      (aget "position")
+      (aset "y" (- (/ viewport-height 2) center-y))))
 
 (defn render! [entities]
   (handle-unknown-entities! (filter
