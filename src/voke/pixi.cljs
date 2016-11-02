@@ -84,17 +84,12 @@
 
 (defn update-camera-position!
   [center-x center-y]
-  (-> stage
-      (aget "position")
-      (aset "x" (- (/ viewport-width 2) center-x)))
-  (-> stage
-      (aget "position")
-      (aset "y" (- (/ viewport-height 2) center-y))))
+  (aset stage "x" (- (/ viewport-width 2) center-x))
+  (aset stage "y" (- (/ viewport-height 2) center-y)))
 
 (defn render! [entities]
   (handle-unknown-entities! (filter
                               #(not (contains? @graphics-data-by-entity-id (:entity/id %)))
                               entities))
   ; TODO update entity visibility
-  ; TODO something something camera
   (.render renderer stage))

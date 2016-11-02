@@ -35,7 +35,12 @@
 ;; System definition
 
 (def system
-  {:system/event-handlers [{:event/type              :movement
+  {:system/initialize     (fn [game-state]
+                            (let [player (first (filter #(contains? % :component/input)
+                                                        (vals (game-state :game-state/entities))))]
+                              (update-camera-position! (get-in player [:component/shape :shape/center]))))
+
+   :system/event-handlers [{:event/type              :movement
                             :system/event-handler-fn handle-movement-event}
                            {:event/type              :entity-removed
                             :system/event-handler-fn handle-remove-entity-event}]})

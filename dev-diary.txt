@@ -7218,7 +7218,6 @@ something a name is the first step towards being able to talk about it."
 oh wow, i hadn't noticed - all these code samples are runnable!
 not in-page, but they link to a tool that lets you run rust code
 nice!
-
 "When talking about lifetime elision, we use the terms input
 lifetime and output lifetime. An input lifetime is a lifetime
 associated with a parameter of a function, and an output lifetime
@@ -7231,3 +7230,10 @@ https://doc.rust-lang.org/book/mutability.html
 "Mutability, the ability to change something, works a bit differently
 in Rust than in other languages. The first aspect of mutabilityis its non-default status"
 /swoon
+
+ok, the camera exists and follows the player!
+this surfaces one ugly thing, though - the fact that i've put obstacles .01 px away from each other
+you can see the gaps now that you can move around!
+i see two ways forward:
+1. see if rbush throws a collision if two rectangels share the exact same start+end pixel
+2. if it does throw a collision, put things .0001 px away from each other and live in shame
