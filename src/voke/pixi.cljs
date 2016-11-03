@@ -17,11 +17,28 @@
 (defonce stage (js/PIXI.Container.))
 (.render renderer stage)
 
+(defonce -graphics-pool
+         (atom
+           (vec
+             (for [_ (range 200)]
+               (js/PIXI.Graphics.)))))
+
+(defn acquire-graphics []
+  (let [graphics (peek @-graphics-pool)]
+    (assert graphics)
+    (swap! -graphics-pool pop)
+    graphics))
+
+(defn release-graphics [graphics]
+  (.clear graphics)
+  (swap! -graphics-pool conj graphics))
+
+
 (defonce graphics-by-entity-id (atom {}))
 
 (defn rectangle
   [x y w h color]
-  (let [graphics (doto (js/PIXI.Graphics.)
+  (let [graphics (doto (acquire-graphics)
                    (.beginFill color)
                    (.drawRect 0 0 w h)
                    (.endFill))]
@@ -69,7 +86,7 @@
   [entity-id]
   (let [graphics (@graphics-by-entity-id entity-id)]
     (.removeChild stage graphics)
-    (.destroy graphics)))
+    (release-graphics graphics)))
 
 (defn update-camera-position!
   [center-x center-y]

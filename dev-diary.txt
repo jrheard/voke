@@ -7300,3 +7300,18 @@ https://github.com/jrheard/voke/issues/43
 to track letting the player actually play in levels
 
 heyyy i knew i remembered writing something like this: https://github.com/pixijs/pixi.js/issues/1777
+
+ooookay, i'm seeing a sawtooth pattern on memory, and it looks like i'm leaking it to boot
+i think i should make a graphics object pool
+
+hm, i added an object pool for it but it doesn't seem to have helped anything, i still have sawteeth
+i guess it's probably the graphicsData objects that're being acquired/allocated
+jeez man i dunno
+is all this worth it?
+what if i just drew to the canvas directly?
+i mean i guess pixi gives me webgl support, and that prevents the gap problem i had earlier
+and presumably is fast
+okok let's continue trying to fix the sawtooth
+
+buh.
+let's check out master and see if it has the same sawtooth problem
