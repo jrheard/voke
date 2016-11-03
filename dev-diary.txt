@@ -7318,3 +7318,39 @@ let's check out master and see if it has the same sawtooth problem
 
 lol ok yeah it totally does
 so i don't think this is a pixi issue, nice
+
+====
+
+11/3/16
+
+advice from chad in pixi gitter:
+Note that things you draw within a single Graphics object are
+batched, but multiple graphics objects are not batched together
+are the rectangles uniform?
+because you can draw one, generate a texture, then create a bunch of sprites (one-per-rect)
+if the sprites share a texture they will be batched
+http://pixijs.download/v4.1.1/docs/PIXI.WebGLRenderer.html#generateTexture
+if you have many different shapes you can draw them to a canvas,
+use the canvas as a texture "spritesheet" and then make all the sprites you need
+and since they all share 1 base texture (the canvas) it will batch
+
+http://www.imake-games.com/cameras-in-2d-platformers/
+* focus on the player / focus on what's important (sometimes the player is throwing a grenade,
+so "what's important" changes)
+* move the camera as little as possible
+
+"Another widely adopted technique when dealing with cameras is to dynamically adjust the
+camera’s target position based on the velocity (or even acceleration) vector of the player’s
+character. If the character is quickly charging right, it’s very likely the player will want
+to see what’s to the far right. The faster the character moves, the more important this behavior
+gets. The same applies for vertical movements!"
+
+this makes a lot of sense
+
+http://natureofcode.com/book/chapter-6-autonomous-agents/
+******* THIS IS A REALLY GOOD EXPLANATION OF STEERING + VECTORS
+explains arriving behavior
+flow fields
+this article is fuckin gold overall
+explains flocking behaviors from scratch
+very impressive piece of work overall, great great great writing

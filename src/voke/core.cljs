@@ -51,12 +51,10 @@
 (defn ^:export main []
   (-initialize!)
 
-  (comment
-    (stest/instrument `process-a-tick)
-    (stest/instrument `voke.state/flush!))
-
   (js/window.requestAnimationFrame
     (fn handle-frame [ts]
+      ; temporary hack while we don't have menus: if the user hits the \ key,
+      ; suspend the game and show the dungeon level generation visualization tool.
       (if (= (@game-state :game-state/mode) :default)
         (do
           (process-game-time ts)
@@ -71,5 +69,8 @@
   (doseq [i (range 5)]
     (add-entity! (e/monster 800 (+ 200 (* i 100)))
                  :repl))
+
+  (stest/instrument `process-a-tick)
+  (stest/instrument `voke.state/flush!)
   )
 
