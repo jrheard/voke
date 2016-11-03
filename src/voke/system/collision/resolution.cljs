@@ -15,6 +15,8 @@
 (defn bottom-edge-y [rect] (+ (get-in rect [:shape/center :geometry/y])
                               (/ (rect :shape/height) 2)))
 
+(def resolution-placement-fudge-factor-px 0.001)
+
 ;;;;;
 ; Single-axis-handling logic
 
@@ -48,9 +50,7 @@
     (arithmetic-fn (get-in shape2 [:shape/center axis])
                    (/ (shape2 field) 2)
                    (/ (shape1 field) 2)
-                   ; XXX - diagonal resolution uses a fudge factor of 0.1,
-                   ; single-axis resolution uses 0.01. standardize
-                   0.01)))
+                   resolution-placement-fudge-factor-px)))
 
 (s/fdef find-closest-clear-spot
   :args (s/cat :entity :entity/entity
@@ -180,10 +180,10 @@
     (apply-movement entity
                     {:geometry/x (x-operation (closest-intersection :geometry/x)
                                               (/ (get-in entity [:component/shape :shape/width]) 2)
-                                              0.1)
+                                              resolution-placement-fudge-factor-px)
                      :geometry/y (y-operation (closest-intersection :geometry/y)
                                               (/ (get-in entity [:component/shape :shape/height]) 2)
-                                              0.1)}
+                                              resolution-placement-fudge-factor-px)}
                     {:geometry/x 0 :geometry/y 0})))
 
 (s/fdef resolve-diagonal-collision

@@ -7257,3 +7257,33 @@ well, i think it's actually fine if obstacles overlap. right?
 a) we can mark them as "can't collide with each other" in the collision system if we want, but
 b) i don't think the collision system's logic ever gets invokved on anything that isn't moving,
 and obstacles never move.
+
+random pixi quote from forums:
+"Try to draw all the boxes with 1 Graphics object, that way they are batched together in webgl and draw very quickly."
+
+https://github.com/pixijs/pixi.js/issues/2524
+these guys say that canvas renderer is bad and i should use webgl renderer
+trying to figure out how to move drawn shapes around in webgl renderer land
+
+asking in the pixi gitter channel
+
+ugh, i think i'm blocked on this until i get a response - i've poked through the source and documentation,
+and i can't figure out how to move rectangles around in a way that works in webgl.
+it seems like everyone else uses pixi to draw sprites (backed by images) and move those around,
+and it seems that my rectangles-only usecase is very rare.
+i wonder if i shouldn't be using pixi after all?
+
+anyway whatever i'll just wait for a response
+this would probably be a good time to start on the next blog post
+
+https://toddmotto.com/cache-busting-jekyll-github-pages
+he just appends the unix timestamp, that seems too heavy-handed for me actually
+
+http://ixti.net/software/2013/01/28/using-jekyll-plugins-on-github-pages.html
+
+trying to just use a bunch of Graphicses
+
+ran into this comment:
+ // ** FREE TIP **! If an object is not interacttive or has no buttons in it (such as a game scene!) set interactiveChildren to false for that displayObject.
+// This will allow pixi to completly ignore and bypass checking the displayObjects children.
+TODO: investigate

@@ -44,6 +44,7 @@
    events]
   (assoc state
          :game-state/entities
+         ; TODO use into / transducers
          (persistent!
            (reduce event-processing-fn
                    (transient (state :game-state/entities))
