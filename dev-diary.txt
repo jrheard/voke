@@ -7287,3 +7287,14 @@ ran into this comment:
  // ** FREE TIP **! If an object is not interacttive or has no buttons in it (such as a game scene!) set interactiveChildren to false for that displayObject.
 // This will allow pixi to completly ignore and bypass checking the displayObjects children.
 TODO: investigate
+
+ok, looks like that's just for mouse/touch events and is set to false by default, ignore
+so, next up i think should be: generating a level and plopping the player into the level
+i see several steps here:
+1. generate a 2d grid level (done)
+2. find a good spot to put the player
+3. turn the 2d grid into a list of e/wall entities, add the player, start the game
+
+actually you know what i'll just call this branch done and spin up
+https://github.com/jrheard/voke/issues/43
+to track letting the player actually play in levels
