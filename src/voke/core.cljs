@@ -18,7 +18,7 @@
               (e/wall 0 30 30 640)
               (e/wall 970 29 30 642)
               (e/wall 0 670 1000 30)
-              #_(e/monster 800 600)])))
+              (e/monster 800 600)])))
 
 ; Useful in dev, so figwheel doesn't cause a jillion ticks of the system to happen at once
 (defonce animation-frame-request-id (atom nil))

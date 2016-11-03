@@ -15,6 +15,7 @@
 
 (defonce renderer (make-renderer viewport-width viewport-height (js/document.getElementById "screen")))
 (defonce stage (js/PIXI.Container.))
+(.render renderer stage)
 
 (defonce graphics-by-entity-id (atom {}))
 

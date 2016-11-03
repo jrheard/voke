@@ -7298,3 +7298,5 @@ i see several steps here:
 actually you know what i'll just call this branch done and spin up
 https://github.com/jrheard/voke/issues/43
 to track letting the player actually play in levels
+
+heyyy i knew i remembered writing something like this: https://github.com/pixijs/pixi.js/issues/1777
