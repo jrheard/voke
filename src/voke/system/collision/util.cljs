@@ -53,7 +53,7 @@
   (-update-entity-center (entity :entity/id) new-center)
 
   (publish-event {:event/type :movement
-                  :entity-id  (entity :entity/id)
+                  :entity     entity
                   :new-center new-center}))
 
 (s/fdef apply-movement

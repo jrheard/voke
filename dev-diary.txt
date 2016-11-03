@@ -7218,7 +7218,6 @@ something a name is the first step towards being able to talk about it."
 oh wow, i hadn't noticed - all these code samples are runnable!
 not in-page, but they link to a tool that lets you run rust code
 nice!
-
 "When talking about lifetime elision, we use the terms input
 lifetime and output lifetime. An input lifetime is a lifetime
 associated with a parameter of a function, and an output lifetime
@@ -7231,3 +7230,91 @@ https://doc.rust-lang.org/book/mutability.html
 "Mutability, the ability to change something, works a bit differently
 in Rust than in other languages. The first aspect of mutabilityis its non-default status"
 /swoon
+
+ok, the camera exists and follows the player!
+this surfaces one ugly thing, though - the fact that i've put obstacles .01 px away from each other
+you can see the gaps now that you can move around!
+i see two ways forward:
+1. see if rbush throws a collision if two rectangels share the exact same start+end pixel
+2. if it does throw a collision, put things .0001 px away from each other and live in shame
+
+yeah, if they overlap they collide:
+
+foo = rbush(16);
+rbush {_maxEntries: 16, _minEntries: 7, data: Object}
+foo.insert([0, 0, 5, 5])
+rbush {_maxEntries: 16, _minEntries: 7, data: Object}
+foo.search([4, 4, 9, 9])
+[Array[4]]
+foo.search([5, 5, 9, 9])
+[Array[4]]
+foo.search([5.00001, 5, 9, 9])
+[]
+foo.search([5.0000000001, 5, 9, 9])
+[]
+
+well, i think it's actually fine if obstacles overlap. right?
+a) we can mark them as "can't collide with each other" in the collision system if we want, but
+b) i don't think the collision system's logic ever gets invokved on anything that isn't moving,
+and obstacles never move.
+
+random pixi quote from forums:
+"Try to draw all the boxes with 1 Graphics object, that way they are batched together in webgl and draw very quickly."
+
+https://github.com/pixijs/pixi.js/issues/2524
+these guys say that canvas renderer is bad and i should use webgl renderer
+trying to figure out how to move drawn shapes around in webgl renderer land
+
+asking in the pixi gitter channel
+
+ugh, i think i'm blocked on this until i get a response - i've poked through the source and documentation,
+and i can't figure out how to move rectangles around in a way that works in webgl.
+it seems like everyone else uses pixi to draw sprites (backed by images) and move those around,
+and it seems that my rectangles-only usecase is very rare.
+i wonder if i shouldn't be using pixi after all?
+
+anyway whatever i'll just wait for a response
+this would probably be a good time to start on the next blog post
+
+https://toddmotto.com/cache-busting-jekyll-github-pages
+he just appends the unix timestamp, that seems too heavy-handed for me actually
+
+http://ixti.net/software/2013/01/28/using-jekyll-plugins-on-github-pages.html
+
+trying to just use a bunch of Graphicses
+
+ran into this comment:
+ // ** FREE TIP **! If an object is not interacttive or has no buttons in it (such as a game scene!) set interactiveChildren to false for that displayObject.
+// This will allow pixi to completly ignore and bypass checking the displayObjects children.
+TODO: investigate
+
+ok, looks like that's just for mouse/touch events and is set to false by default, ignore
+so, next up i think should be: generating a level and plopping the player into the level
+i see several steps here:
+1. generate a 2d grid level (done)
+2. find a good spot to put the player
+3. turn the 2d grid into a list of e/wall entities, add the player, start the game
+
+actually you know what i'll just call this branch done and spin up
+https://github.com/jrheard/voke/issues/43
+to track letting the player actually play in levels
+
+heyyy i knew i remembered writing something like this: https://github.com/pixijs/pixi.js/issues/1777
+
+ooookay, i'm seeing a sawtooth pattern on memory, and it looks like i'm leaking it to boot
+i think i should make a graphics object pool
+
+hm, i added an object pool for it but it doesn't seem to have helped anything, i still have sawteeth
+i guess it's probably the graphicsData objects that're being acquired/allocated
+jeez man i dunno
+is all this worth it?
+what if i just drew to the canvas directly?
+i mean i guess pixi gives me webgl support, and that prevents the gap problem i had earlier
+and presumably is fast
+okok let's continue trying to fix the sawtooth
+
+buh.
+let's check out master and see if it has the same sawtooth problem
+
+lol ok yeah it totally does
+so i don't think this is a pixi issue, nice

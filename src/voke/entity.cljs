@@ -61,8 +61,8 @@
                                                             :geometry/y 0}
                                      :affected-by-friction true
                                      :direction            nil
-                                     :max-acceleration     2.0
-                                     :max-speed            11}
+                                     :max-acceleration     1.0
+                                     :max-speed            8}
                  :collision {:collision/type :good-guy}
                  :render    {:render/fill 0x333333}
                  :weapon    (make-weapon nil 0x666666 10)
@@ -86,7 +86,7 @@
                                                             :geometry/y 0}
                                      :affected-by-friction true
                                      :direction            nil
-                                     :max-acceleration     1.5
+                                     :max-acceleration     0.75
                                      :max-speed            4}
                  :collision {:collision/type :bad-guy}
                  ;:weapon      nil
@@ -106,8 +106,8 @@
     #:component {:shape     #:shape{:width  width
                                     :height height
                                     :type   :rectangle
-                                    :center {:geometry/x x
-                                             :geometry/y y}}
+                                    :center {:geometry/x (+ x (/ width 2))
+                                             :geometry/y (+ y (/ height 2))}}
                  :collision {:collision/type :obstacle}
                  :render    {:render/fill 0x333333}}))
 

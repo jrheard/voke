@@ -6,6 +6,7 @@
             [voke.specs]
             [voke.system.ai.system :as ai]
             [voke.system.attack :as attack]
+            [voke.system.camera :as camera]
             [voke.system.collision.system :as collision]
             [voke.system.damage :as damage]
             [voke.system.death :as death]
@@ -47,6 +48,7 @@
                    damage/system
                    health/system
                    ai/system
+                   camera/system
                    rendering/system])
 
 (def tick-functions
@@ -67,6 +69,7 @@
   (doseq [event-handler-map (flatten
                               (keep identity
                                     (map :system/event-handlers game-systems)))]
+    ; it's weird that this is :event/type, it should be :system/event-type, which maps to :voke.events/type
     (subscribe-to-event (event-handler-map :event/type)
                         (event-handler-map :system/event-handler-fn)))
 
