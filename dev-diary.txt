@@ -7315,3 +7315,6 @@ okok let's continue trying to fix the sawtooth
 
 buh.
 let's check out master and see if it has the same sawtooth problem
+
+lol ok yeah it totally does
+so i don't think this is a pixi issue, nice

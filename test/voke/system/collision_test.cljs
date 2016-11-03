@@ -19,6 +19,7 @@
                                   :center #:geometry{:x x
                                                      :y y}}}))
 
+
 (deftest two-entities-moving-into-each-other-diagonally
   (let [entity-1 (make-entity 1 100 100)
         entity-2 (make-entity 2 115 115)]
@@ -40,8 +41,8 @@
 
       (testing "diagonal collision resolution works correctly on corners"
         (is (= @apply-movement-calls
-               [[entity-1 #:geometry{:x 104.9 :y 104.9} #:geometry{:x 0 :y 0}]
-                [entity-2 #:geometry{:x 99.9 :y 99.9} #:geometry{:x 0 :y 0}]]))))))
+               [[entity-1 #:geometry{:x 104.999 :y 104.999} #:geometry{:x 0 :y 0}]
+                [entity-2 #:geometry{:x 99.999 :y 99.999} #:geometry{:x 0 :y 0}]]))))))
 
 
 
@@ -63,7 +64,7 @@
       (testing "two entities next to each other, the left one moving up+right; it should be able to
       move all the way up and a little bit to the right"
         (is (= @apply-movement-calls
-               [[entity-1 #:geometry{:x 100.99 :y 103} #:geometry{:x 0 :y 3}]]))))))
+               [[entity-1 #:geometry{:x 100.999 :y 103} #:geometry{:x 0 :y 3}]]))))))
 
 (deftest projectiles-and-collides-with
   (let [entity-1 (make-entity 1 100 100 #:collision{:type :projectile :collides-with #{:obstacle} :destroyed-on-contact true})
@@ -125,4 +126,4 @@
 
       (testing "entity-1 should be moved so it's right up against entity-5"
         (is (= @apply-movement-calls
-               [[entity-1 #:geometry{:x 100.99 :y 103} #:geometry{:x 0 :y 3}]]))))))
+               [[entity-1 #:geometry{:x 100.999 :y 103} #:geometry{:x 0 :y 3}]]))))))
