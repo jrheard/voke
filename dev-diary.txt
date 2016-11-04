@@ -7354,3 +7354,12 @@ flow fields
 this article is fuckin gold overall
 explains flocking behaviors from scratch
 very impressive piece of work overall, great great great writing
+
+working on cellular automata blog post now, trying to tighten up my vocabulary
+(is it an algorihtm? class of algorithms? abstract concept? simulation?)
+i have high hopes for http://natureofcode.com/book/chapter-7-cellular-automata/ based on the last chapter
+
+"First, let’s get one thing straight. The term cellular automata is plural. Our code examples
+will simulate just one—a cellular automaton, singular."
+
+
