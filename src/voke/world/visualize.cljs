@@ -7,8 +7,8 @@
 
 (def grid-width 100)
 (def grid-height 100)
-(def canvas-height 800)
-(def canvas-width 800)
+(def canvas-height 400)
+(def canvas-width 400)
 
 ; TODO revisit *all* of these atoms
 
@@ -26,21 +26,21 @@
 (defonce smoothing-pass-survival-threshold (r/atom 4))
 (defonce smoothing-pass-birth-threshold (r/atom 5))
 (defonce num-iterations (r/atom 10000))
-(defonce smoothing-passes (r/atom 12))
+(defonce smoothing-passes (r/atom 5))
 
 (defn reset-rng-seed! []
   (reset! rng-seed (.valueOf (js/Date.))))
 
 ;; Canvas manipulation
 
-(defn get-ctx []
-  (-> "visualization-canvas"
+(defn get-ctx [canvas-id]
+  (-> canvas-id
       (js/document.getElementById)
       (.getContext "2d")))
 
 (defn draw-grid
-  [grid]
-  (let [ctx (get-ctx)
+  [grid canvas-id]
+  (let [ctx (get-ctx canvas-id)
         width (count (first grid))
         height (count grid)
         cell-width (/ canvas-width width)
@@ -82,6 +82,18 @@
           :final (generate/automata 200 200 0.45 4 5 400000 12 4 5))]
     (draw-grid grid)))
 
+(defn draw-cellular-tool-grid []
+  (Math/seedrandom (str @rng-seed))
+  (draw-grid
+    (generate/automata grid-width
+                       grid-height
+                       @initial-fill-chance
+                       0 0 0
+                       @smoothing-passes
+                       @smoothing-pass-survival-threshold
+                       @smoothing-pass-birth-threshold)
+    "cellular-tool-canvas"))
+
 ;; Reagent components
 
 (defn slider
@@ -90,7 +102,7 @@
            :style     {:width "100%"}
            :on-change (fn [e]
                         (reset! an-atom (js/parseFloat (.-target.value e)))
-                        (generate-grid-and-draw))}])
+                        (draw-cellular-tool-grid))}])
 
 (defn tab
   [tab-kw text]
@@ -154,3 +166,58 @@
   (r/render-component [ui]
                       (js/document.getElementById "content"))
   (generate-grid-and-draw))
+
+
+;; cellular blog post
+
+(defn draw-cellular-example []
+  (draw-grid (generate/automata 100 100 0.45 4 5 0 12 4 5) "cellular-example-canvas"))
+
+(defn cellular-example-ui []
+  [:div.cellular-example
+   [:canvas {:id     "cellular-example-canvas"
+             :width  400
+             :height 400}]
+   [:div.button-wrapper
+    [:a.button {:href     "#"
+                :on-click (fn [e]
+                            (.preventDefault e)
+                            (draw-cellular-example))}
+     "generate another"]]])
+
+(defn ^:export cellular-example []
+  (r/render-component [cellular-example-ui]
+                      (js/document.getElementById "cellular-example"))
+  (draw-cellular-example))
+
+
+
+
+
+
+(defn cellular-tool-ui []
+  [:div.cellular-tool
+   [:div.message
+    [:p (str "Chance for a given cell to be filled during intialization: " @initial-fill-chance)]
+    [slider initial-fill-chance 0 1 0.01]
+    [:p (str "Birth threshold: " @smoothing-pass-birth-threshold)]
+    [slider smoothing-pass-birth-threshold 0 8 1]
+    [:p (str "Survival threshold: " @smoothing-pass-survival-threshold)]
+    [slider smoothing-pass-survival-threshold 0 8 1]
+    [:p (str "Number of iterations: " @smoothing-passes)]
+    [slider smoothing-passes 0 12 1]]
+   [:canvas {:id     "cellular-tool-canvas"
+             :width  400
+             :height 400}]
+   [:div.button-wrapper
+    [:a.button {:href     "#"
+                :on-click (fn [e]
+                            (.preventDefault e)
+                            (reset-rng-seed!)
+                            (draw-cellular-tool-grid))}
+     "generate another"]]])
+
+(defn ^:export cellular-tool []
+  (r/render-component [cellular-tool-ui]
+                      (js/document.getElementById "cellular-tool"))
+  (draw-cellular-tool-grid))
