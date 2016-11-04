@@ -7362,4 +7362,19 @@ i have high hopes for http://natureofcode.com/book/chapter-7-cellular-automata/ 
 "First, let’s get one thing straight. The term cellular automata is plural. Our code examples
 will simulate just one—a cellular automaton, singular."
 
+=====
 
+11/4/16
+
+https://christopherdbui.com/organizing-clojure-projects-and-libraries/
+
+this guy likes component
+explains lein release, which i've never seen before, for managing version numbers
+https://github.com/technomancy/leiningen/blob/master/doc/DEPLOY.md
+
+https://christopherdbui.com/asset-pipelines-in-clojure/
+
+https://christopherdbui.com/a-tutorial-of-stuart-sierras-component-for-clojure/
+looks good, come back to this when i want to use component/mount (prob component)
+interesting that he says his example app's core async channels count as components
+nice indepth code examples
