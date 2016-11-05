@@ -7378,3 +7378,37 @@ https://christopherdbui.com/a-tutorial-of-stuart-sierras-component-for-clojure/
 looks good, come back to this when i want to use component/mount (prob component)
 interesting that he says his example app's core async channels count as components
 nice indepth code examples
+
+http://natureofcode.com/book/chapter-1-vectors/
+
+"It’s becoming clearer that for every concept in this world (wind, location, acceleration,
+etc.), we’ll need two variables. And this is only a two-dimensional world. In a 3D world,
+we’ll need x, y, z, xspeed, yspeed, zspeed, and so on."
+
+=====
+
+11/5/16
+
+reading coders at work again, that book rules
+
+jekyll-minibundle or jekyll-assets?
+the latter has a ton more stars, picking it
+
+gotta break blog into two repos so i can get cachebusting and also run on github pages
+gonna have to revert gh pages gem
+
+"A lot of our configuration transforms based on the JEKYLL_ENV variable set in your environment.
+Such as digesting and whether or not to enable the CDN. Some of them can be explicitly overridden
+but a few cannot right now. You should set your JEKYLL_ENV=development on your development
+machine and JEKYLL_ENV=production when building to push."
+
+https://github.com/jekyll/jekyll-assets/issues/241
+
+http://ixti.net/software/2013/01/28/using-jekyll-plugins-on-github-pages.html
+rake publish command
+
+http://ixti.net/software/2012/12/30/unleash-mr-hyde-introduction-of-jekyll-assets.html
+
+https://github.com/ixti/jekyll-assets-demo
+
+mentions a _plugins/ext.rb file, not sure if that's out of date, never heard of that
