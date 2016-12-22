@@ -7412,3 +7412,89 @@ http://ixti.net/software/2012/12/30/unleash-mr-hyde-introduction-of-jekyll-asset
 https://github.com/ixti/jekyll-assets-demo
 
 mentions a _plugins/ext.rb file, not sure if that's out of date, never heard of that
+
+====
+
+12/22/16
+
+haven't worked on voke in a while, not working on it now, just gonna use this space
+to take notes on articles because i haven't done that in a while
+
+http://joeduffyblog.com/2015/11/03/a-tale-of-three-safeties/
+
+"You may be wondering what all this safety cost. Simply put, there are things
+you can’t do without pointer arithmetic, data races, and the like. Much of
+what we did went into minimizing these added costs. And I’m happy to say, in
+the end, we did end up with a competitive system. Building the system on itself
+was key to keeping us honest."
+
+i really like that last sentence
+
+"They key insight driving the formalism here was that no two “threads” sharing
+an address space were permitted to see the same object as mutable at the same
+time. Many could read from the same memory at once, and one could write, but
+multiple could not write at once. A few details were discussed in our OOPSLA
+paper, and Rust achieved a similar outcome and documented it nicely."
+
+http://joeduffyblog.com/2015/11/10/objects-as-secure-capabilities/
+interesting discussion about how on unix, eg calls to open() rely on inspecting ambient
+global state - which user is logged in? - to make decisions about security / access control
+
+"Well, what’s wrong with this?
+
+It’s imprecise. It relies on ambient state that is invisible to the program.
+You can’t easily audit to see the security implications of the operation.
+You just need to know how open works. And thanks to its imprecision, it’s
+easy to get wrong, and going here wrong means security vulnerabilities. Specifically,
+it’s easy to trick a program into doing something on behalf of a user that
+it was never intended to do. This is called the “confused deputy problem”.
+All you need to do is trick the shell or program into impersonating a superuser,
+and you’re home free."
+
+http://joeduffyblog.com/2015/11/19/asynchronous-everything/
+"Synchronous blocking was flat-out disallowed."
+interesting
+
+"I’ll never forget a paper a few years back finding one of the leading causes
+of hangs in Outlook. A commonly used API would occasionally enumerate Postscript
+fonts by attempting to talk to the printer over the network. It cached fonts
+so it only needed to go to the printer once in a while, at unpredictable times.
+As a result, the “good” behavior led developers to think it safe to call from
+the UI thread. Nothing bad happened during testing (where, presumably, the
+developers worked on expensive computers with near-perfect networks). Sadly,
+when the network flaked out, the result was 10 second hangs with spinning donuts
+and bleachy white screens. To this day, we still have this problem in every
+OS that I use."
+
+i like this post a lot
+good examples and good in-depth explanation
+some of the earlier posts in this series were a little handwavy
+this is more meaty
+
+"But it was not tolerable. The model tossed out decades of familiar programming language constructs, like loops.
+It got really bad. Like really, really. It led to callback soup, often nested
+many levels deep, and often in some really important code to get right."
+
+"This also gave us a very important, but subtle, property that we didn’t realize
+until much later. Because in Midori the only way to “wait” for something was
+to use the asynchronous model, and there was no hidden blocking, our type system
+told us the full set of things that could “wait.” More importantly, it told
+us the full set of things that could not wait, which told us what was pure
+synchronous computation! This could be used to guarantee no code ever blocked
+the UI from painting and, as we’ll see below, many other powerful capabilities."
+
+on cancellation:
+"The difference in Midori was the scale. Asynchronous work was everywhere.
+It sprawled out across processes and, sometimes, even machines. It was incredibly
+difficult to chase down run-away work."
+
+"With so much work flying around in the system, debugging was a challenge in the early days.
+The solution, as with many such challenges, was tooling. We taught our tools
+that activities were as first class as threads. We introduced causality IDs
+that flowed with messages across processes, so if you broke into a message
+dispatch in one process, you could trace back to the origin in potentially
+some other distant process. The default behavior for a crash was to gather
+this cross-process stack trace, to help figure out how you go to where you were."
+
+
+
