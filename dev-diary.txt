@@ -7720,4 +7720,25 @@ he was in the opposite world
 
 https://blog.rust-lang.org/2015/04/10/Fearless-Concurrency.html
 
+it blows my mind that rust is able to do all of this stuff at compile time
 
+http://joeduffyblog.com/2010/06/27/on-partiallyconstructed-objects/
+
+http://joeduffyblog.com/2010/01/03/a-brief-retrospective-on-transactional-memory/
+
+"Transactions are terrific because they are “automatic”. You declare the boundaries,
+and the transactional machinery takes care of the rest. This is true of databases and also TM."
+
+good discussion of the ways in which locks are bad
+i don't really know what he means re: unbounded transactions
+just, like, that you can put arbitrarily many lines of code in an atomic{} ?
+guess so!
+
+http://blog.minitab.com/blog/statistics-and-quality-data-analysis/what-are-degrees-of-freedom-in-statistics
+"Another way to say this is that the number of degrees of freedom equals the
+number of "observations" minus the number of required relations among the observations
+(e.g., the number of parameter estimates). "
+good explanation
+
+http://blog.zulip.org/2016/10/13/static-types-in-python-oh-mypy/
+good info about type annotations in python 3
