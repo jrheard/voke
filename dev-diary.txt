@@ -7496,5 +7496,104 @@ dispatch in one process, you could trace back to the origin in potentially
 some other distant process. The default behavior for a crash was to gather
 this cross-process stack trace, to help figure out how you go to where you were."
 
+http://joeduffyblog.com/2016/02/07/the-error-model/
+good discussion on error codes being bad
 
+i like their `ignore foo()` syntax for ignoring return results
 
+=====
+
+12/23/16
+
+far better than any other exception-based model in widespread use today.
+
+he says that rust's error system is "far better than any other exception-based model in widespread use today."
+looks like this:
+
+fn bar() -> Result<(), Error> {
+    match foo() {
+        Ok(value) => /* Use value ... */,
+        Err(err) => return Err(err)
+    }
+}
+
+note pattern matching. apparently this is sugar for it:
+
+fn bar() -> Result<(), Error> {
+    let value = try!(foo);
+    // Use value ...
+}
+
+he really hates unchecked exceptions (what exactly does this mean? does that describe
+python's exception system?), and says that error codes are good for reliability
+(aside from the part where you can forget to check them...)
+
+yeah - "In an unchecked exceptions model, you throw and catch exceptions, without
+it being part of the type system or a function’s signature."
+
+"In this model, any function call – and sometimes any statement – can throw
+an exception, transferring control non-locally somewhere else. Where? Who knows.
+There are no annotations or type system artifacts to guide your analysis. As
+a result, it’s difficult for anyone to reason about a program’s state at the
+time of the throw, the state changes that occur while that exception is propagated
+up the call stack – and possibly across threads in a concurrent program – and
+the resulting state by the time it gets caught or goes unhandled."
+
+ok fair point
+
+when talking about java's checked exceptions, he says:
+
+"It’s true that if you design version 1 of your API to have no failure mode,
+and then want to add failures in version 2, you’re screwed. As you should be,
+in my opinion. An API’s failure mode is a critical part of its design and contract
+with callers. Just as you wouldn’t change the return type of an API silently
+without callers needing to know, you shouldn’t change its failure mode in a
+semantically meaningful way. "
+
+i think rich hickey would agree with this, re: his recent talks about "change"
+
+"Most exception systems get a few major things wrong, regardless of whether
+they are checked or unchecked.
+First, throwing an exception is usually ridiculously expensive. This is almost
+always due to the gathering of a stack trace."
+
+"Another thing most exception systems get wrong is encouraging too coarse a
+granularity of handling errors. Proponents of return codes love that error
+handling is localized to a specific function call. (I do too!) In exception
+handling systems, it’s all too easy to slap a coarse-grained try/catch block
+around some huge hunk of code, without carefully reacting to individual failures.
+That produces brittle code that’s almost certainly wrong; if not today, then
+after the inevitable refactoring that will occur down the road. "
+***** i really like this argument
+
+good distinction between bugs and recoverable errors
+
+"For some background, we can look to fault-tolerant systems design. Abandonment
+(fail-fast) is already a common technique in that realm, and we can apply much
+of what we know about these systems to ordinary programs and processes. Perhaps
+the most important technique is regularly journaling and checkpointing precious
+persistent state."
+
+"Indeed, abandonment can help you avoid data corruption, because bugs detected
+before the next checkpoint prevent bad state from ever escaping."
+
+NASA says:
+
+Rule: The assertion density of the code should average to a minimum of two
+assertions per function. Assertions are used to check for anomalous conditions
+that should never happen in real-life executions. Assertions must always be
+side-effect free and should be defined as Boolean tests. [?!]
+Rationale: Statistics for industrial coding efforts indicate that unit tests
+often find at least one defect per 10 to 100 lines of code written. The odds
+of intercepting defects increase with assertion density. Use of assertions
+is often also recommended as part of strong defensive coding strategy.
+
+the bit about contracts is nice
+i like the comparison between their approach and c#'s
+the argument is that contracts are a great way of getting rid of swaths of exceptions
+for instance:
+
+"This is broken for a number of reasons. It’s laboriously verbose, of course.
+All that ceremony! But we have to go way out of our way to document the exceptions
+when developers really ought not to ever catch them. Instead, they should find
+the bug during development and fix it. All this exception nonsense encourages very bad behavior."
