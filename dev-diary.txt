@@ -7597,3 +7597,127 @@ for instance:
 All that ceremony! But we have to go way out of our way to document the exceptions
 when developers really ought not to ever catch them. Instead, they should find
 the bug during development and fix it. All this exception nonsense encourages very bad behavior."
+
+========
+
+12/24/16
+
+https://wiki.haskell.org/Error_vs._Exception
+
+"The first problem is that "exception" seems to me to be the historically younger
+term. Before there were only "errors", independent of whether they were programming,
+I/O or user errors. In this article we use the term exception for expected
+but irregular situations at runtime and the term error for mistakes in the
+running program that can be resolved only by fixing the program. "
+
+"First, consider a compiler like GHC. If you feed it a program that contains
+invalid syntax or inconsistent types, it emits a description of the problem.
+@Such occurrences are considered to be exceptions. GHC anticipates bad syntax
+@and mismatched types and handles them by generating useful messages for the
+@user. However, if GHC spits out a message like "Panic! This should not happen:
+@... Send a bug report to ghc@haskell.org", then you've encountered a situation
+@which indicates a flaw in GHC. This would be considered an error. It cannot
+be handled by GHC or by the user. The error message, "Panic!...", is only useful
+to the GHC developers in fixing the problem"
+
+good example!
+
+"Thus if you want another criterion for distinction of errors and exceptions:
+Errors can be prevented by (cheap) checks in advance, whereas exceptions can
+only be handled after a risky action was run."
+interesting
+
+i really like that they made this syntax a requirement when calling functions
+that can throw an exception:
+
+int value = try Foo();
+
+he says it makes control flow more explicit, makes it easier to do code reviews, etc
+"Both Rust and Swift now support a similar syntax. I have to admit I’m sad
+we didn’t ship this to the general public years ago. Their implementations
+are very different, however consider this a huge vote of confidence in their syntax."
+nice
+
+interesting discussion of keepers, never heard of this concept before
+
+"Abandonment, and the degree to which we used it, was in my opinion our biggest
+and most successful bet with the Error Model. We found bugs early and often,
+where they are easiest to diagnose and fix. Abandonment-based errors outnumbered
+recoverable errors by a ratio approaching 10:1, making checked exceptions rare
+and tolerable to the developer."
+
+http://joeduffyblog.com/2016/04/10/performance-culture/
+"Continuous performance telemetry is reported from the lab, flighting, and live environments." - ?
+
+interesting discussion of "rings" of performance testing
+
+"Barring exceptional circumstances, regressions should be backed out immediately.
+In teams where I’ve seen this succeed, there were no questions asked, and no
+IOUs. As soon as you relax this stance, the culture begins to break down. Layers
+of regressions pile on top of one another and you end up ceding ground permanently,
+no matter the best intentions of the team. The commit should be undone, the
+developer should identify the root cause, remedy it, ideally write a new test
+if appropriate, and then go through all the hoops again to submit the checkin,
+this time ensuring good performance."
+
+interesting discussion of consumption vs observational performance metrics
+consumption metrics primarily useful as a historical record of how the system has behaved
+so you can have some idea of where to start if your observational metrics begin to tank
+
+"Speaking of printf debugging, telemetry is essential for long-running tests.
+Even low-tech approaches like printfing the current set of metrics every so
+often (e.g., every 15 seconds), can help track down where something went into
+the weeds simply by inspecting a database or logfile. Imagine trying to figure
+out where the 4-hour web server test went off the rails at around the 3 1/2
+hour mark. This can can be utterly maddening without continuous telemetry!
+Of course, it’s also a good idea to go beyond this. The product should have
+a built-in way to collect this telemtry out in the wild, and correlate it back
+to key metrics. StatsD is a fantastic option."
+
+"This is where the idea of “key performance indicators” (KPIs) becomes very
+important. These are the performance metrics important enough to track at
+a management level, to the whole team how healthy the overall product is at
+any given time. In my past team who built an operating system and its components,
+this included things like process startup time, web server throughput, browser
+performance on standard industry benchmarks, and number of frames dropped
+in our realtime audio/video client, including multiple metrics apiece plus
+the abovementioned statistics metrics. These were of course in the regularly
+running pre- and post-commit test suites, but rolling them up in one place,
+and tracking against the goals, was a hugely focusing exercise.
+
+http://joeduffyblog.com/2016/11/30/15-years-of-concurrency/
+
+on STM: "it’s more important to encourage good concurrency architecture than
+it is to make poor ones “just work”"
+
+"I should also note that, for convenience, you could mark a type as immutable
+to indicate “all instances of this type are immutable.” This was actually one
+of the most popular features of all of this. At the end of the day, I’d estimate
+that 1/4-1/3 of all types in the system were marked as immutable:"
+
+interesting discussion about readonly being deep vs shallow
+
+this bit about ownership/isolation is very unusual
+
+"As a result, we eliminated all ambient side-effectful operations, leveraging capability objects instead." ?!?!!
+
+"This obviously covered I/O operations – all of which were asynchronous RPC
+in our system – but also even – somewhat radically – meant that even just getting
+the current time, or generating a random number, required a capability object.
+This let us model side-effects in a way the type-system could see, in addition
+to reaping the other benefits of capabilities."
+!!!!!!!
+***********
+
+"Our initial whack at this was to come up with shallow variants of all the
+permissions. This yielded keywords that became a never-ending source of jokes
+in our hallways: shreadable, shimmutable, and – our favorite – shisolated (which
+sounds like a German swear word when said aloud)."
+
+interesting bit about his work being the inverse of haskell's system
+in haskell, you're in a pure functional language with an escape hatch for mutation / side effects
+he was in the opposite world
+
+https://blog.rust-lang.org/2015/04/10/Fearless-Concurrency.html
+
+
