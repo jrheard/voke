@@ -7742,3 +7742,94 @@ good explanation
 
 http://blog.zulip.org/2016/10/13/static-types-in-python-oh-mypy/
 good info about type annotations in python 3
+
+oh god here's a misplaced comment about one of the joe duffy posts that ended up in the wrong file:
+interesting discussion of "conditional" contracts - ie whether they should be always-on
+or whether you should be able to say that some run in dev time, some in prod
+i like his breakdown of why contracts had to be a language-level feature and why they
+had to be always-on, makes sense to me
+
+=======
+
+12/26/16
+
+http://www.huffingtonpost.com.au/2015/05/13/andrew-ng_n_7267682.html
+"When I talk to researchers, when I talk to people wanting to engage in entrepreneurship,
+I tell them that if you read research papers consistently, if you seriously
+study half a dozen papers a week and you do that for two years, after those
+two years you will have learned a lot. This is a fantastic investment in your
+own long term development."
+
+"But that sort of investment, if you spend a whole Saturday studying rather
+than watching TV, there's no one there to pat you on the back or tell you you
+did a good job. Chances are what you learned studying all Saturday won't make
+you that much better at your job the following Monday. There are very few,
+almost no short-term rewards for these things. But it's a fantastic long-term
+investment. This is really how you become a great researcher, you have to read a lot."
+
+"For example, here is one thing we did, a little technical. Where do you get
+a lot of data for speech recognition? One of the things we did was we would
+take audio data. Other groups use maybe a couple thousand hours of data. We
+use a hundred thousand hours of data. That is much more rocket fuel than what
+you see in academic literature.
+Then one of the things we did was, if we have an audio clip of you saying something,
+we would take that audio clip of you and add background noise to it, like a
+clip recorded in a cafe. So we synthesize an audio clip of what you would sound
+like if you were speaking in a cafe. By synthesizing your voice against lots
+of backgrounds, we just multiply the amount of data that we have. We use tactics
+like that to create more data to feed to our machines, to feed to our rocket engines."
+
+======
+
+12/28/16
+
+https://www.youtube.com/watch?v=F1ka6a13S9I
+TODO watch the rest of https://www.youtube.com/user/lexfridman/videos
+
+talks about end-to-end deep learning, which is what he calls the trend where
+we used to have nns that had discrete outputs with small ranges, like 0/1, 0...1000, etc
+and now we have ones that have "rich" outputs, like taking a photo and outputting a string
+of english text that's a caption for the photo, etc.
+he says they're super cool but not the solution to everything
+
+apparently the deal with end-to-end DL is that you're cutting out intermediate representations
+like for instance, a traditional approach would be to go from audio -> phonemes -> transcript
+where phonemes are what you see in dictionary definitions - symbols that represent the sounds
+that "c", "a", and "t" make
+and end-to-end DL just goes straight from audio->transcript
+and he says that that sounds simple and makes for good PR, but only works some of the time
+
+he gives an example of x-rays of children's hands -> age
+says that this is a place where end-to-end won't work as well as the traditional (intermediate
+representation) approach, because you just don't have enough x-rays of children's hands
+makes sense
+so i guess end-to-end makes a lot of sense in contexts where you have an abundance of data
+
+says that right now we don't have enough data to make an end-to-end approach work well
+in the context of self-driving cars
+
+around 28 minute mark, gives a flowchart for what to do if your model's having trouble
+in different stages (training error, validation error, etc)
+
+around 33:00 he talks about "data synthesis" - generating random data you can use to help
+train your model (hopefully it's representative of what your model will see in the real world!)
+ha he says that simple approach won't actually work
+but if you do a bunch of work on top of it (re: lighting, blending, etc) you can make it work
+
+37:00 unified data warehouse
+
+40:00 talks about speech enabled reareview mirrors
+uses this as an example to show how if you have a preexisting giant amount of data, and you
+have a new similar-but-different problem, you can make some use of the preexisting data instead
+of just throwing it all away
+
+he makes the old set his training set, and splits the new set into his validation+test sets
+
+discusses human-level performance around 53:00
+
+good insight around 58:30 - if you've surpassed humans overall, you can still often
+find slices/subsets of your dataset/problem where you're still worse than humans, and then
+focus on those
+
+around 1:01:00 he defines human-level error
+
