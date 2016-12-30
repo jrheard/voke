@@ -7970,4 +7970,94 @@ because that's the only way we can communicate about these losses and basins"
 
 you can start with a high learning rate then decay it over time
 
+really enjoying this class so far
+
+lecture 4
+https://www.youtube.com/watch?v=Q_UWHTY_TEQ&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=4
+
+around 6-minute mark he walks through gradient calculation step by step in the graph
+which i had trouble understanding in the udacity materials
+df/dz is 3, which means that "the influence of z on the final value is positive, and with 'force' of 3"
+
+this is good so far
+i like that he devotes so much lecture time to this, it seems important and i really didn't
+understand it well
+
+=====
+
+12/30/16
+
+focuses on thinking about the network as a graph of computation
+
+apparently you hit neural network land once you start to have one or more hidden layers
+he talks briefly about how you have different options for activation functions
+and mentions that they introduce nonlinearities
+
+but doesn't explain what that means and why you would want that
+
+hopefully in the next lecture
+
+lecture 5
+https://www.youtube.com/watch?v=jhUZ800C650&index=5&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG
+
+"finetuning - we rarely ever train convnets from scratch" - ?
+
+ah ok this is like the rearview mirror example from ng's talk
+you train your cnn on imagenet, then finetune it on your own much smaller dataset
+
+caffe model zoo is a repository of pretrained CNNs
+
+http://blog.piekniewski.info/2016/12/29/can-a-deep-net-see-a-cat/
+figure 6 is really interesting
+he says that deep nets (particularly CNNs i think) care about textures - position doens't
+matter, you can chop up a picture of a cat into randomly positioned pieces and it still
+think that it's a cat
+
+ok back to the lecture
+
+history of training neural networks
+1957 - mark I perceptron
+binary stepwise function, 0 or 1, not differentiable so backpropagation wasn't possible (or invented yet)
+
+1986 you start to see something like backpropagation, loss function, gradient descent
+
+2006 - "unsupervised pretraining" - ?
+
+activation functions
+sigmoid, tanh, relu, etc
+
+sigmoid is bad because if you've got outputs like -10 or 10, etc, the "neuron" is "saturated"
+and the gradient "vanishes" - basically when you've got values like that going through a sigmoid
+function, the function has a slope of ~=0, and so all the inputs under it have tiny gradients
+
+sigmoid outputs are not zero-centered
+apparently that means that they converge slower during training/backpropagation
+
+tanh
+looks a lot like sigmoid, squashes numbers to range [-1, 1], zero-centered
+but it still kills gradients when saturated, like sigmoid does
+
+relu
+"it converges six times faster and we don't know why!" aaaaaaaaaaaaa
+people tend to initialize relu neurons with slightly positive biases, eg 0.01
+controversial, some people say it doesn't help
+
+leaky relu, max(0.01x, x)
+
+still unclear to me what the deal is with activation functions / nonlinearities
+http://cs231n.github.io/neural-networks-1/
+"Notice that the non-linearity is critical computationally - if we left it out, the two matrices
+could be collapsed to a single matrix, and therefore the predicted class scores would again
+be a linear function of the input. The non-linearity is where we get the wiggle."
+
+https://www.quora.com/What-is-the-role-of-the-activation-function-in-a-neural-network
+"the role of the activation function in a neural network is to produce a non-linear decision
+boundary via non-linear combinations of the weighted inputs."
+
+http://stats.stackexchange.com/questions/228296/what-is-the-purpose-of-a-neural-network-activation-function
+
+so it seems like you just literally need to have one or more functions in the pipeline
+that are _not straight lines_
+in order to end up with a "decision boundary" that is not a straight line and fits your dataset well
+
 
