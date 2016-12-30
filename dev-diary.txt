@@ -7818,7 +7818,7 @@ but if you do a bunch of work on top of it (re: lighting, blending, etc) you can
 
 37:00 unified data warehouse
 
-40:00 talks about speech enabled reareview mirrors
+40:00 talks about speech enabled rearview mirrors
 uses this as an example to show how if you have a preexisting giant amount of data, and you
 have a new similar-but-different problem, you can make some use of the preexisting data instead
 of just throwing it all away
@@ -7832,4 +7832,102 @@ find slices/subsets of your dataset/problem where you're still worse than humans
 focus on those
 
 around 1:01:00 he defines human-level error
+you want it to be near the bayes rate (optimal error rate)
+so a team of expert doctors rather than a single typical doctor, for instance
+
+around 1:05:00, what can AI/DL do?
+1) anything that a typical person can do within <1s of thinking (interesting heuristic)
+2) predicting the next outcome/action in a series
+
+TODO try out kaggle
+
+personal advice at the end: to get really good at a field, read a lot of papers and try to replicate results
+says it's an "incredibly reliable process"
+
+he says the trick to getting great at a new field is spending each weekend studying
+and replicating results for a year
+
+======
+
+12/29/16
+
+231n lecture 1
+https://www.youtube.com/watch?v=F-g0-6_RRUA&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=1
+history of vision
+543 million years ago the first eye is developed, "big bang" of evolution
+da vinci camera obscura in 16th century
+
+1959, experiment involving putting needles in live cat brains (?!)
+"almost 50% of your brain is involved in vision"
+"because it's so important and it's so damn hard"
+some (most? all?) visual neurons seem to be particularly interested in solid lines rather than eg a whole fish
+edges
+
+1963 block world, precursor to computer vision
+"it's the edges that define the shap"
+"start simple"
+
+summer 1966, MIT tries to solve vision in one summer with some interns
+
+david marr, 1970s, book "vision"
+"build a heirarchical model"
+input image -> "primal sketch" -> 2.5d sketch -> 3d model representation
+
+eyes, nose, mouth, hair separated by "springs" - distance between them can vary with some tolerance
+
+normalized cut, 1997, re: perceptual grouping
+looks like the magic lasso in photoshop
+"and you can see, the results are not that great"
+
+real-time face detection, 2001 - makes it to samsung cameras in 2006
+seems like this is where you start to see learning - doesn't sound like it's hand-coded
+
+feature recognition - "it's really hard to recognize an object by describing the whole thing"
+if you see a person but can't see the bottom half of them because it's occluded by a couch,
+you can still tell it's a person based on the remaining visible features
+
+benchmarking is important so that you can compare your results/approaches with each other
+pascal visual object challenge (20 object categories) 2006-2012
+
+image net (22k categories, 14M images) - this prof put that together
+seems like it was a response to the pascal object challenge, since there are >>>> 20 types of
+objects in the real world
+
+someone managed a big advance / improvement in error on imagenet in 2012, thanks to a CNN
+
+interesting bit about how she showed people complex images for 500ms and they were able to write
+whole paragraphs telling a story about the scene
+
+lecture 2
+https://www.youtube.com/watch?v=ZM4umP6F1Jc&index=2&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG
+nearest neighbor classifier
+cifar-10 dataset
+10 labels, 50k train images, 32x32px; 10k test images
+
+discussion of hyperparameters
+"very problem-dependent - must try them all out and see what works best"
+talks about validation set vs test set
+which algorithm you use is basically a hyperparameter as well
+
+k nearest neighbors not great for images
+
+ok so "parameters" is just another word for "weights"
+
+in linear classifier, talks about W as basically a stack of classifiers - your cat classifier,
+your dog classifier, your ship classifier - stacked on top of each other
+
+linear classifier really isn't looking very good
+you have to have a horse / plane / etc that's like exactly in the same position / setting
+as your horses in your training set were
+
+interesting bit about the image being a point in 3072-dimensional space
+and the classifiers being lines that try to separate the space into sections, or "color" it
+
+linear classifiers would work even worse on grayscale images than on RGB apparently
+
+introduces concept of a loss function
+
+
+lecture 3
+https://www.youtube.com/watch?v=qqBJl65fQck&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=3
 
