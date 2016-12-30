@@ -7931,3 +7931,43 @@ introduces concept of a loss function
 lecture 3
 https://www.youtube.com/watch?v=qqBJl65fQck&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=3
 
+talks more about loss function
+refers to the course notes, which i've never looked at before
+http://cs231n.github.io/linear-classify/
+
+interesting explanation of regularization
+so the idea is that you take your loss function and you add another function to it
+and that ends up being your "objective" function
+and so your loss function really wants to fit your training set as closely as possible
+and your regularization function wants to impose some sort of separate rules / structure / characteristics
+on top of your W (aka parameters)
+for instance, you want to have your parameters be close-ish to zero, and you want them to
+all be used, rather than having just a few really huge parameters and the rest are all at zero
+he uses the term "diffuse" weights
+you want to use all of your inputs
+
+i really wish this guy didn't take as many questions / comments from the class
+pretty distracting imo
+whatever i can just skip past them
+
+so far i've been enjoying this course as a supplement to the udacity material
+they've been doing a good job of giving you an intuition for what the different parts of these
+systems are _for_
+
+nice demo of optimization
+
+around 58:00 he talks about the "gradient check", which is basically just a term for when
+you've implemented gradient math by hand and you can check your math
+
+hyperparameters you need to worry about the most:
+learning rate (step size) and regularization strength
+
+at 1:04:30, he's trying to explain different characteristics you might see in your loss function
+based on whether your learning rate is too high or too low
+and he gets frustrated and says:
+"in general, when you talk about neural networks and optimization, you'll see a lot of handwaving
+because that's the only way we can communicate about these losses and basins"
+
+you can start with a high learning rate then decay it over time
+
+
