@@ -8209,3 +8209,204 @@ vggnet is a good architecture to mimic, simple enough to understand, good result
 
 interesting explanation of resnet / skips around 1:09:00
 hyperparameters onscreen at 1:11:30
+
+=====
+
+12/31/16
+
+http://karpathy.github.io/2015/03/30/breaking-convnets/
+"ConvNets express a differentiable function from the pixel values to class scores. For example,
+a ConvNet might take a 227x227 image and transforms these ~100,000 numbers through a wiggly
+function (parameterized by several million parameters) to 1000 numbers that we interpret
+as the confidences for 1000 classes (e.g. the classes of ImageNet)."
+
+"We compute the gradient just as before with backpropagation, and then we can perform an
+image update instead of a parameter update, with the end result being that we increase the
+score of whatever class we want. E.g. we can take the banana image and wiggle every pixel
+according to the gradient of that image on the cat class. This would change the image a tiny
+amount, but the score of cat would now increase. Somewhat unintuitively, it turns out that
+you don’t have to change the image too much to toggle the image from being classified correctly
+as a banana, to being classified as anything else (e.g. cat)."
+
+wiggle your pixels, not your parameters, gotcha
+i don't like how he uses "wiggle" in two different senses here - one sense is "so you don't just
+compute straight lines", the other sense is "the act of updating your parameters"
+great article otherwise though
+
+http://karpathy.github.io/2015/05/21/rnn-effectiveness/
+
+"RNNs combine the input vector with their state vector with a fixed (but learned) function
+to produce a new state vector. This can in programming terms be interpreted as running a
+fixed program with certain inputs and some internal variables. Viewed this way, RNNs essentially
+describe programs. In fact, it is known that RNNs are Turing-Complete in the sense that they
+can to simulate arbitrary programs (with proper weights). But similar to universal approximation
+theorems for neural nets you shouldn’t read too much into this. In fact, forget I said anything."
+
+https://www.youtube.com/watch?v=AgkfIQ4IGaM
+****************
+this is really really really helpful for reasoning about what's going on in CNNs
+
+http://karpathy.github.io/2016/05/31/rl/
+***** the top of this post is a goldmine if i ever learn what reinforcement learning is
+and get interested in learning more about it
+
+good explanation of the credit assignment problem
+
+"That’s the beauty of neural nets; Using them can feel like cheating: You’re allowed to have
+1 million parameters embedded in 1 teraflop of compute and you can make it do arbitrary things
+with SGD. It shouldn’t work, but amusingly we live in a universe where it does."
+
+so it seems like the idea is to have sgd and a simulation of your game running at the same time
+
+"With Policy Gradients we would take the two games we won and slightly encourage every single
+action we made in that episode. Conversely, we would also take the two games we lost and
+slightly discourage every single action we made in that episode."
+
+"As a last note, I’d like to do something I wish I had done in my RNN blog post. I think
+I may have given the impression that RNNs are magic and automatically do arbitrary sequential
+problems. The truth is that getting these models to work can be tricky, requires care and
+expertise, and in many cases could also be an overkill, where simpler methods could get you
+90%+ of the way there. The same goes for Policy Gradients. They are not automatic: You need
+a lot of samples, it trains forever, it is difficult to debug when it doesn’t work. One should
+always try a BB gun before reaching for the Bazooka."
+************
+
+lecture 8
+https://www.youtube.com/watch?v=wFG_JMQ6_Sk&index=8&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG
+classification + localization
+you train a CNN like before, except you take the last FC layer(s) off the top
+and you hook up a new set of layers and train them to predict a bounding box
+in order to classify + localize, use the new FC layers and the old ones too
+strap each set of FC layers to the top of the system in turn
+
+detection as classification
+brute force :/
+
+better solution is region proposal + classifier
+
+http://www.deeplearningweekly.com/blog/deep-learning-2016-the-year-in-review
+******* dude this article is a fucking gold mine
+https://aws.amazon.com/ec2/instance-types/p2/
+about $1/hour
+not sure how it compares to the previous gpu types
+
+GAN is interesting
+supposed to combat adversarial inputs
+i'm sure it could work on adversarial inputs that look to humans like static -
+but what about eg a panda image that's been subtly tweaked in ways that are imperceptible
+to humans, and so now it looks to the CNN like it's an ostrich?
+i don't see how the discriminator could filter that out
+
+hm or maybe i'm interpreting this wrong
+it looks like maybe the purpose isn't to have D fight against malicious inputs,
+but instead to have G be able to *generate* new data. that's an interesting angle
+could be a good way to expand datasets
+
+The paper " Generative Adversarial Text to Image Synthesis " presents an impressive examples
+of what GAN's are able to accomplish. The authors train a GAN to convert text descriptions
+into images.
+
+https://research.googleblog.com/2016/09/announcing-youtube-8m-large-and-diverse.html
+8 million labeled youtube videos
+
+"To address (2), we had to overcome the storage and computational resource bottlenecks that
+researchers face when working with videos. Pursuing video understanding at YouTube-8M’s scale
+would normally require a petabyte of video storage and dozens of CPU-years worth of processing.
+To make the dataset useful to researchers and students with limited computational resources,
+we pre-processed the videos and extracted frame-level features using a state-of-the-art deep
+learning model--the publicly available Inception-V3 image annotation model trained on ImageNet.
+These features are extracted at 1 frame-per-second temporal resolution, from 1.9 billion
+video frames, and are further compressed to fit on a single commodity hard disk (less than
+1.5 TB). This makes it possible to download this dataset and train a baseline TensorFlow
+model at full scale on a single GPU in less than a day! "
+
+http://nlpers.blogspot.de/2016/12/whence-your-reward-function.html
+
+"Delayed reward is one of the hardest issues in RL, because (a) it means you have to do a
+lot of exploration and (b) you have a significant credit assignment problem. For instance,
+if you imagine a variant of (pick your favorite video game) where you only get a +1/-1 reward
+at the end of the game that says whether you won or lost, it becomes much much harder to
+learn, even if you play 10 million frames or 10 billion frames.
+
+That's all to say: games are really nice settings for RL because there's a very well defined
+reward function and you typically get that reward very frequently. Neither of these things
+is going to be true in the real world, regardless of how much data you have."
+
+"There is the joke example in the R+N AI textbook where you give a vacuum cleaner a reward
+function for number of pieces of gunk picked up; the vacuum learns to pick up gunk, then
+drop it, then pick it up again, ad infinitum."
+
+"This is one reason I've spent most of my RL effort on imitation learning (IL) like things,
+typically where you can simulate an oracle. I've rarely seen an NLP problem that's been solved
+with RL where I haven't thought that it would have been much better and easier to just do
+IL. Of course IL has it's own issues: it's not a panacea."
+
+i haven't learned IL yet, but i wonder if i could teach a duelyst AI to play against me
+
+https://research.googleblog.com/2016/11/app-discovery-with-google-play-part-1.html
+
+"Our initial attempt was to build a deep neural network (DNN) trained to predict topics for
+an app based on words and phrases from the app title and description. For example, if the
+app description mentioned “frightening”, “very scary”, and “fear” then associate the “horror
+game” topic with it. However, given the learning capacity of DNNs, it completely “memorized”
+the topics for the apps in our small training data and failed to generalize to new apps it
+hadn’t seen before. "
+
+"While this architecture generalized well for popular topics like “social networking”, we
+ran into a new problem for more niche topics like “selfie”. The single classifier built to
+predict all the topics together focused most of its learning on the popular topics, ignoring
+the errors it made on the less common ones. To solve this problem we built a separate classifier
+for each topic and tuned them in isolation."
+
+they end up bringing in humans to help label their dataset
+
+"To evaluate {app, topic} pairs by human raters, we asked them questions of the form, “To
+what extent is topic X related to app Y?” Multiple raters received the same question and
+independently selected answers on a rating scale to indicate if the topic was “important”
+for the app, “somewhat related”, or completely “off-topic”. Our initial evaluations showed
+a high level of disagreement amongst the raters. Diving deeper, we identified several causes
+of disagreement: vague guidelines for answer selection, insufficient rater training, evaluating
+broad topics like “computer files” and “game physics” that applied to most apps or games.
+Tackling these issues led to significant gains in rater agreement. Asking raters to choose
+an explicit reason for their answer from a curated list further improved reliability. Despite
+the improvements, we sometimes still have to “agree to disagree” and currently discard answers
+where raters fail to reach consensus."
+
+https://research.googleblog.com/2016/12/app-discovery-with-google-play-part-2.html
+
+"To incorporate this app relatedness in our recommendations, we take a two pronged approach:
+(a) offline candidate generation i.e. the generation of the potential related apps that other
+users have downloaded, in addition to the app in question, and (b) online personalized re-ranking,
+where we re-rank these candidates using a personalized ML model. "
+
+https://news.ycombinator.com/item?id=13274545
+commentary on ML in general
+
+"One of the takeaways from this work is that re-ranking content, like related apps, is one
+of the critical ways of app discovery in the store, and can bring great value to the user
+without impacting perceived relevance. Compared to the control (where no re-ranking was done),
+we saw a 20% increase in the app install rate from the “You might also like” suggestions.
+This had no user perceivable change in latency."
+
+https://en.wikipedia.org/wiki/Nearest_neighbor_search
+
+https://ml.berkeley.edu/blog/2016/11/06/tutorial-1/
+******* this is good
+
+i like that they start with this emphasis on how ML is about "drawing lines through data"
+they introduce the term decision boundary really early on, whereas i've only seen it alluded to
+deep into several courses/etc, never properly defined
+
+https://ml.berkeley.edu/blog/2016/12/24/tutorial-2/
+glad to have a chance to learn more about perceptrons and SVMs, i don't know much about 'em
+
+super cool svm simulation
+
+https://ml.berkeley.edu/blog/2016/12/03/github/
+
+https://www.quora.com/When-should-I-use-Naive-Bayes-classifier-over-neural-networks
+naive bayes useful when you don't have enough data to train an NN
+
+https://en.wikipedia.org/wiki/Vantage-point_tree
+
+https://arxiv.org/pdf/1511.06422v7.pdf
