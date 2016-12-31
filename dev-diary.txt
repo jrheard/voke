@@ -8060,4 +8060,152 @@ so it seems like you just literally need to have one or more functions in the pi
 that are _not straight lines_
 in order to end up with a "decision boundary" that is not a straight line and fits your dataset well
 
+back to lecture
+activation function choice is still an extremely active area of research
+we don't really know what's good yet
+relu seems like a safe choice for now
 
+preprocess your data - zero-center it by subtracting the mean
+not as common in images
+also mentions PCA (decorrelating) and "whitening" data
+
+in image datasets, you can start by first calculating the "Mean image" - a [32,32,3] array -
+and subtracting it from all your datapoints to normalize them
+alternatively you can subtract the per-channel mean
+
+interesting demonstration of a ten-layer network collapsing to zero on initialization
+this is _really_ useful
+so basically initialization is important! you can really fuck things up if you don't initialize well!
+
+Xavier initialization, 2010
+divide by square root of number of input neurons
+W = np.random.randn(fan_in, fan_out) / np.sqrt(fan_in)
+works well with tanh, breaks in relu
+
+in relu land, this will work better:
+W = np.random.randn(fan_in, fan_out) / np.sqrt(fan_in)
+
+at 52:00, talks about batch normalization
+something about making unit gaussian activations (not sure what this means)
+
+you put batch normalization layers between your fully-connected layer and your activation function
+
+apparently batch normalization is actually really pretty sweet
+he says:
+improves gradient flow
+allows higher learning rates
+reduces strong dependence on initialization
+acts as a form of regularization
+
+around 1:00:00, he gives a good walkthrough of how to start building a NN from scratch
+and the different sanity checks you should be doing on your loss function as you tweak the system
+
+make sure that turning up regularization increases your loss
+make sure that you are able to overfit on a tiny slice of your data, ie loss goes to 0
+
+he suggests sampling random values of your hyperparameters and trying them
+says it's better than "grid search", fixed steps
+
+******************
+he's really focusing on giving us good intuition around how to interpret the behavior of these systems
+great stuff, a++
+
+he encourages plotting+visualizing your loss function and accuracy
+and noting the relationship between them
+
+lecture 6
+https://www.youtube.com/watch?v=egPTd9zZzec&index=6&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG
+
+oh my god at the 1:45 mark he talks about why you need activaction functions
+holy fucking shit
+"if you don't use an activation function, your capacity is equal to that of a linear classifier"
+activation functions give you "wiggle" that you can use to fit your data
+not a good explanation ://///////
+
+ok now we talk about alternatives to sgd
+apparently sgd is really slow
+
+you can add "momentum" to the equation
+
+this all feels like such a house of cards
+
+then there's nesterov momentum, which is momentum step + regular gradient step
+"lookahead" gradient step after the momentum step
+
+around 15:00 he says you really don't have to worry about local minima all that much
+"there are lots of local minima, but they're all at about the same loss" if you've got
+a really big neural network
+"so really there's no bad local minimum you converge to"
+"you'll almost always get the same loss over time"
+
+adagrad
+rmsprop is a modification to adagrad
+he says usually rmsprop is better (rmsprop was the one that was cited in a coursera slide)
+
+here he talks about adam, which i just saw somewhere yesterday, maybe on udacity material
+
+lol around 26:40 when he's like "that's usually .9, that other thing's usually .99...5"
+"no reason"
+"seems to work"
+
+around 29:00, on learning rates: start with a high learning rate, then decay it
+epoch: you've seen every training example one time
+
+he says adam is best
+
+so basically my understanding is that these systems are all about what you do after backpropagation
+when you want to tweak your weights
+sgd is basically just: take your gradient, head there by it times your small learning rate
+and all these other guys are that but a little more complex, with the intention of getting you
+to converge there at a noticeably faster rate
+which sounds good
+
+so use adam rather than sgd
+
+model ensembles
+"train multiple independent models, at test time average their results, you always get an extra 2% performance"
+???!?!?!?!??!?!?!?!
+
+you can approximate this by using some of your model's saved previous-epoch checkpoints and calling those
+independent models
+
+this guy's fucking insane
+
+ok, dropout time
+he says that dropout is basically equivalent to training a large ensemble of models that share parameters
+that's interesting
+
+if you use dropout, you have to remember to account for it at test time
+he says inverted dropout is pretty common, as opposed to scaling your stuff at test time
+
+http://cs231n.github.io/neural-networks-3/
+this is good shit
+note the summary at the end
+
+really really useful overview of convnet applications starting around 1:03:00 or so
+interesting bit about using them to identify tumors, roads, agricultural stuff, whales
+
+lecture 7
+https://www.youtube.com/watch?v=sHyIqu_S5Ks&index=7&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG
+
+convnets operate on volumes - they take volumes and return volumes
+
+around 15:00 talks about stride, padding
+god this part is always so boring
+
+anyway padding is useful so you can have hundreds of layers without shrinking the size of your representation
+
+pooling around 35:00, slide looks familiar
+
+alexnet hyperparameter numbers onscreen at 53:30
+
+another one's architecture onscreen at 59:16
+
+he says you can get rid of the final fully-connected layers at the top of a cnn
+and use average pooling instead
+i don't fully understand this bit about number of parameters
+
+vggnet is a good architecture to mimic, simple enough to understand, good results
+
+interesting explanation of resnet / skips around 1:09:00
+hyperparameters onscreen at 1:11:30
