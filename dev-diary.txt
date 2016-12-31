@@ -8461,5 +8461,25 @@ see human thought as fundamentally a model-building activity"
 i like that distinction between pattern recognition and model building, it does a good job
 of expressing what's bothered me about ML so far
 
+" Other human cognitive abilities remain difficult to understand computationally, including
+creativity, common sense, and general purpose reasoning. As long as natural intelligence remains
+the best example of intelligence, we believe that the project of reverse engineering the human
+solutions to difficult computational problems will continue to inform and advance AI."
+
+"While humans and neural networks may perform equally well on the MNIST digit recognition task
+ and other large-scale image classification tasks, it does not mean that they learn and think in the
+ same way. There are at least two important differences: people learn from fewer examples and
+ they learn richer representations, a comparison true for both learning handwritten characters as
+ well as learning more general classes of objects "
+
+they spend some time drilling into this atari challenge
+there's a game called frostbite that the dqn system sucked at
+and in general, on these games, the system took about 500x times longer to train than a human did
+(the human got 2 hours)
+
+i wonder if it would be possible to train an AI to play downwell
+
+"People never start completely from scratch, or even close to “from scratch,” and that is the secret
+ to their success."
 
 
