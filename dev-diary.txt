@@ -8410,3 +8410,56 @@ naive bayes useful when you don't have enough data to train an NN
 https://en.wikipedia.org/wiki/Vantage-point_tree
 
 https://arxiv.org/pdf/1511.06422v7.pdf
+"all you need is a good init" paper
+"Romero et al. (2015) stated that deep and thin networks are very hard to train by backpropagation
+if deeper than five layers, especially with uniform initialization."
+looks like this paper focuses on SGD - cs231n made it sound like sgd's basically obsoleted by adam
+
+https://web.stanford.edu/~awni/papers/relu_hybrid_icml2013_final.pdf
+from 2013, andrew ng
+relu gets 2% better performance than sigmoid in this situation
+
+"Both the leaky and standard ReL networks perform
+ similarly, suggesting the leaky rectifiers’ non-zero
+ gradient does not substantially impact training optimization.
+ During training we observed leaky rectifier
+ DNNs converge slightly faster, which is perhaps due
+ to the difference in gradient among the two rectifiers."
+
+let's take a quick break with https://www.infoq.com/presentations/Datalog
+a little too cutesy for me so far
+briefly turns into a sales pitch for datomic
+
+https://arxiv.org/pdf/1605.05396v2.pdf
+GAN paper
+on how to go from text -> pictures
+pretty insane stuff
+i wish the pictures were more than like 5px by 5px though
+
+https://arxiv.org/pdf/1611.05763v2.pdf
+"learning to reinforcement learn"
+over my head.
+
+https://arxiv.org/pdf/1604.00289v3.pdf
+"Building Machines That Learn and Think Like People"
+"hold your horses" basically
+
+"Beyond the specific ingredients in our proposal, we draw a broader distinction between two different
+computational approaches to intelligence. The statistical pattern recognition approach treats
+prediction as primary, usually in the context of a specific classification, regression, or control task.
+In this view, learning is about discovering features that have high value states in common – a
+shared label in a classification setting or a shared value in a reinforcement learning setting – across
+a large, diverse set of training data. The alternative approach treats models of the world as primary,
+where learning is the process of model-building. Cognition is about using these models to
+understand the world, to explain what we see, to imagine what could have happened that didn’t,
+or what could be true that isn’t, and then planning actions to make it so. The difference between
+pattern recognition and model-building, between prediction and explanation, is central to
+our view of human intelligence. Just as scientists seek to explain nature, not simply predict it, we
+see human thought as fundamentally a model-building activity"
+******
+
+i like that distinction between pattern recognition and model building, it does a good job
+of expressing what's bothered me about ML so far
+
+
+
