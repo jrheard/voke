@@ -8482,4 +8482,38 @@ i wonder if it would be possible to train an AI to play downwell
 "People never start completely from scratch, or even close to “from scratch,” and that is the secret
  to their success."
 
+this little interlude with A, B, and a box is interesting
+
+taking a break with https://www.youtube.com/watch?v=IbjF5VjniVE
+introduces unsupervised learning
+"adversarial learning is the best idea in machine learning in the last 20 years"
+***
+energy-based GAN
+
+it'd be fun to implement one of these myself
+and generate fucked-up dog photos like he has at 49:40
+
+this was a really cool talk
+
+back to the paper
+". Recent
+ work on hierarchical-DQNs shows that by providing explicit object representations to a DQN, and
+ then defining sub-goals based on reaching those objects, DQNs can learn to play games with sparse
+ rewards (such as Montezuma’s Revenge) by combining these sub-goals together to achieve larger
+ goals (Kulkarni, Narasimhan, Saeedi, & Tenenbaum, 2016)."
+
+"Autonomous driving. Perfect autonomous driving requires intuitive psychology. Beyond detecting
+ and avoiding pedestrians, autonomous cars could more accurately predict pedestrian
+ behavior by inferring mental states, including their beliefs (e.g., Do they think it is safe to
+ cross the street? Are they paying attention?) and desires (e.g., Where do they want to go? Do
+ they want to cross? Are they retrieving a ball lost in the street?). Similarly, other drivers on
+ the road have similarly complex mental states underlying their behavior (e.g., Do they want
+ to change lanes? Pass another car? Are they swerving to avoid a hidden hazard? Are they
+ distracted?). This type of psychological reasoning, along with other types of model-based
+ causal and physical reasoning, are likely to be especially valuable in challenging and novel
+ driving circumstances for which there is little relevant training data (e.g. navigating unusual
+ construction zones, natural disasters, etc.)"
+
+http://cs231n.github.io/understanding-cnn/
+
 
