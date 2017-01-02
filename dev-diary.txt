@@ -8516,4 +8516,144 @@ back to the paper
 
 http://cs231n.github.io/understanding-cnn/
 
+as usual, i like that they try to give you some intuition around: these categories of behavior
+indicate that your NN is looking good, these categories indicate that something is wrong, here's
+what you should do in those situations. really good stuff
+
+"ConvNets can be interpreted as gradually transforming the images into a representation in
+which the classes are separable by a linear classifier."
+
+this occlusion section is really cool!
+
+======
+
+1/1/17
+
+lecture 9
+https://www.youtube.com/watch?v=ASdbG_7KMhc&index=9&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG
+talks about visualizing convnets
+
+the bit about generating images based on the 4096-length code right before the output layer is cool
+
+http://torch.ch/
+https://github.com/BVLC/caffe
+
+https://deeplearning4j.org/compare-dl4j-torch7-pylearn
+
+https://github.com/wildermuthn/d4lj-iris-example-clj/blob/master/src/dl4j_clj_example/core.clj
+disgusting
+
+lecture 10
+https://www.youtube.com/watch?v=R1rXkuJ5w20&index=10&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG
+recurrent neural networks
+RNNs are all about giving you the ability to have sequences as your input and/or output
+rather than a single fixed item
+
+really cool exploration of different cells in the RNN
+
+some of this bit about LSTMs goes over my head but i think that's ok for now
+
+he says there's some relationship/similarity between LSTMs and resnets (the microsoft architecture)
+that it seems like we don't fully understand yet
+
+lecture 11
+https://www.youtube.com/watch?v=G3m6HusAJTg&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=11
+******* this looks like it's gonna be really fuckin useful
+
+data augmentation
+flip image horizontally
+take random crops / scales
+color jitter
+
+add noise at train time, deal with it at test time
+he really highly recommends data augmentation
+
+transfer learning, fine tuning
+recommendations onscreen at 21:00
+
+he says transfer learning with CNNs is "pervasive - the norm, not the exception"
+
+small filters are good around 28:00
+
+discussion of GPUs around 52:30
+
+lecture 12
+https://www.youtube.com/watch?v=b6RntuTiKQo&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=12
+
+oh god the mic's all fucked up
+
+overview of caffe source code around 4:00
+
+apparently everything they cover here is basically an alternative to tensorflow so i probably
+don't need to use caffe/torch/etc myself, good to know
+
+hdf5 - format for storing a bunch of pixel data contiguously on disk
+
+i'm not going to watch this whole thing.
+
+tensorboard sounds cool, wonder why udacity didn't mention it
+
+******
+possible fun convnet project: classifying movie posters
+unclear whether or not it'd be possible to generate them too though
+seems like generation only works on small image sizes
+but then how does deep dream work?
+
+
+http://www.bitfusion.io/2016/11/03/quick-comparison-of-tensorflow-gpu-performance-on-aws-p2-and-g2-instances/
+"Averaging the speedup across all four types of networks, the results show an approximate
+~2.42x improvement in performance – not bad for an instance which is only ~1.39 more expensive
+on an hourly on demand basis."
+
+not sure what bitfusion is - looks like it's probably only relevant if i'm a company
+
+https://arxiv.org/pdf/1609.05518.pdf
+"Towards Deep Symbolic Reinforcement Learning"
+
+=======
+
+1/2/17
+
+http://www.fast.ai/
+what is this?
+
+http://www.fast.ai/2016/12/29/uses-of-ai/
+***** good shit
+
+http://course.fast.ai/
+this launched on christmas eve
+i should probably take a look at it
+
+http://www.fast.ai/2016/12/19/favorite-posts/
+******** super good resource
+
+"As for your question about whether to front-load mathematical rigor, I think it’s good to
+focus on practical coding, since that way you can experiment and develop a good intuition
+and understanding of what you’re doing. Math is best learned on an as-needed basis - if you
+can’t understand something you’re trying to learn because math concepts are popping up you’re
+not familiar with, jump over to Khan Academy or to the absolutely beautiful 3 Blue 1 Brown
+Essence of Linear Algebra videos (great for visual thinkers) and get to work!"
+
+this makes me feel a little better :)
+
+ok back to https://arxiv.org/pdf/1609.05518.pdf
+
+"But as an approach to general intelligence, classical symbolic AI has been disappointing. A major
+ obstacle here is the symbol grounding problem [18, 19]. The symbolic elements of a representation
+ in classical AI – the constants, functions, and predicates – are typically hand-crafted, rather than
+ grounded in data from the real world. Philosophically speaking, this means their semantics are
+ parasitic on meanings in the heads of their designers rather than deriving from a direct connection
+ with the world. Pragmatically, hand-crafted representations cannot capture the rich statistics of realworld
+ perceptual data, cannot support ongoing adaptation to an unknown environment, and are an
+ obvious barrier to full autonomy. By contrast, none of these problems afflict machine learning."
+
+interesting counterpoint to the opacity of neural nets
+
+https://arxiv.org/pdf/1609.03126v3.pdf
+"ENERGY-BASED GENERATIVE ADVERSARIAL NETWORKS"
+
+cool bit in section 4 where they give detailed+specific info on initialization/hyperparameters
+
+many many many horrifying images in this paper
+
 
