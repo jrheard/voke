@@ -8864,5 +8864,85 @@ http://danielnouri.org/notes/2014/12/17/using-convolutional-neural-nets-to-detec
 
 data augmentation example
 
+http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf
+lecun traffic sign paper
+very short!
+2011, 5 pages
+
+"Additionally, we build a jittered dataset by adding 5
+ transformed versions of the original training set, yielding
+ 126,750 samples in total. Samples are randomly perturbed in
+ position ([-2,2] pixels), in scale ([.9,1.1] ratio) and rotation
+ ([-15,+15] degrees). ConvNets architectures have built-in
+ invariance to small translations, scaling and rotations. When
+ a dataset does not naturally contain those deformations,
+ adding them synthetically will yield more robust learning
+ to potential deformations in the test set."
+
+http://xgboost.readthedocs.io/en/latest/model.html
+
+"A very important fact about objective functions is they must always contain two parts: training
+loss and regularization. "
+
+this isn't well written, and udacity's going to cover this stuff soon
+closing tab
+
+=======
+
+1/4/17
+
+http://kevinhughes.ca/blog/tensor-kart
+
+"To create a training dataset, I wrote a program to take screenshots of my desktop synced
+with input from my Xbox controller. Then I ran an N64 emulator and positioned the window
+in the capture area. Using this program, I recorded a dataset about what my AI would see
+and what the appropriate action was"
+
+https://github.com/SullyChen/Autopilot-TensorFlow
+
+https://arxiv.org/pdf/1604.07316.pdf
+********* nvidia self-driving car paper
+good shit
+
+"Compared to explicit decomposition of the problem, such as lane marking detection,
+ path planning, and control, our end-to-end system optimizes all processing
+ steps simultaneously. We argue that this will eventually lead to better performance
+ and smaller systems. Better performance will result because the internal
+ components self-optimize to maximize overall system performance, instead of optimizing
+ human-selected intermediate criteria, e. g., lane detection. Such criteria
+ understandably are selected for ease of human interpretation which doesn’t automatically
+ guarantee maximum system performance. Smaller networks are possible
+ because the system learns to solve the problem with the minimal number of
+ processing steps."
+
+"Training with data from only the human driver is not sufficient. The network must
+ learn how to recover from mistakes. Otherwise the car will slowly drift off the road. The training
+ data is therefore augmented with additional images that show the car in different shifts from the
+ center of the lane and rotations from the direction of the road."
+
+"We follow the five convolutional layers with three fully connected layers leading to an output control
+ value which is the inverse turning radius. The fully connected layers are designed to function as a
+ controller for steering, but we note that by training the system end-to-end, it is not possible to make
+ a clean break between which parts of the network function primarily as feature extractor and which
+ serve as controller"
+
+
+https://github.com/kevinhughes27/TensorKart/blob/master/model.py
+here's that mario kart tensorflow model
+seems pretty simple!
+i think the hardest part sounds like it was the I/O and the data collection
+
+https://www.reddit.com/r/MachineLearning/comments/50eokb/which_one_should_i_choose_keras_tensorlayer/
+sounds like keras is what people use
+
+https://medium.com/self-driving-cars/tensorflow-vs-tf-learn-vs-keras-vs-tf-slim-b83811966020#.g7rj8e9gg
+oh hey this is one of our instructors
+
+ok so anyway the impression i'm getting is that it makes plenty of sense for udacity to
+be recommending that we learn keras, sounds like lots of people use it
+
+https://keras.io/
+
+this looks pretty good man
 
 
