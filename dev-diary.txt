@@ -8656,4 +8656,213 @@ cool bit in section 4 where they give detailed+specific info on initialization/h
 
 many many many horrifying images in this paper
 
+https://medium.com/@ageitgey/machine-learning-is-fun-part-3-deep-learning-and-convolutional-neural-networks-f40359318721#.b2887vaxx
+
+decent high-level article, good pictures
+***** GOOD SHIT TOWARD THE BOTTOM
+example code including AUGMENTATION!
+apparently something called "tflearn" comes with that
+
+https://medium.com/@ageitgey/machine-learning-is-fun-part-4-modern-face-recognition-with-deep-learning-c3cffc121d78#.i7kdkw1mr
+
+cool example, ferrell+chad+fallon gif, demo code at the end
+
+https://medium.com/@ageitgey/machine-learning-is-fun-part-2-a26a10b68df3#.6ygreedf9
+this is pretty cool
+he generates mario levels
+
+http://colah.github.io/posts/2014-03-NN-Manifolds-Topology/
+
+"However, there remain a number of concerns about them. One is that it can be quite challenging
+to understand what a neural network is really doing. If one trains it well, it achieves high
+quality results, but it is challenging to understand how it is doing so. If the network fails,
+it is hard to understand what went wrong."
+
+ok i do not understand this article
+
+http://colah.github.io/posts/2014-07-Understanding-Convolutions/
+
+no, i don't understand this either
+maybe this guy isn't good at explaining things?
+or i'm dumb.
+also this blog makes my chrome almost crash every time i try to read it
+
+anyway http://tflearn.org/ looks cool
+
+"Note: TF Learn is at an early development stage. Contributions are more than welcome!"
+
+this is probably why i haven't seen it mentioned in any of the materials i've seen
+
+repo started on march 27 of 2016
+
+anyway long story short, when i work on toy projects i'll use tflearn
+
+http://setosa.io/ev/image-kernels/
+more interactive than you'd expect, which is cool
+
+https://arxiv.org/pdf/1506.03500.pdf
+another reference to word2vec
+https://en.wikipedia.org/wiki/Word2vec
+these images are pretty bad, dude
+
+https://blog.acolyer.org/2017/01/02/interaction-networks-for-learning-about-objects-relations-and-physics/
+
+implementation a bit over my head
+let's take a look at the experiments portion
+
+"Our interaction network implementation is the first learnable physics engine than can scale
+up to real-world problems, and is a promising template for new AI approaches to reasoning
+about other physical and mechanical systems, scene understanding, social perception, hierarchical
+planning, and analogical reasoning."
+
+blog author points out -
+"Now we just need to bolt-on a perceptual front-end that can infer objects and relations
+from raw observations!"
+
+lecture 13
+https://www.youtube.com/watch?v=yCrkzVFsEX0&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=13
+
+segmentation
+
+recurrent convolutional neural network
+
+instance segmentation - telling individual cows apart
+
+attention
+
+i think i should work through assignment 3 at some point
+
+apparently soft attention is good
+
+ok time to go back to the udacity course, got my limit increased
+
+i wonder if i can get that visualization system to work
+
+cool, classifying traffic signs with accuracy 0.929 on the test set, seems pretty sweet
+
+taking a break for now, will tackle part 3 tomorrow
+
+TODO consider printing out some of the misclassifications
+
+======
+
+1/4/16
+
+lecture 14
+https://www.youtube.com/watch?v=k645B_f4a6Y&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=14
+
+video
+don't worry about motion to start off
+single-frame convnets work pretty well
+doing a ton of extra work to go across multiple frames in a complex way bought them a whole 1.6% increase
+
+rnn convnet
+
+unsupervised
+
+goal of supervised learning:
+you have a dataset X with some labels Y
+and you want to learn a _function_ that maps an x to a y
+
+autoencoder
+so you use an autoencoder to reduce the dimensionality of your xs and produce zs
+then you somehow plug in the autoencoder system into a supervised system
+he says you use it to "initialize" the supervised system
+it's unclear if he means that you give the zs to the system, or you reuse the weights
+of the autoencoder somehow
+seems like you probably use the zs
+
+he says autoencoders don't seem to work well in practice
+
+the idea with autoencoders is to have the system learn the identity function
+but the system has a bottleneck in the  middle
+so it's forced to discard some irrelevant aspects of the data
+
+variational autoencoder - lots of statistics
+lots of math.
+
+he says traditional autoencoders "not used much any more"
+
+GANs - "can we generate images with less math?" - yes please!
+
+multiscale GANs
+
+lecture 15
+https://www.youtube.com/watch?v=qtm4JgbxuEc&list=PLLvH2FwAQhnpj1WEB-jHmPuUeQ8mX-XXG&index=15
+
+goog
+started with unsupervised learning
+but supervised learning works really well, so they decided to focus on it
+
+he sees a general trend from multi-step systems to end-to-end systems
+says that multi-step systems can cause impediments to optimization, because at every stage
+of the system you're optimizing it relative to some metric, but it may not be the right metric
+for the system as a whole
+
+really really interesting that at one point he refers to being able to fit models on a mobile device
+i always figured that the models were all server-side
+i mean obviously they have to be *trained* offline / server-side / etc
+but i never thought about whether or not they could be *deployed* client-side afterward
+interesting!
+
+he says embeddings are great
+you want to embed eg words in a really high (100 or 1000, etc)-dimensional space
+so that they end up being really near each other if they have similar meanings
+
+he says that if you've got an awesome model but it takes too much compute,
+you can "quantize", which seems to mean reducing precision of your numbers
+eg going from 32 bits to 8 bits
+
+distillation
+when you have a big model and you want to make a smaller version of it that can fit on a phone
+your big model takes a picture as input and returns a softmax vector as output
+usually when you train a model, you're telling it it should be targeting one-hot vectors
+instead of that, try "softening" the good model's softmax output,
+and have the small model's training phase try to target some _combination_ of the one-hot vectors
+and the softened softmax vectors
+
+"soft targets are a VERY good regularizer!" - hm
+says they "enrich gradients", so you train really fast
+
+https://medium.com/@Moscow25/gans-will-change-the-world-7ed6ae8515ca#.6881helpr
+this is a pretty decent article actually
+cool example images
+
+https://github.com/moscow25/deep_draw/blob/master/learning/draw_poker.py
+poker cnn ai
+
+https://blog.ought.com/nips-2016-875bb8fadb8c#.4cvxqtx20
+"what methods win Kaggle competitions? Gradient tree boosting (especially XGBoost) and deep
+neural nets (especially convolutional nets for images and RNNs for some time series problems)"
+
+"Current machine learning techniques work best when training data and real data come from
+the same distribution. When it’s likely that an algorithm will be applied in a setting that
+is different from the training setting, it can be good to have the test set come from a different
+distribution than the training set, hopefully mirroring how the real application data will
+again come from a different distribution. This way, you get a better sense for how the algorithm
+does under distribution shift."
+
+seems wise
+
+https://gab41.lab41.org/batch-normalization-what-the-hey-d480039a9e3b#.ze3f1qpuj
+bbbbb
+
+http://yerevann.com/a-guide-to-deep-learning/?utm_campaign=Revue%20newsletter&utm_medium=Newsletter&utm_source=revue
+*** good list of deep learning links
+
+https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine
+
+https://deeplearning4j.org/use_cases.html
+************** good shit, examples/ideas for deep learning
+
+http://setosa.io/ev/principal-component-analysis/
+******* cool interactive visualization
+
+https://blog.acolyer.org/2017/01/03/matching-networks-for-one-shot-learning/
+
+http://danielnouri.org/notes/2014/12/17/using-convolutional-neural-nets-to-detect-facial-keypoints-tutorial/#dropout
+
+data augmentation example
+
+
 
