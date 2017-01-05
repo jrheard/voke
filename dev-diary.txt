@@ -9051,6 +9051,78 @@ the randomly initialized weights would wreck the learned weights in the convolut
 In our case this is why we first train the top-level classifier, and only then start fine-tuning
 convolutional weights alongside it."
 
+"fine-tuning should be done with a very slow learning rate, and typically with the SGD optimizer
+rather than an adaptative learning rate optimizer such as RMSProp. This is to make sure that
+the magnitude of the updates stays very small, so as not to wreck the previously learned
+features."
 
+so what he does is _reuse_ his previously trained fully-connected layers, from earlier in this article
 
+=====
 
+1/5/17
+
+https://github.com/fchollet/keras/blob/master/examples/neural_style_transfer.py
+"a loss function
+ that has 3 components: "style loss", "content loss",
+ and "total variation loss""
+
+https://github.com/fchollet/keras-resources
+
+https://github.com/sherjilozair/dqn
+will come back to this later
+uses openai gym, keras, dqn
+
+https://yanpanlau.github.io/2016/07/10/FlappyBird-Keras.html
+useful article
+
+he converts to grayscale, downscales images to 80x80, and sends four images at a time
+to the network so that it can get a sense of velocity (necessary?)
+
+useful metaphor of deep q-learning network as a compressed strategy guide
+
+https://github.com/maxpumperla/hyperas
+****** THIS LOOKS USEFUL
+https://github.com/hyperopt/hyperopt
+
+https://github.com/transcranial/keras-js this looks pretty sweet
+
+https://github.com/fchollet/keras/blob/master/examples/deep_dream.py
+TODO read+understand this, try it out, attempt to duplicate it
+
+https://arxiv.org/pdf/1611.01578v1.pdf
+
+"On the CIFAR-10 dataset, our method,
+ starting from scratch, can design a novel network architecture that rivals the best
+ human-invented architecture in terms of test set accuracy. Our CIFAR-10 model
+ achieves a test error rate of 3.84, which is only 0.1 percent worse and 1.2x faster
+ than the current state-of-the-art model."
+
+"Our work is based on the observation that the structure and connectivity of a
+ neural network can be typically specified by a variable-length string."
+
+https://arxiv.org/pdf/1512.03385v1.pdf
+
+this is the resnet paper
+so it looks like the basic deal with resnet was:
+boy, it seems like the more layers we add to our networks, the better they perform -
+but we've been running into gradient / initialization issues when our networks get too deep.
+or maybe the issues aren't related to gradients
+lol i see now - "The reason for such optimization difficulties will be studied in the future."
+hilarious!
+
+batch normalization and regularization seems to help, but what if we did this other thing instead?
+and "this other thing" is these shortcut connections
+
+https://www.nervanasys.com/demystifying-deep-reinforcement-learning/
+
+this is a solid intro
+
+interesting part:
+"This is a classical convolutional neural network with three convolutional layers, followed
+by two fully connected layers. People familiar with object recognition networks may notice
+that there are no pooling layers. But if you really think about it, pooling layers buy you
+translation invariance – the network becomes insensitive to the location of an object in
+the image. That makes perfectly sense for a classification task like ImageNet, but for games
+the location of the ball is crucial in determining the potential reward and we wouldn’t want
+to discard this information!"
