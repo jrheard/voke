@@ -8945,4 +8945,112 @@ https://keras.io/
 
 this looks pretty good man
 
+https://github.com/fchollet/keras/issues/1711
+cross-validation tips
+
+https://keras.io/getting-started/faq/
+********* good tips
+interesting bit about getting the output of intermediate layers
+you can do model.get_layer('foo').output
+
+note the bit about EarlyStopping, lets you stop automatically when your validation loss stops decreasing
+
+*** note freezing a model
+useful for fine-tuning
+trainable=False
+
+keras.applications has pretrained models+weights
+
+this is one super weird thing: it's impossible to see a version history / changelog of keras
+there are just opaque version numbers with no written description of what changed between them
+no blog / etc
+frustrating
+
+https://keras.io/applications/
+has examples of how to use the pretrained models/weights
+
+https://blog.keras.io/how-convolutional-neural-networks-see-the-world.html
+********** THIS IS USEFUL
+"Note that we only go up to the last convolutional layer --we don't include fully-connected
+layers. The reason is that adding the fully connected layers forces you to use a fixed input
+size for the model (224x224, the original ImageNet format). By only keeping the convolutional
+modules, our model can be adapted to arbitrary input sizes (defined by img_width and img_height)."
+
+gives example of setting weights per layer
+
+"A remarkable observation: a lot of these filters are identical, but rotated by some non-random
+factor (typically 90 degrees). This means that we could potentially compress the number of
+filters used in a convnet by a large factor by finding a way to make the convolution filters
+rotation-invariant. I can see a few ways this could be achieved --it's an interesting research
+direction."
+
+this is a really good post
+
+"Deep learning may not be intelligence is any real sense, but it's still working considerably
+better than anybody could have anticipated just a few years ago. Now, if only we understood
+why... ;-)"
+
+l o fuckin l
+
+https://blog.keras.io/building-autoencoders-in-keras.html
+
+"To build an autoencoder, you need three things: an encoding function, a decoding function,
+and a distance function between the amount of information loss between the compressed representation
+of your data and the decompressed representation (i.e. a "loss" function)."
+
+"Are they good at data compression?
+ Usually, not really. In picture compression for instance, it is pretty difficult to train
+ an autoencoder that does a better job than a basic algorithm like JPEG, and typically the
+ only way it can be achieved is by restricting yourself to a very specific type of picture
+ (e.g. one for which JPEG does not do a good job). The fact that autoencoders are data-specific
+ makes them generally impractical for real-world data compression problems: you can only
+ use them on data that is similar to what they were trained on, and making them more general
+ thus requires lots of training data. But future advances might change this, who knows."
+
+so basically he says that autoencoders aren't useful, he's just made this tutorial
+because lots of beginners have heard of them
+
+"In practical settings, autoencoders applied to images are always convolutional autoencoders
+--they simply perform much better."
+
+*********he gives an example of using tensorboard with keras!!!!!!!
+
+holy shit it looks like it's really good at denoising
+these things should be able to solve captchas like they're nothing
+
+https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html
+
+this is really useful
+talks about using word2vec / glove
+
+https://blog.keras.io/building-powerful-image-classification-models-using-very-little-data.html
+******** use this for movie poster classification
+
+"Training a convnet from scratch on a small image dataset will still yield reasonable results,
+without the need for any custom feature engineering. Convnets are just plain good. They are
+the right tool for the job."
+**** coverage of augmentation in keras
+
+good coverage of how to fight overfitting (regularization, reduce number of parameters)
+
+i hadn't realized that reducing your number of parameters was useful for fighting overfitting -
+i figured it was just a good idea to keep your model from taking too much compute
+
+dude this keras blog is just a total fucking goldmine
+
+he computes the bottleneck features just once and reuses them for efficiency
+i wouldn't necessarily have that constraint, i think, since i can use an ec2 p2
+"Note that this prevents us from using data augmentation."
+
+********
+THIS IS A REALLY GOOD GUIDE ON FINE TUNING
+"in order to perform fine-tuning, all layers should start with properly trained weights:
+for instance you should not slap a randomly initialized fully-connected network on top of
+a pre-trained convolutional base. This is because the large gradient updates triggered by
+the randomly initialized weights would wreck the learned weights in the convolutional base.
+In our case this is why we first train the top-level classifier, and only then start fine-tuning
+convolutional weights alongside it."
+
+
+
 
