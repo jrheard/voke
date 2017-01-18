@@ -9126,3 +9126,61 @@ translation invariance – the network becomes insensitive to the location of an
 the image. That makes perfectly sense for a classification task like ImageNet, but for games
 the location of the ball is crucial in determining the potential reward and we wouldn’t want
 to discard this information!"
+
+"A simple and effective fix for the above problem is ε-greedy exploration – with probability
+ε choose a random action, otherwise go with the “greedy” action with the highest Q-value.
+In their system DeepMind actually decreases ε over time from 1 to 0.1 – in the beginning
+the system makes completely random moves to explore the state space maximally, and then it
+settles down to a fixed exploration rate."
+
+https://www.nervanasys.com/openai/
+kinda light on info
+
+https://lwn.net/Articles/315022/
+systemtap
+
+https://onesignal.com/blog/rust-at-onesignal/
+good rust post
+
+https://blog.acolyer.org/2017/01/05/unsupervised-learning-of-3d-structure-from-images/
+seems pretty insane
+
+https://openai.com/blog/universe/
+
+"In a standard training regime, we initialize agents from scratch and let them twitch randomly
+through tens of millions of trials as they learn to repeat actions that happen to lead to
+rewarding outcomes."
+
+i like that wording
+
+i wonder if i could make an isaac AI
+
+googlenet: fast, accurate
+
+=========
+
+1/6/17
+
+https://blog.acolyer.org/2017/01/06/strategic-attentive-writer-for-learning-macro-actions/
+
+straw could be useful for an isaac ai
+"STRAW consists of two modules working in concert. The action module is responsible for translating
+input from the environment into an action plan. The commitment module decides how long to
+stick with the current action plan vs abandoning it and forming a new plan."
+
+https://blog.acolyer.org/2016/10/10/asynchronous-methods-for-deep-reinforcement-learning/
+
+======
+
+1/14/17
+
+five distortion coefficients
+k1 k2 p1 p2 k3
+
+======
+
+1/18/17
+
+http://martin.zinkevich.org/rules_of_ml/rules_of_ml.pdf
+
+
