@@ -9183,4 +9183,131 @@ k1 k2 p1 p2 k3
 
 http://martin.zinkevich.org/rules_of_ml/rules_of_ml.pdf
 
+"Rule #3: Choose machine learning over a complex heuristic.
+ A simple heuristic can get your product out the door. A complex heuristic is unmaintainable."
 
+****** good shit
+
+" How to integrate your model into your application. You can either apply the model live, or
+ pre­compute the model on examples offline and store the results in a table. For example,
+ you might want to pre­classify web pages and store the results in a table, but you might
+ want to classify chat messages live."
+
+"Rule #10: Watch for silent failures.
+ This is a problem that occurs more for machine learning systems than for other kinds of
+ systems. Suppose that a particular table that is being joined is no longer being updated. The
+ machine learning system will adjust, and behavior will continue to be reasonably good, decaying
+ gradually. Sometimes tables are found that were months out of date, and a simple refresh
+ improved performance more than any other launch that quarter!"
+
+"Rule #15: Separate Spam Filtering and Quality Ranking in a Policy Layer.
+ Quality ranking is a fine art, but spam filtering is a war. The signals that you use to determine
+ high quality posts will become obvious to those who use your system, and they will tweak their
+ posts to have these properties. Thus, your quality ranking should focus on ranking content that
+ is posted in good faith. You should not discount the quality ranking learner for ranking spam
+ highly. Similarly, “racy” content should be handled separately from Quality Ranking.
+ Spam filtering is a different story. You have to expect that the features that you need to generate
+ will be constantly changing. Often, there will be obvious rules that you put into the system (if a
+ post has more than three spam votes, don’t retrieve it, et cetera). Any learned model will have to
+ be updated daily, if not faster. The reputation of the creator of the content will play a great role."
+
+talks about transformations of input: discretization (taking continuous feature like age, and turning
+it into several features that are buckets - 1 if age between 18 and 35, etc) and crosses
+
+"Rule #30: Importance weight sampled data, don’t arbitrarily drop it!
+ When you have too much data, there is a temptation to take files 1­12, and ignore files 13­99.
+ This is a mistake: dropping data in training has caused issues in the past for several teams (see
+ Rule #6). Although data that was never shown to the user can be dropped, importance
+ weighting is best for the rest. Importance weighting means that if you decide that you are going
+ to sample example X with a 30% probability, then give it a weight of 10/3. With importance
+ weighting, all of the calibration properties discussed in Rule #14 still hold."
+
+"Rule #33: If you produce a model based on the data until January 5th, test the model on
+ the data from January 6th and after.
+ In general, measure performance of a model on the data gathered after the data you trained the
+ model on, as this better reflects what your system will do in production. If you produce a model
+ based on the data until January 5th, test the model on the data from January 6th. You will
+ expect that the performance will not be as good on the new data, but it shouldn’t be radically
+ worse. Since there might be daily effects, you might not predict the average click rate or
+ conversion rate, but the area under the curve, which represents the likelihood of giving the
+ positive example a score higher than a negative example, should be reasonably close"
+
+
+https://research.google.com/pubs/pub43146.html
+zzzzzzz
+
+
+=====
+
+1/23/17
+
+https://blog.discordapp.com/how-discord-stores-billions-of-messages-7fa6ec7ee4c7#.5bbe5x3to
+
+"Deleting a column and writing null to a column are the exact same thing. They both generate
+a tombstone. Since all writes in Cassandra are upserts, that means you are generating a tombstone
+even when writing null for the first time. In practice, our entire message schema contains
+16 columns, but the average message only has 4 values set. We were writing 12 tombstones
+into Cassandra most of the time for no reason. The solution to this was simple: only write
+non-null values to Cassandra."
+
+**********
+_really_ interesting dig into a problem where one channel had deleted all of their messages
+except one, good diagnosis+explanation
+
+https://blog.twitter.com/2010/announcing-snowflake
+
+====
+
+1/26/17
+
+https://blog.acolyer.org/2017/01/26/the-truth-the-whole-truth-and-nothing-but-the-truth-a-pragmatic-guide-to-assessing-empirical-evaluations/
+
+interesting bit about gmail having a fast and slow path, bimodal distribution that only becomes
+obvious if you're looking at the histogram, and so if you try to reason about the situation
+by assuming that you're dealing with a normal distribution, all of your reasoning is invalid
+
+this "In our experience, while X seems obvious and easy to avoid, in reality, it is far from it"
+construction they keep repeating is cute and all, but "it is far from it" is a super weird phrase
+
+http://blog.beeminder.com/chelsea/
+
+http://blog.beeminder.com/akrasia/
+
+"Here’s a ubiquitous example. Why not save money by buying bulk-size candy? It’s technically
+entirely irrational not to. You should buy the bulk size, save the money, and then ration
+it to match the pace you’d eat it at when Gbuying the individual sizes. Same consumption rate,
+less cost. The problem is your future self won’t be rational with a pile of candy in the
+house. Sugar is a bit addictive, after all. So it’s worth spending some extra money to constrain
+the choices of your gluttonous future self. Similarly, some smokers buy cigarettes by the
+pack instead of the carton, paying a hefty premium to throttle their future consumption"
+
+interesting!
+
+http://blog.beeminder.com/flexbind/#TOI1
+mentions focused time per week
+here is a goal i should look into setting up:
+# of hours of time spent in rescuetime's FocusTime per week
+
+http://blog.beeminder.com/burnout/
+
+"Not everyone views it this way but to me Beeminder is the nuclear option. Try every other
+lifehack in the book to get yourself to do what you want to do. Establish habits, set up
+environmental triggers, success spirals, social support, you name it. Beemind everything
+as well, but whenever possible find ways to keep that sword of Damocles securely tethered
+to the ceiling. "
+
+=====
+
+1/27/17
+
+udacity stuff
+let's review:
+HLS color space
+S channel seems good for finding lane lines, isn't as impacted by shadows for some reason
+sobel gradients on the x and y axis
+x axis seems best for finding lane lines, since they're mostly vertical
+
+"At this point, it's okay to detect edges around trees or cars because these lines can be
+mostly filtered out by applying a mask to the image and essentially cropping out the area
+outside of the lane lines. It's most important that you reliably detect different colors
+of lane lines under varying degrees of daylight and shadow."
